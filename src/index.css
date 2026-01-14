@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body, #root, .App {
+    background-color: #6C7293 !important; /* Figma wala background */
+    background: #F4F7FE !important;
+    
+}
+
+/* Agar koi div green hai to usay bhi force dain */
+div[class*="bg-green"], div[style*="background: green"] {
+    background-color: transparent !important;
+}
+
+/* Sidebar aur Cards ko white rehne dain */
+.ant-layout-sider, .ant-card, .bg-white {
+    background-color: #ffffff !important;
+     border-radius: 20px !important;
+     margin: 12px;
+}
+
+/* Sidebar Active Item Styling */
+.sidebar-menu .ant-menu-item-selected {
+    background-color: #0A5BE2 !important;
+    color: white !important; /* Figma Blue */
+    font-weight: 700;
+    border-radius: 15px !important;
+}
+
+.sidebar-menu .ant-menu-item {
+    margin-bottom: 8px !important;
+    border-radius: 20px !important;
+    text-decoration-line: none !important;
+}
+.logout-btn{
+border:1px solid;
+border-color: #8A8A8F;
+}

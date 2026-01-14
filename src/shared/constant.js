@@ -1,0 +1,41 @@
+export const ENVIRONMENTS = {
+  DEVELOPMENT: "development",
+  PRODUCTION: "production"
+};
+export const DISPUTE_TYPES = [
+  { label: "General", value: "general" },
+  { label: "Session", value: "session" },
+];
+
+export const PRIORITIES = [
+  { label: "High", value: "High" },
+  { label: "Mid", value: "Mid" },
+  { label: "Low", value: "Low" },
+];
+
+export const STATUSES = [
+  { label: "Pending", value: "Pending" },
+  { label: "In Process", value: "In Process" },
+  { label: "Resolved", value: "Resolved" },
+  { label: "Escalated", value: "Escalated" },
+  { label: "Closed", value: "Closed" },
+];
+
+export const SideBarMenuList = [
+  {
+    id: 1,
+    to: "/dashboard",
+    label: "Dashboard",
+    langLabel: "Dashboard",
+    permission: "Dashboard",
+    icon: "Test",
+  },
+  {
+    id: 2,
+    to: "/user",
+    label: "Users",
+    langLabel: "users",
+    icon: "Test",
+  },
+
+];

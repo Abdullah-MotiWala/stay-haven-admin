@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="434.398" height="468.599" viewBox="0 0 434.398 468.599">
+  <defs>
+    <filter id="Mask" x="0" y="0" width="428.213" height="468.599" filterUnits="userSpaceOnUse">
+      <feOffset dy="13" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="12.5" result="blur"/>
+      <feFlood flood-color="#3a6faf" flood-opacity="0.078"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Mask-2" x="0" y="0" width="428.213" height="468.599" filterUnits="userSpaceOnUse">
+      <feOffset dy="13" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="12.5" result="blur-2"/>
+      <feFlood flood-color="#3a6faf" flood-opacity="0.078"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-path">
+      <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#Mask)">
+        <path id="Mask-3" data-name="Mask" d="M0,171.224a51.943,51.943,0,0,1,16.834-38.281L155.378,5.881a36.36,36.36,0,0,1,49.736.547l132.1,126.617a51.943,51.943,0,0,1,16,37.5V350.96a38.957,38.957,0,0,1-38.957,38.957H38.957A38.957,38.957,0,0,1,0,350.96Z" transform="translate(0 3.68)" fill="#e3ecf3"/>
+      </g>
+    </clipPath>
+    <filter id="Rectangle" x="12" y="148.064" width="404.213" height="292.535" filterUnits="userSpaceOnUse">
+      <feOffset dy="-3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="8.5" result="blur-3"/>
+      <feFlood flood-color="#1c3d64" flood-opacity="0.071"/>
+      <feComposite operator="in" in2="blur-3"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle_Copy" x="27" y="283.379" width="374.213" height="142.22" filterUnits="userSpaceOnUse">
+      <feOffset dy="-3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3.5" result="blur-4"/>
+      <feFlood flood-color="#406ca0" flood-opacity="0.027"/>
+      <feComposite operator="in" in2="blur-4"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Oval_2" x="318.979" y="343.17" width="115.42" height="115.42" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="4" result="blur-5"/>
+      <feFlood flood-color="#ffb240" flood-opacity="0.404"/>
+      <feComposite operator="in" in2="blur-5"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Artwork" transform="translate(37.5 24.05)">
+    <g id="envelope" transform="translate(0 0.45)">
+      <g transform="matrix(1, 0, 0, 1, -37.5, -24.5)" filter="url(#Mask-2)">
+        <path id="Mask-4" data-name="Mask" d="M0,171.224a51.943,51.943,0,0,1,16.834-38.281L155.378,5.881a36.36,36.36,0,0,1,49.736.547l132.1,126.617a51.943,51.943,0,0,1,16,37.5V350.96a38.957,38.957,0,0,1-38.957,38.957H38.957A38.957,38.957,0,0,1,0,350.96Z" transform="translate(37.5 28.18)" fill="#e3ecf3"/>
+      </g>
+      <g id="envelope-2" data-name="envelope" clip-path="url(#clip-path)">
+        <g transform="matrix(1, 0, 0, 1, -37.5, -24.5)" filter="url(#Rectangle)">
+          <path id="Rectangle-2" data-name="Rectangle" d="M0,0,161.423,116.32a25.972,25.972,0,0,0,30.367,0L353.213,0V215.564a25.972,25.972,0,0,1-25.972,25.972H25.972A25.972,25.972,0,0,1,0,215.564Z" transform="translate(37.5 176.56)" fill="#fdfeff"/>
+        </g>
+        <g transform="matrix(1, 0, 0, 1, -37.5, -24.5)" filter="url(#Rectangle_Copy)">
+          <path id="Rectangle_Copy-2" data-name="Rectangle Copy" d="M161.423,3.014a25.972,25.972,0,0,1,30.367,0l161.423,116.32H0Z" transform="translate(37.5 298.77)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="face" transform="translate(122.066 129.139)">
+      <circle id="Oval" cx="12.986" cy="12.986" r="12.986" fill="#1b3554" opacity="0.2"/>
+      <circle id="Oval_Copy_2" data-name="Oval Copy 2" cx="12.986" cy="12.986" r="12.986" transform="translate(90.9)" fill="#1b3554" opacity="0.2"/>
+      <path id="Rectangle_3" data-name="Rectangle 3" d="M0-1.354A6.543,6.543,0,0,0,5.583,5.118L38.049,9.934l31.688-4.8a6.563,6.563,0,0,0,5.58-6.489h0a4.857,4.857,0,0,0-5.581-4.8l-31.877,4.8L5.582-6.166A4.865,4.865,0,0,0,0-1.354Z" transform="translate(20.777 54.995)" fill="#1b3554" opacity="0.2"/>
+    </g>
+    <g id="indicatprs" transform="translate(293.479 329.12)">
+      <g transform="matrix(1, 0, 0, 1, -330.98, -353.17)" filter="url(#Oval_2)">
+        <circle id="Oval_2-2" data-name="Oval 2" cx="45.71" cy="45.71" r="45.71" transform="translate(330.98 353.17)" fill="#ffb240"/>
+      </g>
+      <text id="_0" data-name="0" transform="translate(45.166 58.622)" fill="#fff" font-size="44" font-family="SFCompactText-Semibold, SF Compact Text" font-weight="600" letter-spacing="-0.01em"><tspan x="-13" y="0">0</tspan></text>
+    </g>
+  </g>
+</svg>

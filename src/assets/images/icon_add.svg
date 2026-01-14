@@ -1,0 +1,7 @@
+<svg id="Icon_Add_copy" data-name="Icon_Add copy" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <g id="Ellipse_6" data-name="Ellipse 6" fill="none" stroke="#999b9f" stroke-width="1">
+    <circle cx="10" cy="10" r="10" stroke="none"/>
+    <circle cx="10" cy="10" r="9.5" fill="none"/>
+  </g>
+  <path id="Rectangle_2" data-name="Rectangle 2" d="M4.729,9.958V5.708H.49a.49.49,0,1,1,0-.979H4.729V.49a.49.49,0,1,1,.979,0V4.729H9.958a.49.49,0,1,1,0,.979H5.708V9.958a.49.49,0,1,1-.979,0Z" transform="translate(4.776 4.776)" fill="#999b9f"/>
+</svg>

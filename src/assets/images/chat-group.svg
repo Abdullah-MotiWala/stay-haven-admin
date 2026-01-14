@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="428.58" height="420.09" viewBox="0 0 428.58 420.09">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Mask" d="M178.356,72.318c0-27.775-19.308-43.706-47.633-55.821C118.316,11.191,104.18,0,89.178,0,71.108,0,54.293,12.545,40.245,20.037,16,32.964,0,47.032,0,72.318,0,112.258,178.356,112.258,178.356,72.318Z" fill="#333f4e"/>
+    </clipPath>
+    <filter id="Rectangle_Copy" x="190.775" y="270.06" width="42.605" height="73.589" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur result="blur"/>
+      <feFlood flood-opacity="0.278"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-path-2">
+      <path id="Mask-2" data-name="Mask" d="M23.145,23.2A23.171,23.171,0,0,0,46.291,0H0A23.171,23.171,0,0,0,23.145,23.2Z" transform="translate(0 0)" fill="#372c28"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="1.154" y1="0.271" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#cea2ff"/>
+      <stop offset="1" stop-color="#9f69ff"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.168" x2="0.808" y2="0.638" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#9ea0ff"/>
+      <stop offset="1" stop-color="#9f69ff"/>
+    </linearGradient>
+    <clipPath id="clip-path-3">
+      <circle id="Mask-3" data-name="Mask" cx="39.952" cy="39.952" r="39.952" fill="#bde4c3"/>
+    </clipPath>
+    <clipPath id="clip-path-4">
+      <path id="Mask-4" data-name="Mask" d="M49.3,19.99c0-7.678-5.337-12.081-13.167-15.43C32.705,3.093,28.8,0,24.651,0c-5,0-9.643,3.468-13.526,5.539C4.424,9.112,0,13,0,19.99,0,31.031,49.3,31.031,49.3,19.99Z" fill="#e7e7e7"/>
+    </clipPath>
+    <clipPath id="clip-path-5">
+      <path id="Mask-5" data-name="Mask" d="M6.4,6.412A6.4,6.4,0,0,0,12.8,0H0A6.4,6.4,0,0,0,6.4,6.412Z" transform="translate(0 0)" fill="#372c28"/>
+    </clipPath>
+    <clipPath id="clip-path-6">
+      <circle id="Mask-6" data-name="Mask" cx="39.952" cy="39.952" r="39.952" fill="#ade0e5"/>
+    </clipPath>
+    <clipPath id="clip-path-7">
+      <path id="Mask-7" data-name="Mask" d="M5.92,5.933A5.926,5.926,0,0,0,11.84,0H0A5.926,5.926,0,0,0,5.92,5.933Z" transform="translate(0 0)" fill="#372c28"/>
+    </clipPath>
+    <clipPath id="clip-path-8">
+      <circle id="Mask-8" data-name="Mask" cx="39.952" cy="39.952" r="39.952" fill="#fed5f1"/>
+    </clipPath>
+    <clipPath id="clip-path-9">
+      <path id="Mask-9" data-name="Mask" d="M-2.061,5.484A5.478,5.478,0,0,1-7.533,0H3.411A5.478,5.478,0,0,1-2.061,5.484Z" transform="translate(7.533 0)" fill="#372c28"/>
+    </clipPath>
+  </defs>
+  <g id="Artwork" style="mix-blend-mode: luminosity;isolation: isolate">
+    <circle id="circle" cx="189.592" cy="189.592" r="189.592" transform="translate(24.698 39.226)" fill="none" stroke="#1b3554" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" stroke-dasharray="5 19" opacity="0.161"/>
+    <g id="main" transform="translate(124.942 101.383)">
+      <g id="Rectangle_6" data-name="Rectangle 6" transform="translate(0 216.433)">
+        <path id="Mask-10" data-name="Mask" d="M178.356,72.318c0-27.775-19.308-43.706-47.633-55.821C118.316,11.191,104.18,0,89.178,0,71.108,0,54.293,12.545,40.245,20.037,16,32.964,0,47.032,0,72.318,0,112.258,178.356,112.258,178.356,72.318Z" transform="translate(0 0)" fill="#333f4e"/>
+        <g id="Rectangle_6-2" data-name="Rectangle 6" transform="translate(0 0)" clip-path="url(#clip-path)">
+          <path id="Rectangle_6-3" data-name="Rectangle 6" d="M0,4.289A4.358,4.358,0,0,1,5.135,0L18.79,2.473,34.066-.081a4.358,4.358,0,0,1,5.077,4.3V33.854a4.358,4.358,0,0,1-4.358,4.358H4.358A4.358,4.358,0,0,1,0,33.854Z" transform="translate(107.218 72.634)" fill="#485360"/>
+        </g>
+      </g>
+      <g transform="matrix(1, 0, 0, 1, -124.94, -101.38)" filter="url(#Rectangle_Copy)">
+        <path id="Rectangle_Copy-2" data-name="Rectangle Copy" d="M.337,21.778A21.3,21.3,0,0,1,21.634,0h0a21.3,21.3,0,0,1,21.3,21.778l-.617,27.588a20.685,20.685,0,0,1-20.68,20.223h0A20.685,20.685,0,0,1,.954,49.366Z" transform="translate(190.44 270.06)" fill="#d8baa1"/>
+      </g>
+      <path id="Rectangle" d="M0,0H114.366l-2.959,100.821a39.517,39.517,0,0,1-39.5,38.357H42.458a39.517,39.517,0,0,1-39.5-38.357Z" transform="translate(29.953 70.433)" fill="#e5cfbc"/>
+      <ellipse id="Oval_3" data-name="Oval 3" cx="11.573" cy="12.963" rx="11.573" ry="12.963" transform="translate(19.061 107.274)" fill="#e5cfbc"/>
+      <ellipse id="Oval_3_Copy" data-name="Oval 3 Copy" cx="11.573" cy="12.963" rx="11.573" ry="12.963" transform="translate(132.065 107.274)" fill="#e5cfbc"/>
+      <g id="Group_2" data-name="Group 2" transform="translate(60.18 114.578)">
+        <circle id="Oval" cx="5.085" cy="5.085" r="5.085" transform="translate(0 0)" fill="#494a4b"/>
+        <circle id="Oval_Copy_2" data-name="Oval Copy 2" cx="5.085" cy="5.085" r="5.085" transform="translate(44.747 0)" fill="#494a4b"/>
+        <g id="Oval_2_Copy" data-name="Oval 2 Copy" transform="translate(3.811 44.547)">
+          <path id="Mask-11" data-name="Mask" d="M23.145,23.2A23.171,23.171,0,0,0,46.291,0H0A23.171,23.171,0,0,0,23.145,23.2Z" transform="translate(0 0)" fill="#372c28"/>
+          <g id="Oval_2_Copy-2" data-name="Oval 2 Copy" transform="translate(0 0)" clip-path="url(#clip-path-2)">
+            <path id="Oval_2_Copy-3" data-name="Oval 2 Copy" d="M23.145-15.967A23.171,23.171,0,0,1,46.291,7.23H0A23.171,23.171,0,0,1,23.145-15.967Z" transform="translate(0 29.611)" fill="#d96b70"/>
+            <path id="Oval_2_Copy_2" data-name="Oval 2 Copy 2" d="M14.976-10.331A14.993,14.993,0,0,1,29.953,4.678H0A14.993,14.993,0,0,1,14.976-10.331Z" transform="translate(8.169 -0.585)" fill="#fff"/>
+          </g>
+        </g>
+        <path id="Rectangle_4" data-name="Rectangle 4" d="M2.467,3.362A3.982,3.982,0,0,1,6.4,0h0a3.982,3.982,0,0,1,3.933,3.362l2.389,15.166a6.4,6.4,0,0,1-6.323,7.4h0a6.4,6.4,0,0,1-6.323-7.4Z" transform="translate(21.328 9.158)" fill="#a38080" opacity="0.308"/>
+      </g>
+      <g id="Group_4" data-name="Group 4" transform="translate(22.998 0)">
+        <path id="Path_5" data-name="Path 5" d="M12.7,37.117s-29.392-15.326-36.794,12c-4.459,14.207-3.428,26.415-3.326,36.712-11.524-24.338-12.768-61.322-4.459-75.767C-29.747,6.36,7.505-1.407,12.7.221,21.022,2.829,12.7,37.117,12.7,37.117Z" transform="translate(37.238 34.44)" fill="url(#linear-gradient)"/>
+        <path id="Path_4" data-name="Path 4" d="M28.576,124.827,24.123,71.995s-53.284,29.964-93.025,3.09S-85.57,10.4-65.76,0c-3.142,6.646-.16,24.893,21.4,19.135,17.808-4.757,29.542-16.575,55.054-2.907C60.524,42.927,28.576,124.827,28.576,124.827Z" transform="translate(91.259)" fill="url(#linear-gradient-2)"/>
+      </g>
+      <rect id="Rectangle_21" data-name="Rectangle 21" width="36.32" height="30.509" rx="4" transform="translate(46.49 104.916)" fill="rgba(255,255,255,0.23)" stroke="#454545" stroke-width="3"/>
+      <path id="Rectangle_7" data-name="Rectangle 7" d="M0,0,14.528,13.075v10.17L0,10.17Z" transform="translate(31.962 102.011)" fill="#454545"/>
+      <path id="Rectangle_7_Copy" data-name="Rectangle 7 Copy" d="M14.528,0,0,13.075v10.17L14.528,10.17Z" transform="translate(129.3 102.011)" fill="#454545"/>
+      <rect id="Rectangle_2" data-name="Rectangle 2" width="13.075" height="5.811" transform="translate(81.358 117.991)" fill="#454545"/>
+      <rect id="Rectangle_21_Copy" data-name="Rectangle 21 Copy" width="36.32" height="30.509" rx="4" transform="translate(92.98 104.916)" fill="rgba(255,255,255,0.23)" stroke="#454545" stroke-width="3"/>
+    </g>
+    <g id="person" transform="translate(173.175)">
+      <circle id="Mask-12" data-name="Mask" cx="39.952" cy="39.952" r="39.952" transform="translate(0)" fill="#bde4c3"/>
+      <g id="person-2" data-name="person" transform="translate(0)" clip-path="url(#clip-path-3)">
+        <g id="Group" transform="translate(15.69 10.17)">
+          <g id="Rectangle_6-4" data-name="Rectangle 6" transform="translate(0 57.331)">
+            <path id="Mask-13" data-name="Mask" d="M49.3,19.99c0-7.678-5.337-12.081-13.167-15.43C32.705,3.093,28.8,0,24.651,0c-5,0-9.643,3.468-13.526,5.539C4.424,9.112,0,13,0,19.99,0,31.031,49.3,31.031,49.3,19.99Z" transform="translate(0 0)" fill="#e7e7e7"/>
+            <g id="Rectangle_6-5" data-name="Rectangle 6" transform="translate(0 0)" clip-path="url(#clip-path-4)">
+              <path id="Rectangle_6-6" data-name="Rectangle 6" d="M0,4.784A4.358,4.358,0,0,1,5.135.5l.059.011L5.743.414a4.358,4.358,0,0,1,5.077,4.3V6.027a4.358,4.358,0,0,1-4.358,4.358h-2.1A4.358,4.358,0,0,1,0,6.027Z" transform="translate(29.637 20.255)" fill="#62d186"/>
+            </g>
+          </g>
+          <path id="Rectangle_Copy-3" data-name="Rectangle Copy" d="M.093,6.02A5.888,5.888,0,0,1,5.98,0h0a5.888,5.888,0,0,1,5.887,6.02L11.7,13.646a5.718,5.718,0,0,1-5.716,5.59h0a5.718,5.718,0,0,1-5.716-5.59Z" transform="translate(18.106 44.13)" fill="#866e57"/>
+          <path id="Rectangle-2" data-name="Rectangle" d="M0,0H31.613l-.7,23.8A15.115,15.115,0,0,1,15.807,38.472h0A15.115,15.115,0,0,1,.7,23.8Z" transform="translate(8.28 16.973)" fill="#93775e"/>
+          <ellipse id="Oval_3-2" data-name="Oval 3" cx="3.199" cy="3.583" rx="3.199" ry="3.583" transform="translate(5.269 27.157)" fill="#93775e"/>
+          <ellipse id="Oval_3_Copy-2" data-name="Oval 3 Copy" cx="3.199" cy="3.583" rx="3.199" ry="3.583" transform="translate(36.506 27.157)" fill="#93775e"/>
+          <g id="Group_2-2" data-name="Group 2" transform="translate(15.43 28.666)">
+            <path id="Rectangle_3_Copy" data-name="Rectangle 3 Copy" d="M0,2.374A1.956,1.956,0,0,1,1.053.639L2.282,0,3.468.63A1.975,1.975,0,0,1,4.516,2.374h0a.715.715,0,0,1-1.05.632l-1.2-.632-1.218.637A.719.719,0,0,1,0,2.374Z" transform="translate(0 0)" fill="#5a4840"/>
+            <g id="Oval_2_Copy-4" data-name="Oval 2 Copy" transform="translate(2.258 12.824)">
+              <path id="Mask-14" data-name="Mask" d="M6.4,6.412A6.4,6.4,0,0,0,12.8,0H0A6.4,6.4,0,0,0,6.4,6.412Z" transform="translate(0 0)" fill="#372c28"/>
+              <g id="Oval_2_Copy-5" data-name="Oval 2 Copy" transform="translate(0 0)" clip-path="url(#clip-path-5)">
+                <path id="Oval_2_Copy-6" data-name="Oval 2 Copy" d="M6.4-4.414A6.4,6.4,0,0,1,12.8,2H0A6.4,6.4,0,0,1,6.4-4.414Z" transform="translate(0 8.185)" fill="#d96b70"/>
+                <path id="Oval_2_Copy_2-2" data-name="Oval 2 Copy 2" d="M4.14-2.856A4.144,4.144,0,0,1,8.28,1.293H0A4.144,4.144,0,0,1,4.14-2.856Z" transform="translate(2.258 -0.162)" fill="#fff"/>
+              </g>
+            </g>
+            <path id="Rectangle_4-2" data-name="Rectangle 4" d="M.682.929A1.1,1.1,0,0,1,1.769,0h0A1.1,1.1,0,0,1,2.856.929l.66,4.192A1.769,1.769,0,0,1,1.769,7.166h0A1.769,1.769,0,0,1,.021,5.122Z" transform="translate(6.699 2.64)" fill="#482222" opacity="0.2"/>
+            <path id="Rectangle_3_Copy_2" data-name="Rectangle 3 Copy 2" d="M0,2.374A1.956,1.956,0,0,1,1.053.639L2.282,0,3.468.63A1.975,1.975,0,0,1,4.516,2.374h0a.715.715,0,0,1-1.05.632l-1.2-.632-1.218.637A.719.719,0,0,1,0,2.374Z" transform="translate(12.796 0)" fill="#5a4840"/>
+          </g>
+          <ellipse id="Oval_2" data-name="Oval 2" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(6.022 15.087)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_18" data-name="Oval 2 Copy 18" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(6.022 10.938)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_10" data-name="Oval 2 Copy 10" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(6.022 3.772)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_11" data-name="Oval 2 Copy 11" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(11.29 0.754)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_12" data-name="Oval 2 Copy 12" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(12.419 4.903)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_13" data-name="Oval 2 Copy 13" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(18.065 0)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_14" data-name="Oval 2 Copy 14" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(22.205 3.395)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_15" data-name="Oval 2 Copy 15" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(25.968 0.377)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_16" data-name="Oval 2 Copy 16" cx="5.833" cy="5.846" rx="5.833" ry="5.846" transform="translate(30.484 4.149)" fill="#272d35"/>
+          <path id="Rectangle_5" data-name="Rectangle 5" d="M0,0H1.882V12.824L.376,9.807Z" transform="translate(7.527 17.727)" fill="#272d35"/>
+          <path id="Rectangle_5_Copy" data-name="Rectangle 5 Copy" d="M0,0H1.882L1.505,9.807,0,12.824Z" transform="translate(39.14 17.727)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_3" data-name="Oval 2 Copy 3" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(9.409 12.447)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_4" data-name="Oval 2 Copy 4" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(12.796 13.956)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_5" data-name="Oval 2 Copy 5" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(17.688 13.201)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_6" data-name="Oval 2 Copy 6" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(22.581 12.07)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_7" data-name="Oval 2 Copy 7" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(26.721 13.956)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_8" data-name="Oval 2 Copy 8" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(30.861 12.447)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_9" data-name="Oval 2 Copy 9" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(35.377 14.333)" fill="#272d35"/>
+          <ellipse id="Oval_2_Copy_17" data-name="Oval 2 Copy 17" cx="3.199" cy="3.206" rx="3.199" ry="3.206" transform="translate(36.129 10.938)" fill="#272d35"/>
+        </g>
+      </g>
+    </g>
+    <g id="heart" transform="translate(335.6 87.169)">
+      <circle id="Oval_Copy" data-name="Oval Copy" cx="39.952" cy="39.952" r="39.952" fill="#fff" stroke="rgba(27,53,84,0.14)" stroke-width="1"/>
+      <path id="Shape" d="M14.409,25.707c-28.113-15.286-7.781-34.289,0-21.491C22.191-8.582,42.525,10.421,14.409,25.707Z" transform="matrix(0.899, 0.438, -0.438, 0.899, 31.791, 24.04)" fill="#a2a8bd"/>
+    </g>
+    <g id="person-3" data-name="person" transform="translate(348.675 255.695)">
+      <circle id="Mask-15" data-name="Mask" cx="39.952" cy="39.952" r="39.952" fill="#ade0e5"/>
+      <g id="person-4" data-name="person" clip-path="url(#clip-path-6)">
+        <g id="Group_Copy" data-name="Group Copy" transform="translate(17.434 6.222)">
+          <path id="Oval_11" data-name="Oval 11" d="M45.618,18.5c0-7.1-4.938-11.179-12.183-14.277C30.262,2.862,26.646,0,22.809,0c-4.622,0-8.923,3.209-12.516,5.125C4.093,8.431,0,12.029,0,18.5,0,28.713,45.618,28.713,45.618,18.5Z" transform="translate(0 54.503)" fill="#b38bff"/>
+          <path id="Rectangle_Copy-4" data-name="Rectangle Copy" d="M.086,5.57A5.449,5.449,0,0,1,5.533,0h0A5.449,5.449,0,0,1,10.98,5.57l-.158,7.056A5.291,5.291,0,0,1,5.533,17.8h0A5.291,5.291,0,0,1,.244,12.627Z" transform="translate(16.754 42.288)" fill="#c4a588"/>
+          <path id="Rectangle-3" data-name="Rectangle" d="M.234,14.622A14.292,14.292,0,0,1,14.522,0h0A14.292,14.292,0,0,1,28.81,14.622l-.393,17.039A13.9,13.9,0,0,1,14.522,45.238h0A13.9,13.9,0,0,1,.627,31.661Z" transform="translate(7.765 7.52)" fill="#fff0d2"/>
+          <path id="Rectangle_Copy_2" data-name="Rectangle Copy 2" d="M0,0S1.417,9.306,3.367,11.766c2.411,3.041,6.41,6.428,10.686,6.428,4.219,0,8.409-3.466,10.855-6.428C26.947,9.3,28.32,0,28.32,0L28,17.049A13.84,13.84,0,0,1,14.16,30.628h0A13.84,13.84,0,0,1,.322,17.049Z" transform="translate(8.127 32.394)" fill="#ff7575"/>
+          <ellipse id="Oval_4" data-name="Oval 4" cx="6.982" cy="6.998" rx="6.982" ry="6.998" transform="translate(15.361 47.64)" fill="#ff7575"/>
+          <ellipse id="Oval_3-3" data-name="Oval 3" cx="2.96" cy="3.315" rx="2.96" ry="3.315" transform="translate(4.875 26.583)" fill="#fff0d2"/>
+          <ellipse id="Oval_3_Copy-3" data-name="Oval 3 Copy" cx="2.96" cy="3.315" rx="2.96" ry="3.315" transform="translate(33.778 26.583)" fill="#fff0d2"/>
+          <g id="Group_2-3" data-name="Group 2" transform="translate(14.278 27.046)">
+            <path id="Rectangle_3_Copy-2" data-name="Rectangle 3 Copy" d="M0,2.2A1.81,1.81,0,0,1,.974.591L2.111,0l1.1.583A1.827,1.827,0,0,1,4.179,2.2h0a.662.662,0,0,1-.971.585L2.1,2.2.973,2.786A.665.665,0,0,1,0,2.2Z" transform="translate(0 0)" fill="#5b5552"/>
+            <g id="Oval_2_Copy-7" data-name="Oval 2 Copy" transform="translate(2.089 14.199)">
+              <path id="Mask-16" data-name="Mask" d="M5.92,5.933A5.926,5.926,0,0,0,11.84,0H0A5.926,5.926,0,0,0,5.92,5.933Z" transform="translate(0 0)" fill="#372c28"/>
+              <g id="Oval_2_Copy-8" data-name="Oval 2 Copy" transform="translate(0 0)" clip-path="url(#clip-path-7)">
+                <path id="Oval_2_Copy-9" data-name="Oval 2 Copy" d="M5.92-4.084a5.926,5.926,0,0,1,5.92,5.933H0A5.926,5.926,0,0,1,5.92-4.084Z" transform="translate(0 7.574)" fill="#d96b70"/>
+                <path id="Oval_2_Copy_2-3" data-name="Oval 2 Copy 2" d="M3.831-2.642A3.835,3.835,0,0,1,7.661,1.2H0A3.835,3.835,0,0,1,3.831-2.642Z" transform="translate(2.089 -0.15)" fill="#fff"/>
+              </g>
+            </g>
+            <path id="Rectangle_4-3" data-name="Rectangle 4" d="M.631.86A1.018,1.018,0,0,1,1.637,0h0A1.018,1.018,0,0,1,2.643.86l.611,3.879A1.637,1.637,0,0,1,1.637,6.631h0A1.637,1.637,0,0,1,.02,4.739Z" transform="translate(6.198 2.443)" fill="#c08267" opacity="0.419"/>
+            <path id="Rectangle_3_Copy_2-2" data-name="Rectangle 3 Copy 2" d="M0,2.2A1.81,1.81,0,0,1,.974.591L2.111,0l1.1.583A1.827,1.827,0,0,1,4.179,2.2h0a.662.662,0,0,1-.971.585L2.1,2.2.973,2.786A.665.665,0,0,1,0,2.2Z" transform="translate(11.84 0)" fill="#5b5552"/>
+          </g>
+          <path id="Path_2" data-name="Path 2" d="M.828,12.292C-.4,10.793-.465,8.165,2.061,6.031S3.223.209.828.168s6.467-1.69,7.433,6.275S2.061,13.791.828,12.292Z" transform="translate(18.457 0)" fill="#ff7575"/>
+          <path id="Path_2_Copy" data-name="Path 2 Copy" d="M.789.658c1.284-.979,3.536-1.027,5.365.979s4.988.923,5.023-.979S12.625,5.793,5.8,6.56-.5,1.637.789.658Z" transform="translate(22.093 36.476)" fill="#ff7575"/>
+          <path id="Path_2_Copy_2" data-name="Path 2 Copy 2" d="M10.532.658C9.248-.321,7-.369,5.168,1.637S.179,2.559.144.658-1.3,5.793,5.52,6.56,11.817,1.637,10.532.658Z" transform="translate(10.921 36.476)" fill="#ff7575"/>
+        </g>
+      </g>
+    </g>
+    <g id="mail" transform="translate(13.075 87.169)">
+      <circle id="Oval_Copy_2-2" data-name="Oval Copy 2" cx="39.952" cy="39.952" r="39.952" fill="#fff" stroke="rgba(27,53,84,0.14)" stroke-width="1"/>
+      <path id="Shape-2" data-name="Shape" d="M2.62,20.892A2.624,2.624,0,0,1,0,18.281V2.611A2.624,2.624,0,0,1,2.62,0H23.58A2.624,2.624,0,0,1,26.2,2.611V18.281a2.624,2.624,0,0,1-2.62,2.611Z" transform="translate(24.414 34.37) rotate(-20)" fill="#a2a8bd"/>
+    </g>
+    <g id="person-5" data-name="person" transform="translate(0 255.695)">
+      <circle id="Mask-17" data-name="Mask" cx="39.952" cy="39.952" r="39.952" fill="#fed5f1"/>
+      <g id="person-6" data-name="person" clip-path="url(#clip-path-8)">
+        <g id="Group_Copy_2" data-name="Group Copy 2" transform="translate(13.226 3.319)">
+          <rect id="Rectangle_20" data-name="Rectangle 20" width="38.645" height="43.316" transform="translate(7.476 26.596)" fill="#323232"/>
+          <path id="Oval_11-2" data-name="Oval 11" d="M-34.3,17.8c0-7.76,5.395-12.211,13.308-15.6,1.91-.817,2.442-1.114,4.606-2.132,1.762-.828-2.284,6.04,7,6.04S-2.71-.275-.765.581A49.02,49.02,0,0,1,4.287,3.19C11.06,6.8,15.532,10.732,15.532,17.8,15.532,28.956-34.3,28.956-34.3,17.8Z" transform="translate(36.619 56.885)" fill="#88f88e"/>
+          <ellipse id="Oval_6" data-name="Oval 6" cx="10.932" cy="10.957" rx="10.932" ry="10.957" transform="translate(15.612 52.586)" fill="#b4ff64"/>
+          <path id="Rectangle_Copy-5" data-name="Rectangle Copy" d="M3.616,6.085A5.952,5.952,0,0,0-2.334,0h0a5.952,5.952,0,0,0-5.95,6.085l.172,7.708a5.779,5.779,0,0,0,5.778,5.65h0a5.779,5.779,0,0,0,5.778-5.65Z" transform="translate(28.687 41.133)" fill="#f2ddca"/>
+          <path id="Rectangle-4" data-name="Rectangle" d="M9.276,15.911A14.9,14.9,0,0,0-5.592,0h-.059A14.9,14.9,0,0,0-20.519,15.911l.676,9.96a11.623,11.623,0,0,0,5.473,9.092l8.749,5.423,8.749-5.423A11.623,11.623,0,0,0,8.6,25.871Z" transform="translate(31.974 12.184)" fill="#ffebd8"/>
+          <path id="Rectangle_4-4" data-name="Rectangle 4" d="M.3.673A.784.784,0,0,0-.476,0h0a.784.784,0,0,0-.776.673L-1.76,4.231A1.3,1.3,0,0,0-.476,5.713h0A1.3,1.3,0,0,0,.809,4.231Z" transform="translate(27.019 31.229)" fill="#a5725c" opacity="0.2"/>
+          <path id="Rectangle_3_Copy_2-3" data-name="Rectangle 3 Copy 2" d="M1.423,2.4A1.977,1.977,0,0,0,.358.646L-.883,0l-1.2.637A2,2,0,0,0-3.142,2.4h0a.723.723,0,0,0,1.061.639L-.872,2.4l1.231.644A.727.727,0,0,0,1.423,2.4Z" transform="translate(20.745 24.993)" fill="#81685d"/>
+          <g id="Group_4-2" data-name="Group 4" transform="translate(30.073 28.67)">
+            <path id="Rectangle_3_Copy-3" data-name="Rectangle 3 Copy" d="M1.9,1.347A7.281,7.281,0,0,0-1.371,0,4.851,4.851,0,0,0-4.195,1.5h0a1.04,1.04,0,0,0,1.526.919l1.312-.693,1.082.755A1.383,1.383,0,0,0,1.9,1.347Z" transform="translate(4.195 0)" fill="#81685d"/>
+            <path id="Path_5-2" data-name="Path 5" d="M.806,0s-.6,1.948-2.223,2.256c-.641-.449-.4-1.932.47-1.5C-.279,1.086.806,0,.806,0Z" transform="translate(6.447 0.201)" fill="#81685d"/>
+          </g>
+          <g id="Group_4_Copy" data-name="Group 4 Copy" transform="translate(16.272 28.67)">
+            <path id="Rectangle_3_Copy-4" data-name="Rectangle 3 Copy" d="M0,1.347A7.281,7.281,0,0,1,3.271,0,4.851,4.851,0,0,1,6.094,1.5h0a1.04,1.04,0,0,1-1.526.919L3.256,1.726l-1.082.755A1.383,1.383,0,0,1,0,1.347Z" transform="translate(1.158 0)" fill="#81685d"/>
+            <path id="Path_5-3" data-name="Path 5" d="M0,0S.6,1.948,2.223,2.256c.641-.449.4-1.932-.47-1.5C1.084,1.086,0,0,0,0Z" transform="translate(0 0.201)" fill="#81685d"/>
+          </g>
+          <path id="Oval_5" data-name="Oval 5" d="M15.006,20.814c-7.442,0-14.648-2.683-15-5.317S11.323,0,18.765,0,31.771,2.615,32.782,8.062,22.448,20.814,15.006,20.814Z" transform="matrix(0.819, -0.574, 0.574, 0.819, 0, 18.839)" fill="#323232"/>
+          <g id="Oval_2_Copy-10" data-name="Oval 2 Copy" transform="translate(20.897 39.96)">
+            <path id="Mask-18" data-name="Mask" d="M-2.061,5.484A5.478,5.478,0,0,1-7.533,0H3.411A5.478,5.478,0,0,1-2.061,5.484Z" transform="translate(7.533 0)" fill="#372c28"/>
+            <g id="Oval_2_Copy-11" data-name="Oval 2 Copy" transform="translate(0 0)" clip-path="url(#clip-path-9)">
+              <path id="Oval_2_Copy-12" data-name="Oval 2 Copy" d="M-2.061-3.775A5.478,5.478,0,0,0-7.533,1.709H3.411A5.478,5.478,0,0,0-2.061-3.775Z" transform="translate(7.533 7)" fill="#d96b70"/>
+              <path id="Oval_2_Copy_2-4" data-name="Oval 2 Copy 2" d="M-1.334-2.442A3.544,3.544,0,0,0-4.874,1.106H2.207A3.544,3.544,0,0,0-1.334-2.442Z" transform="translate(6.805 -0.138)" fill="#fff"/>
+            </g>
+          </g>
+          <path id="Path_3" data-name="Path 3" d="M.069,16.363V35.749S-8.106,21.143-2.324,5.9C4.867-10.428.069,16.363.069,16.363Z" transform="translate(11.904 10.623)" fill="#323232"/>
+          <path id="Path_4-2" data-name="Path 4" d="M-10.028,10.594S.906,20.275,1.017,24.8.906,40.381.906,40.381,7.348,30.36,6.449,20.222-2.157.975-10.828.062-10.028,10.594-10.028,10.594Z" transform="translate(39.778 4.572)" fill="#323232"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

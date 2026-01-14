@@ -1,0 +1,205 @@
+@media only screen and (max-width:850px){
+	
+.col-md-6.banner-right {    display: none;	}
+
+section.banner {    text-align: center;    background-color: #ffedc7;    padding: 60px 0;	}
+
+.banner h1 {    font-size: 30px;    line-height: normal;	}
+
+.banner h1 span i:before {    background-size: contain;    width: 14px;   top: -4px;	}
+
+section.provide_section {    padding: 60px 0;    text-align: center;	}
+
+.provide_section h2 {    font-size: 22px;	}
+
+.provide_section h4 {    background-position: center bottom;	}
+
+.provide_section p {    max-width: 100%;	}
+
+.provide_section .col-md-5 {    margin-bottom: 50px;	}
+
+.prod_head h2 {    font-size: 22px;	}
+
+.prod_head h4 {    font-size: 16px;	}
+
+section.product_section {    padding-top: 0;	}
+
+.prod_item {    text-align: center;	}
+
+section.del_section {    text-align: center;	}
+
+.del_right h2 {    font-size: 24px;    margin-top: 30px;	}
+
+.del_btns ul li a {    width: 100%;    min-width: 180px;	}
+
+.del_btns ul {    justify-content: center;	}
+
+.del_btns ul li {    margin: 0;	    padding: 5px;	}
+
+.del-thumb {    max-width: 200px;	    margin: 0 auto;	}
+
+.apps_section {    text-align: center;	}
+
+.app-group img.app_2 {left: -110px;}
+
+.app-group img {    left: 0;	}
+
+.app-right {    text-align: center;	}
+
+.app-right h2 {    background-position: center bottom;    font-size: 22px;	}
+
+.app-right br {    display: none;	}
+
+.app-right ul {    justify-content: center;	}
+
+.app-right ul li img {    max-width: 100px;	}
+
+.app-right p {    margin-bottom: 20px;	}
+
+.lets_section {    padding-top: 60px;    text-align: center;    padding-bottom: 60px;	}
+
+.lets_right h2 {    font-size: 22px;	}
+
+.lets_right h4 {    font-size: 16px;	}
+
+a.btn.btn-default.btn-lets {font-size: 16px;max-width: 180px;margin-top: 20px;padding: 12px 0;}
+
+footer {    text-align: center;	}
+
+ul.ftr_social {    justify-content: center;	}
+
+footer .col-md-3 {    margin-bottom: 20px;	}
+
+footer h4 {    margin-bottom: 10px;	}
+
+form.ftr-news {    max-width: 280px;    margin-left: auto;    margin-right: auto;	}
+
+ul.stay_links {    display: table;    margin: 0 auto;	}
+
+.row-address .col-md-6.text-right {    text-align: center !important;	}
+
+header .col-md-10  , header .col-md-9 {    display: none !important;	}
+
+a.logo img {    max-width: 80px;	}
+
+.col-md-12.page-head h1.page-title {    font-size: 30px;		}
+
+.col-md-12.page-head {    text-align: center;	}
+
+.col-md-12.about-sec {padding: 50px 30px 0;box-shadow: none;}
+
+.about-sec h3 {    font-size: 20px;    margin-top: 30px;    margin-bottom: 10px;}
+
+.contact-left iframe {    height: 300px;    margin-bottom: 40px;	}
+
+.contact-inn {   border-radius: 0;   box-shadow: none;    border: none;    padding: 0;	}
+
+.contact-inn h4 {    font-size: 18px;	}
+
+section.content-page {    padding-bottom: 60px;	}
+
+.form-section .col-md-6.offset-3 {    margin-left: 0;	}
+
+.form-area {    padding: 30px;	}
+
+.form-head h1 {    font-size: 24px;	}
+
+section.form-section {    background-color: #ffedc7;    }
+
+.about-sec h4 {    font-size: 18px;	}
+
+.succ-head {    display: none;   }
+
+.form-head.suc-head br {  display: none;  }
+
+body.forms_bg {    background: #ffedc7;	}
+
+.headnav {    display: block;	}
+
+.headnav img {    max-width: 33px;    height: auto;	}
+
+section.banner-after {    background: #ffedc7;    padding-top: 40px;    padding-bottom: 40px;	}
+
+h3.isaac-tail {    margin: 0 auto 30px;    font-size: 16px;	    padding: 10px 30px;}
+
+section.banner-after h1 {    font-size: 24px;    line-height: normal;	}
+
+.banner-left {    text-align: center;	}
+
+.banner-after .col-md-6.col-rel {    display: none;		}
+
+section.del_section.del_after {    padding: 60px 0; }
+
+section.gallery_area {    padding: 60px 0;    text-align: center;	}
+
+.gallery_thumb img {    width: 100%;	}
+
+.tab_thumb img {    width: 100%;	}
+
+section.diff_taste {    padding-bottom: 0;	}
+
+.news_feed .col-md-12.head_style {    margin-bottom: 0;	}
+
+.head_style h2 {    font-size: 30px;	}
+
+section.news_feed {    padding: 40px 0;	}
+
+section.news_feed br {    display: none;	}
+
+.diff-view {    margin-top: 20px;    position: relative;	}
+
+.diff-left-tab {    min-height: auto;    margin-bottom: 40px;    height: auto;}
+
+section.welcome_bar {    text-align: center;	}
+
+.wel-head h2 {    font-size: 30px;	}
+
+section.innavbar ul {    /* display: inline-block; */	}
+
+section.innavbar ul {justify-content: center;align-items: center;flex-flow: wrap;}
+
+section.innavbar ul li a {    padding: 10px;	}
+
+section.list-page {    padding-top: 50px;    text-align: center;	}
+
+h1.page-title {    font-size: 30px;}
+ 
+.col-md-6.add-pro {margin-top: 0;text-align: center;}
+
+a.btn.btn-olg {    float: none;    padding: 11px 22px;    font-size: 16px;	} 
+ 
+ul.pagination.cst-paginat {    justify-content: center;	}
+
+p.show_entry {    float: none;	} 
+ 
+.order-filter .col-md-3.col-last {    -ms-flex: 0 0 100%;    flex: 0 0 100%;    max-width: 100%;	}
+
+.order-filter .col-md-3 {    -ms-flex: 0 0 100%;    flex: 0 0 100%;    max-width: 100%;	}
+
+.order-filter.row {    text-align: left;	}
+
+.order-filter label[for="orderto"], .order-filter label[for="ordersubt"] {    display: none;	} 
+ 
+table.table , table.table tr , table.table td , table.table th {    display: inline-block;    width: 100%;	} 
+
+.norder-thumb {    width: 50%;    margin-left: auto;    margin-right: auto;	}
+
+.norder-item {    flex-direction: column;	}
+
+.norder-cnt {    width: 100%;	} 
+
+.col-md-6.dpage-head {    text-align: center;	}
+ 
+a.deals_thumb {    width: 50%;    margin: 0 auto;    display: block;}
+
+.deals_item {    flex-flow: column;    padding: 20px;	}
+
+.deal_right {    width: 100%;    text-align: center;    margin-top: 10px;	}
+
+.deal_right h4 {    margin: 0 auto;	} 
+
+.ct-right {    text-align: left;	} 
+ 
+}
+
+

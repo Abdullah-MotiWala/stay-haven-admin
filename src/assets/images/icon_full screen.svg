@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="49" viewBox="0 0 48 49">
+  <g id="icon_full_screen" data-name="icon_full screen" transform="translate(-0.307 0.452)">
+    <rect id="Rectangle" width="48" height="49" rx="24" transform="translate(0.307 -0.452)" fill="#fff"/>
+    <path id="maximize" d="M8.451,3H5.18A2.18,2.18,0,0,0,3,5.18V8.451m19.716,0V5.18A2.18,2.18,0,0,0,20.536,3H17.265m0,18.063h3.271a2.18,2.18,0,0,0,2.18-2.18V15.612M3,15.612v3.271a2.18,2.18,0,0,0,2.18,2.18H8.451" transform="translate(11.182 12.415)" fill="none" stroke="#0056d2" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+  <g id="vuesax_linear_document-text" data-name="vuesax/linear/document-text" transform="translate(-172 -188)">
+    <g id="document-text" transform="translate(172 188)">
+      <path id="Vector" d="M31.667,12.667v7.917c0,7.917-3.167,11.083-11.083,11.083h-9.5C3.167,31.667,0,28.5,0,20.583v-9.5C0,3.167,3.167,0,11.083,0H19" transform="translate(3.167 3.167)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path id="Vector-2" data-name="Vector" d="M12.667,12.667H6.333C1.583,12.667,0,11.083,0,6.333V0Z" transform="translate(22.167 3.167)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path id="Vector-3" data-name="Vector" d="M0,0H9.5" transform="translate(11.083 20.583)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path id="Vector-4" data-name="Vector" d="M0,0H6.333" transform="translate(11.083 26.917)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path id="Vector-5" data-name="Vector" d="M0,0H38V38H0Z" fill="none" opacity="0"/>
+    </g>
+  </g>
+</svg>

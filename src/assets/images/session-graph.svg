@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="978" height="378" viewBox="0 0 978 378">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#2257ca"/>
+      <stop offset="1" stop-color="#65bee3"/>
+    </linearGradient>
+  </defs>
+  <g id="Group_2" data-name="Group 2" transform="translate(-16 -405)">
+    <text id="_100_" data-name="100%" transform="translate(16 454)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">100%</tspan></text>
+    <text id="_50_" data-name="50%" transform="translate(24 594)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">50%</tspan></text>
+    <text id="_0_" data-name="0%" transform="translate(36 733)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">0%</tspan></text>
+    <path id="Path_2" data-name="Path 2" d="M-352,430.445H547" transform="translate(447 16.555)" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="7 7" opacity="0.2"/>
+    <path id="Path_3" data-name="Path 3" d="M-352,430.445H547" transform="translate(447 201.555)" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="7 7" opacity="0.2"/>
+    <path id="Path_51539" data-name="Path 51539" d="M-352,430.445H547" transform="translate(447 108.555)" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="7 7" opacity="0.2"/>
+    <path id="Path_4" data-name="Path 4" d="M-352,430.445H547" transform="translate(447 294.555)" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="7 7" opacity="0.2"/>
+    <rect id="Rectangle_725" data-name="Rectangle 725" width="30" height="160" rx="15" transform="translate(122 564)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_725-2" data-name="Rectangle 725" width="30" height="123" rx="15" transform="translate(258 601)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_726" data-name="Rectangle 726" width="30" height="319" rx="15" transform="translate(396 405)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_727" data-name="Rectangle 727" width="30" height="199" rx="15" transform="translate(536 525)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_728" data-name="Rectangle 728" width="30" height="263" rx="15" transform="translate(675 461)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_729" data-name="Rectangle 729" width="30" height="92" rx="15" transform="translate(814 632)" fill="url(#linear-gradient)"/>
+    <rect id="Rectangle_730" data-name="Rectangle 730" width="30" height="172" rx="15" transform="translate(953 552)" fill="url(#linear-gradient)"/>
+    <text id="_21_01" data-name="21/01" transform="translate(112 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">21/01</tspan></text>
+    <text id="_22_01" data-name="22/01" transform="translate(246 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">22/01</tspan></text>
+    <text id="_23_01" data-name="23/01" transform="translate(384 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">23/01</tspan></text>
+    <text id="_24_01" data-name="24/01" transform="translate(523 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">24/01</tspan></text>
+    <text id="_25_01" data-name="25/01" transform="translate(663 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">25/01</tspan></text>
+    <text id="_26_01" data-name="26/01" transform="translate(802 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">26/01</tspan></text>
+    <text id="_27_01" data-name="27/01" transform="translate(941 776)" fill="#999b9f" font-size="20" font-family="Poppins" font-weight="500"><tspan x="0" y="0">27/01</tspan></text>
+  </g>
+</svg>

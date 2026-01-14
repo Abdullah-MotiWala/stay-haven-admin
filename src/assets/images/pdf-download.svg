@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="396" height="144" viewBox="0 0 396 144">
+  <g id="_1" data-name="1" transform="translate(-1085 -406)">
+    <path id="Rectangle_31" data-name="Rectangle 31" d="M25,0H371a25,25,0,0,1,25,25V144a0,0,0,0,1,0,0H25A25,25,0,0,1,0,119V25A25,25,0,0,1,25,0Z" transform="translate(1085 406)" fill="#babbc2" opacity="0.1"/>
+    <g id="Group_24" data-name="Group 24" transform="translate(0 3)">
+      <text id="Yeah_Sure._Here_it_is_." data-name="Yeah Sure. Here it is ." transform="translate(1117 442)" fill="#1d2733" font-size="16" font-family="Poppins-Regular, Poppins"><tspan x="0" y="0">Yeah Sure. Here it is .</tspan></text>
+      <g id="File" transform="translate(-218 -195)">
+        <rect id="Rectangle_32" data-name="Rectangle 32" width="329" height="58" rx="5" transform="translate(1335 661)" fill="#babbc2" opacity="0.1"/>
+        <g id="_1-2" data-name="1" transform="translate(0 7)">
+          <g id="File-2" data-name="File" transform="translate(0 -205)">
+            <rect id="bg" width="40" height="40" rx="10" transform="translate(1360 868)" fill="#ff3131"/>
+            <text id="AI" transform="translate(1374 893)" fill="#fff" font-size="14" font-family="Poppins-Medium, Poppins" font-weight="500"><tspan x="0" y="0">AI</tspan></text>
+          </g>
+          <text id="Picture.pdf" transform="translate(1420 688)" fill="#1d2733" font-size="14" font-family="Poppins-Regular, Poppins"><tspan x="0" y="0">Picture.pdf</tspan></text>
+        </g>
+        <g id="download" transform="translate(1618 678)">
+          <path id="Path_47" data-name="Path 47" d="M21,15v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V15" fill="none" stroke="#4694f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <path id="Path_48" data-name="Path 48" d="M7,10l5,5,5-5" fill="none" stroke="#4694f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <line id="Line_24" data-name="Line 24" y1="12" transform="translate(12 3)" fill="none" stroke="#4694f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
