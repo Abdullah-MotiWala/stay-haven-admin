@@ -8,18 +8,20 @@ const BookingTable = ({ bookingsData = [] }) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 overflow-hidden">
+    <div className="w-full bg-white rounded-[32px] pt-4 shadow-sm border border-gray-100 overflow-hidden">
       {/* Header */}
       <div className="flex justify-between items-center mb-6 px-2">
-        <h2 className="text-2xl font-bold text-gray-900">Recent Bookings</h2>
-        <button className="text-blue-600 text-sm font-semibold hover:underline">View All</button>
+        <h2 className="text-2xl font-bold text-gray-900 pl-2">Recent Bookings</h2>
+        <button className="text-blue-600 text-sm font-semibold hover:no-underline hover:text-blue pr-2">View All</button>
       </div>
 
       {/* Responsive Wrapper */}
       <div className="overflow-x-auto">
+        {/* <label htmlFor="" className='text-2xl font-bold text-gray-900'>Recent Bookings</label> */}
         <table className="w-full text-left border-collapse">
+          
           <thead>
-            <tr className="border-y border-dashed border-blue-100 bg-[#F8F9FA]">
+            <tr className="border-y border-dashed border-blue-100 text-blue bg-[#F8F9FA]">
               <th className="py-4 px-4 text-[13px] font-bold text-blue-600 uppercase tracking-tight">Booking ID</th>
               <th className="py-4 px-4 text-[13px] font-bold text-blue-600 uppercase tracking-tight">Guest Name</th>
               <th className="py-4 px-4 text-[13px] font-bold text-blue-600 uppercase tracking-tight">Room Type</th>

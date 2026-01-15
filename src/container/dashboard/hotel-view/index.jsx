@@ -5,6 +5,11 @@ import { ShopOutlined } from '@ant-design/icons';
 import RoomOccupancyCard from '../../../components/RoomOccupation';
 import RevenueDashboard from '../../../components/RevenueSnapshot';
 import BookingTable from "../../../components/RecentTable"
+import path from "../../../assets/icons/Path.png"
+import water from "../../../assets/icons/water.png"
+import pool from "../../../assets/icons/pool.png"
+import group from "../../../assets/icons/group.png"
+import bad from "../../../assets/icons/bad.png"
 const HotelProfile = () => {
   const stats = [
     { label: "Total Rooms", value: "120", bgColor: "bg-[#F4F9F1]", iconColor: "text-[#87B66D]", iconBg: "bg-[#E2EECF]" },
@@ -61,15 +66,15 @@ const chartData = [
           <div className="md:col-span-4 border-r-0 md:border-r border-gray-100 pr-4">
             <h1 className="text-[28px] font-bold text-[#1B2559] leading-tight">Grand Plaza Hotel</h1>
             <div className="flex items-center gap-1 mt-1">
-              <span className="text-[#8B95B7] text-sm font-medium">Karachi, Pakistan</span>
+              <span className="text-[#8B95B7] text-sm font-medium">Karachi,Pakistan</span>
               <div className="flex text-yellow-400 ml-1">
                 {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
               </div>
             </div>
             <div className="flex gap-2 mt-4">
               <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-bold">#321-01</span>
-              <div className="flex items-center gap-2 bg-[#A5E3B8] text-[#2D6A4F] px-4 py-1.5 rounded-full text-xs font-bold">
-                Active <span className="text-[10px]">▼</span>
+              <div className="flex items-center gap-1 bg-[#A5E3B8] text-[#2D6A4F] px-4 py-1.5 rounded-full text-xs font-bold">
+                Active <img src={path} alt="" />
               </div>
             </div>
           </div>
@@ -77,11 +82,11 @@ const chartData = [
           {/* Address & Policy */}
           <div className="md:col-span-4 flex flex-col gap-5 px-0 md:px-4">
             <div>
-              <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Hotel Address</p>
+              <p className="text-[#8B95B7] text-[10px] uppercase f tracking-wider mb-1">Hotel Address</p>
               <p className="font-bold text-[13px] text-[#1B2559]">Main Shahra-e-Faisal, Karachi</p>
             </div>
             <div>
-              <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Cancellation Policy</p>
+              <p className="text-[#8B95B7] text-[10px] uppercase  tracking-wider mb-1">Cancellation Policy</p>
               <p className="font-bold text-[13px] text-[#1B2559]">Upto 24 hours before checkin</p>
             </div>
           </div>
@@ -89,19 +94,19 @@ const chartData = [
           {/* Email & Amenities */}
           <div className="md:col-span-4 flex flex-col gap-4">
             <div>
-              <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Email</p>
+              <p className="text-[#8B95B7] text-[10px] uppercase  tracking-wider mb-1">Email</p>
               <p className="font-bold text-[13px] text-[#1B2559]">info@grandplazahotel.com</p>
             </div>
             <div>
-              <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Amenities included</p>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <p className="text-[#8B95B7] text-[10px] uppercase  tracking-wider mb-1">Amenities included</p>
+              <div className="flex  gap-1   mt-2">
                 {[
                   { icon: <Wifi size={12}/>, label: "Free WiFi" },
-                  { icon: <Coffee size={12}/>, label: "Breakfast" },
-                  { icon: <Droplets size={12}/>, label: "Pool" },
-                  { icon: <Wind size={12}/>, label: "Cold/Warm water" }
+                  { icon: <img src={group} alt="" />, label: "Breakfast" },
+                  { icon: <img src={pool} alt="" />, label: "Pool" },
+                  { icon: <img src={water} alt="" />, label: "Cold/Warm water" }
                 ].map((item, idx) => (
-                  <div key={idx} className="flex flex-col p-1 items-center justify-center bg-[#F8F9FD]  rounded-lg min-w-[75px]">
+                  <div key={idx} className="flex flex-col p-1  items-center justify-center bg-[#F8F9FD]  rounded-lg min-w-[40px]">
                     <span className="text-[#4A5568] mb-1">{item.icon}</span>
                     <span className="text-[8px] font-bold text-[#8B95B7] text-center uppercase whitespace-nowrap">{item.label}</span>
                   </div>
@@ -126,7 +131,7 @@ const chartData = [
           </div>
         ))}
       </div> */}
-      <MatrixCard showShadow={false} icon={ShopOutlined}/>
+      <MatrixCard showShadow={false} icon={bad}/>
     </div>
   <div
   className="

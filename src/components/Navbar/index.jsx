@@ -6,7 +6,7 @@ const Navbar = () => {
     <header className="w-full px-2">
       <div
         className="flex items-center justify-between gap-4
-        bg-transparent backdrop-blur-md rounded-xl
+        bg-transparent  rounded-xl
         px-4 py-3"
       >
         {/* Search */}

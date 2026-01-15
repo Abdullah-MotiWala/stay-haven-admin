@@ -4,6 +4,7 @@ import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../../components/Navbar';
 import MatrixCard from '../../../components/MatrixCard';
+import home from "../../../assets/icons/home.png"
 import Table from "../../../components/Table"
 import Breadcrumb from '../../../components/Breadcrumb';
 const HotelsListing = () => {
@@ -21,10 +22,10 @@ const HotelsListing = () => {
 
   return (
    
-    <div className="p-6 bg-[#F4F7FE] min-h-screen">
-     <Navbar/>  
+    <div className="p-6 min-h-screen">
+
        <Breadcrumb title="Hotels" />
-     <MatrixCard />
+     <MatrixCard showShadow={true} icon={home}/>
 
       {/* Figma Frame 7: Table & Filters */}
       <div className="bg-white p-8 rounded-3xl shadow-sm">

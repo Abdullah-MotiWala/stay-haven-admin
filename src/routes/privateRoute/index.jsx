@@ -3,7 +3,9 @@ import HotelsListing from "../../container/dashboard/hotels";
 import HotelView from "../../container/dashboard/hotel-view"; 
 import HotelForm from "../../container/dashboard/hotel-form"; 
 import AdminLayout from "../../layouts/adminLayout";
-
+import Room from "../../container/dashboard/rooms";
+import Login from "../../container/auth/login"
+import Signup from "../../container/auth/signUp"
 export const PrivateRoutes = [
   {
     path: "/admin", 
@@ -16,6 +18,10 @@ export const PrivateRoutes = [
           { path: "hotels", element: <HotelsListing /> }, 
           { path: "hotel-view/:id", element: <HotelView /> }, 
           { path: "hotel-edit/:id", element: <HotelForm /> },
+          { path: "login", element: <Login /> },
+          { path: "signup", element: <Signup /> },
+
+        
         ],
       },
     ],

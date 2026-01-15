@@ -75,9 +75,9 @@ const [rowActionOpen, setRowActionOpen] = useState(null);
 
         {/* Table Container - Responsive scroll */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-y border-gray-100 bg-blue-50/30">
+          <table className="border-dashed border-2 border-gray-200 w-full text-left">
+            <thead >
+              <tr className="border-y border-gray-100 text-blue border-dashed border-2 border-gray-50" >
                 <th className="p-4 w-10"><input type="checkbox" className="rounded accent-blue-600" /></th>
                 <th className="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider">Hotel ID</th>
                 <th className="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider">Hotel Name</th>
@@ -89,9 +89,9 @@ const [rowActionOpen, setRowActionOpen] = useState(null);
                 <th className="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="border-dashed border-2 border-gray-200 divide-y divide-gray-50 ">
               {hotels.map((hotel, index) => (
-                <tr key={index} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={index} className="border-dashed border-2 border-gray-200 even:bg-[#F8F9FA] hover:bg-gray-50/50 transition-colors ">
                   <td className="p-4"><input type="checkbox" className="rounded" /></td>
                   <td className="p-4 text-sm text-gray-600">{hotel.id}</td>
                   <td className="p-4">

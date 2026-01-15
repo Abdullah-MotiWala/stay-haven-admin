@@ -1,9 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 
-const MatrixCard = ({
-  showShadow = true,
-  icon: Icon = HomeOutlined,
-}) => {
+const MatrixCard = (props) => {
+  const {icon , showShadow} = props;
   const colors = ["#F3F7EE", "#EFF9FF", "#F7EFFF", "#F3F4FB"];
   const iconcolors = ["#D1E1BC", "#C7DAE7", "#DED0EC", "#CBCEE7"];
 
@@ -42,7 +40,7 @@ const MatrixCard = ({
             style={{ backgroundColor: iconcolors[i] }}
             className="absolute top-4 right-4 p-1 rounded-lg"
           >
-            <Icon className="text-lg" />
+           <img src={icon} alt="" />
           </div>
 
           {/* Content */}

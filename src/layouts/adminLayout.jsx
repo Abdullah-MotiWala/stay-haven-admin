@@ -2,15 +2,16 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import Navbar from "../components/Navbar"
 
 const AdminLayout = () => {
   return (
-    <div className="flex h-screen w-full bg-[#F4F7FE] overflow-hidden">
+    <div className="flex h-screen w-full  overflow-hidden">
       <Sidebar />
-
       <main className="flex-1 overflow-y-auto relative">
         <div className="p-4 md:p-8">
-            <Outlet /> 
+          <Navbar />
+          <Outlet />
         </div>
       </main>
     </div>
