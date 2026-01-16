@@ -10,6 +10,8 @@ import RoomDetailsForm from "../../components/roomsForm";
 import RoomDetail from '../../components/roomDetail';
 import AddRooms from '../../container/dashboard/addRooms';
 import Room from "../../container/dashboard/rooms";
+import Ticket from "../../container/dashboard/tickets";
+import TicketView from "../../container/dashboard/ticketView";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -24,7 +26,10 @@ export const AdminRoute = [
           { path: "hotel-view", element: <HotelView /> },
           { path: "rooms/add", element: <RoomDetailsForm /> },
           { path: "rooms/addnext", element: <AddRooms /> },
-            {path:"rooms" , element:<Room/>}
+            {path:"rooms" , element:<Room/>},
+            {path:"tickets" , element:<Ticket/>},
+            {path:"ticket/view" ,element:<TicketView/>}
+
 
         ],
       },

@@ -7,20 +7,23 @@ const App = (e) => (
       {
         href: '',
         title: (<>
-            <HomeOutlined color='#0A5BE2'/>
-            <span className='text-[#0A5BE2]'>Dashboard</span>
-            </>
+          <HomeOutlined color='#0A5BE2' />
+          <span className='text-[#0A5BE2]'>Dashboard</span>
+        </>
         ),
       },
-      
+
       {
-        href:"",
-        title:e.title,
+        href: "",
+        title: e.title,
       },
-      {
-        href:"",
-        title:e.subtitle,
-      }
+
+      e.subtitle ? {
+        href: "",
+        title: e.subtitle,
+      } : ""
+
+
     ]}
   />
 );

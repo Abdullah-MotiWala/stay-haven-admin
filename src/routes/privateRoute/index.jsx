@@ -20,7 +20,6 @@ export const PrivateRoutes = [
           { path: "hotel-edit/:id", element: <HotelForm /> },
           { path: "login", element: <Login /> },
           { path: "signup", element: <Signup /> },
-
         
         ],
       },
