@@ -2,10 +2,10 @@ import React from 'react';
 // Import Admin Guard and Layout first
 import { AdminGuard } from "../guards"; 
 import AdminLayout from "../../layouts/adminLayout";
-import Dashboard from "../../container/dashboard/hotels/index"; 
-import Hotels from "../../container/dashboard/hotels/index";
-import AddHotel from "../../container/dashboard/add-hotels/index";
-import HotelView from "../../container/dashboard/hotel-view/index";
+import Dashboard from "../../container/hotels/hotels/index"; 
+import Hotels from "../../container/hotels/hotels/index";
+import AddHotel from "../../container/hotels/add-hotels/index";
+import HotelView from "../../container/hotels/hotel-view/index";
 
 export const AdminRoute = [
   {
