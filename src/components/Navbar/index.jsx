@@ -6,14 +6,13 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="w-full px-2">
+    <header className="w-full px-3 ">
       <div
         className="flex items-center justify-between gap-4
-        bg-transparent backdrop-blur-md rounded-xl
-        px-4 py-3"
+        bg-transparent  py-3"
       >
         {/* Search */}
-        <div className="flex items-center gap-2 bg-white/70 rounded-full px-4 py-2 w-full max-w-xs shadow-sm">
+        <div className="flex items-center gap-2 bg-white/70 rounded-md px-4 py-2 w-full max-w-xs shadow-sm">
           <Search size={18} className="text-gray-500" />
           <input
             type="text"
@@ -27,7 +26,7 @@ const Navbar = () => {
           
           {/* List Hotel / Room Button (Naya Button) */}
           <button 
-            onClick={() => navigate("/admin/hotel-edit/new")} // Aapka add hotel route
+            onClick={() => navigate("/admin/hotel/add")} // Aapka add hotel route
             className="hidden lg:flex items-center gap-2 bg-[#0A5BE2] text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >
             <Plus size={16} />

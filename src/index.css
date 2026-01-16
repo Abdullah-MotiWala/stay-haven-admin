@@ -2,28 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-body, #root, .App {
-    background-color: #6C7293 !important; /* Figma wala background */
-    background: #F4F7FE !important;
-    
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lufga', sans-serif !important;
 }
 
+body,
+#root,
+#root {
+  height: 100%;
+  min-height: 100%;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body{
+  margin: 0;
+  background-image: url('./assets/images/background.png');
+  background-size: cover;        /* image full screen */
+  background-position: top right;   /* center se show */
+  background-repeat: no-repeat;  /* repeat band */
+  background-attachment: fixed;  /* scroll par fixed */
+}
+
+
 /* Agar koi div green hai to usay bhi force dain */
-div[class*="bg-green"], div[style*="background: green"] {
+div[class*="bg-green"],
+div[style*="background: green"] {
     background-color: transparent !important;
 }
 
 /* Sidebar aur Cards ko white rehne dain */
-.ant-layout-sider, .ant-card, .bg-white {
+.ant-layout-sider,
+.ant-card,
+.bg-white {
     background-color: #ffffff !important;
-     border-radius: 20px !important;
-     margin: 12px;
+    border-radius: 20px !important;
+    margin: 12px;
 }
 
 /* Sidebar Active Item Styling */
 .sidebar-menu .ant-menu-item-selected {
     background-color: #0A5BE2 !important;
-    color: white !important; /* Figma Blue */
+    color: white !important;
+    /* Figma Blue */
     font-weight: 700;
     border-radius: 15px !important;
 }
@@ -33,7 +58,16 @@ div[class*="bg-green"], div[style*="background: green"] {
     border-radius: 20px !important;
     text-decoration-line: none !important;
 }
-.logout-btn{
-border:1px solid;
-border-color: #8A8A8F;
+
+.logout-btn {
+    border: 1px solid;
+    border-color: #8A8A8F;
+}
+a{
+    text-decoration-line: none !important;
+    text-decoration: none !important;
+}
+a :hover{
+    text-decoration-line: none !important;
+    text-decoration: none !important;
 }

@@ -1,12 +1,18 @@
 import React from 'react';
 // Import Admin Guard and Layout first
-import { AdminGuard } from "../guards"; 
+import { AdminGuard } from "../guards";
 import AdminLayout from "../../layouts/adminLayout";
-import Dashboard from "../../container/hotels/hotels/index"; 
+
+// import Dashboard from "../../container/hotels/hotels/index";
 import Hotels from "../../container/hotels/hotels/index";
 import AddHotel from "../../container/hotels/add-hotels/index";
 import HotelView from "../../container/hotels/hotel-view/index";
-
+// import RoomDetailsForm from "../../components/roomsForm";
+// import RoomDetail from '../../components/roomDetail';
+// import AddRooms from '../../container/hotels/addRooms';
+// import Room from "../../container/hotels/rooms";
+// import Ticket from "../../container/hotels/tickets";
+// import TicketView from "../../container";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -15,10 +21,17 @@ export const AdminRoute = [
       {
         element: <AdminLayout />,
         children: [
-          { path: "dashboard", element: <Dashboard /> },
+          // { path: "hotels", element: <hotels /> },
           { path: "hotels", element: <Hotels /> },
-          { path: "add-hotel", element: <AddHotel /> },
-          { path: "hotel-view", element: <HotelView /> },
+          { path: "hotel/add", element: <AddHotel /> },
+          { path: "hotel/view/:id", element: <HotelView /> },
+          // { path: "rooms/add", element: <RoomDetailsForm /> },
+          // { path: "rooms/addnext", element: <AddRooms /> },
+            // {path:"rooms" , element:<Room/>},
+            // {path:"tickets" , element:<Ticket/>},
+            // {path:"ticket/view" ,element:<TicketView/>}
+
+
         ],
       },
     ],

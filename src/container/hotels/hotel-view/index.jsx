@@ -1,17 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // useNavigate add kiya
-import { getHotelById } from '../../../services/hotel';
-import { Edit3, Wifi, Coffee, Droplets, Wind, Star } from 'lucide-react';
-import MatrixCard from '../../../components/MatrixCard';
-import { ShopOutlined } from '@ant-design/icons';
-import RoomOccupancyCard from '../../../components/RoomOccupation';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom"; // useNavigate add kiya
+import { getHotelById } from "../../../services/hotel";
+import { Edit3, Wifi, Coffee, Droplets, Wind, Star } from "lucide-react";
+import MatrixCard from "../../../components/MatrixCard";
+import { ShopOutlined } from "@ant-design/icons";
+import RoomOccupancyCard from "../../../components/RoomOccupation";
+import Breadcrumb from "../../../components/Breadcrumb";
 import BookingTable from "../../../components/RecentTable";
+import editIcon from "../../../assets/icons/editIcon.png";
+import downArrowIcon from "../../../assets/icons/downArrowIcon.png";
+import { DEFAULT_IMAGE } from "../../../shared/constant";
+import hotel1 from "../../../assets/icons/IconHotel1.png";
+import hotel2 from "../../../assets//icons/IconHotel1.png";
+import hotel3 from "../../../assets/icons/IconHotel2.png";
+import hotel4 from "../../../assets/icons/IconHotel3.png";
+import HotelDirectory from "../../../components/Table";
 
 const HotelProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate(); // Navigation hook
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const uiHotelId = location.state?.uiHotelId;
+
+  console.log(uiHotelId, "uiHotelIduiHotelId");
+  console.log("location.state =", location.state);
 
   useEffect(() => {
     const fetchHotelData = async () => {
@@ -30,82 +44,276 @@ const HotelProfile = () => {
 
   // Update logic function
   const handleEditClick = () => {
-  // Aapke routes file ke mutabiq path 'hotel-edit' hai
-  navigate(`/admin/hotel-edit/${id}`); 
-};
+    // Aapke routes file ke mutabiq path 'hotel-edit' hai
+    navigate(`/admin/hotel-edit/${id}`);
+  };
 
-  if (loading) return <div className="p-20 text-center text-blue-600 font-bold text-xl tracking-wider animate-pulse">Loading Hotel Profile...</div>;
-  if (!hotel) return <div className="p-20 text-center text-red-500 font-bold">Hotel Not Found!</div>;
+  const cardsData = [
+    {
+      title: "Total Rooms",
+      value: 120,
+      bg: "#F3F7EE",
+      iconBg: "#D1E1BC",
+      image: hotel1,
+      // trend: "+12%",
+      // trendText: "vs last week",
+      showTrend: false,
+    },
+    {
+      title: "Occupied",
+      value: 84,
+      bg: "#EFF9FF",
+      iconBg: "#C7DAE7",
+      image: hotel1,
+    },
+    {
+      title: "Available Rooms",
+      value: 34,
+      bg: "#F7EFFF",
+      iconBg: "#DED0EC",
+      image: hotel3,
+    },
+    {
+      title: "In Draft",
+      value: "02",
+      bg: "#F3F4FB",
+      iconBg: "#CBCEE7",
+      image: hotel4,
+    },
+  ];
+
+  const amenities = [
+    { label: "Free Wifi", icon: Wifi, active: true },
+    { label: "Breakfast", icon: Coffee },
+    { label: "Pool", icon: Droplets },
+    { label: "Cold/Warm water", icon: Droplets },
+  ];
+
+  if (loading)
+    return (
+      <div className="p-20 text-center text-blue-600 font-bold text-xl tracking-wider animate-pulse">
+        Loading Hotel Profile...
+      </div>
+    );
+  if (!hotel)
+    return (
+      <div className="p-20 text-center text-red-500 font-bold">
+        Hotel Not Found!
+      </div>
+    );
+
+  const columns = [
+    { key: "bookingId", label: "Booking ID", type: "text" },
+    { key: "guestName", label: "Guest Name", type: "text" },
+    { key: "roomType", label: "Room Type", type: "roomType" },
+    { key: "roomNumber", label: "Room No", type: "text" },
+    { key: "duration", label: "Duration", type: "text" },
+    { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
+    { key: "status", label: "Status", type: "status" },
+  ];
+
+  const bookings = [
+    {
+      bookingId: "#321-02",
+      guestName: "Muhammad Akbar Ali Khan Iqbal",
+      roomType: "Deluxe",
+      roomNumber: "Room 101",
+      duration: "3 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Sara Iqbal",
+      roomType: "Standard",
+      roomNumber: "Room 202",
+      duration: "2 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Alexander James William Robert Smith",
+      roomType: "Deluxe",
+      roomNumber: "Room 300",
+      duration: "1 night",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-Out",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Sophia Grace",
+      roomType: "Deluxe",
+      roomNumber: "Room 119",
+      duration: "3 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-Out",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Benjamin Thomas Edward Samuel Brown",
+      roomType: "Standard",
+      roomNumber: "Room 210",
+      duration: "2 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+  ];
 
   return (
     <>
+      <div className="mt-4 px-3 !overflow-x-hidden">
+        <Breadcrumb title="Hotels" subtitle="View hotel" />
+      </div>
+
       <div className="w-full bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 font-sans">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-[18px] font-bold text-[#1B2559]">Hotel Profile</h3>
-          
+          <h3 className="text-[18px] font-bold text-[#1B2559]">
+            Hotel Profile
+          </h3>
+
           {/* Edit Button linked to handleEditClick */}
-          <button 
+          <button
             onClick={handleEditClick}
-            className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-gray-700 hover:bg-[#2563EB] hover:text-white transition-all duration-300"
+            className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark  hover:text-extradark transition-all duration-300"
           >
-            <Edit3 size={14} /> Edit Profile
+            <div>
+              <img src={editIcon} alt="Edit Icon" />
+            </div>
+            Edit
           </button>
         </div>
 
         {/* Main Content Layout */}
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-10">
-          <div className="w-full lg:w-[280px] h-[180px] shrink-0">
-            <img 
-              src={hotel.img || "https://images.unsplash.com/photo-1566073771259-6a8506099945"} 
-              className="w-full h-full rounded-[16px] object-cover shadow-sm border border-gray-100" 
-              alt={hotel.name} 
+          {/* LEFT IMAGE */}
+          <div className="w-full lg:w-[217px] h-[152px] shrink-0">
+            <img
+              src={hotel.img ?? DEFAULT_IMAGE}
+              className="w-full h-full rounded-[16px] object-cover border border-gray-100"
+              alt={hotel.name}
             />
           </div>
 
-          <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            
-            <div className="md:col-span-4 border-r-0 md:border-r border-gray-100 pr-4">
-              <h1 className="text-[28px] font-bold text-[#1B2559] leading-tight capitalize">{hotel.name}</h1>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-[#8B95B7] text-sm font-medium">{hotel.city}, {hotel.country}</span>
-                <div className="flex text-yellow-400 ml-1">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+          {/* RIGHT CONTENT */}
+          <div className="flex-1 flex items-start gap-8">
+            {/* LEFT INFO COLUMN */}
+            <div className="w-[320px] shrink-0">
+              <h1 className="text-[28px] font-medium text-[#1B2559] leading-tight">
+                {hotel.name}
+              </h1>
+
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm text-[#8B95B7]">
+                  {hotel.city}, {hotel.country}
+                </span>
+
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} fill="currentColor" />
+                  ))}
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-bold uppercase">ID: {id.slice(-5)}</span>
-                <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${hotel.status === 'Active' ? 'bg-[#A5E3B8] text-[#2D6A4F]' : 'bg-red-100 text-red-600'}`}>
-                  {hotel.status || 'Active'}
+
+              {/* ID + STATUS */}
+              <div className="flex items-center gap-3 mt-4">
+                {/* ID */}
+                <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-semibold uppercase">
+                  #{uiHotelId ?? "N/A"}
+                </span>
+
+                {/* STATUS BADGE */}
+                <div
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${
+                    hotel.isActive
+                      ? "bg-[#A5E3B8] text-[#2D6A4F]"
+                      : "bg-[#FECACA] text-[#B91C1C]"
+                  }`}
+                >
+
+                  {hotel.isActive ? "Active" : "Inactive"}
+
+                  {/* dropdown arrow */}
+                  <img
+                    src={downArrowIcon}
+                    alt="arrow"
+                    // className="w-3 h-3 ml-1"
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="md:col-span-4 flex flex-col gap-5 px-0 md:px-4">
-              <div>
-                <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Hotel Address</p>
-                <p className="font-bold text-[13px] text-[#1B2559]">{hotel.address}</p>
-              </div>
-              <div>
-                <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Cancellation Policy</p>
-                <p className="font-bold text-[13px] text-[#1B2559]">{hotel.cancellation_policy || "No Policy Set"}</p>
-              </div>
-            </div>
+            {/* VERTICAL DIVIDER */}
+            <span className="self-stretch w-px bg-lightSeconday" />
 
-            <div className="md:col-span-4 flex flex-col gap-4">
-              <div>
-                <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Contact Email</p>
-                <p className="font-bold text-[13px] text-[#1B2559]">{hotel.email}</p>
+            {/* RIGHT DETAILS */}
+            <div className="flex flex-1  gap-40">
+              <div className="flex flex-col gap-5">
+                <div>
+                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
+                    Hotel Address
+                  </p>
+                  <p className="text-[13px] font-medium text-[#1B2559]">
+                    {hotel.address}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
+                    Cancellation Policy
+                  </p>
+                  <p className="text-[13px] font-medium text-[#1B2559]">
+                    {hotel.cancellation_policy || "No Policy Set"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-[#8B95B7] text-[10px] uppercase font-bold tracking-wider mb-1">Price Per Night</p>
-                <p className="font-bold text-[18px] text-[#2563EB]">${hotel.pricePerNight || hotel.price_per_night}</p>
+
+              {/* EMAIL + PRICE */}
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
+                    Contact Email
+                  </p>
+                  <p className="text-[13px] font-medium text-[#1B2559]">
+                    {hotel.email || "—"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
+                    Amenities included
+                  </p>
+                  {/* <p className="text-[18px] font-bold text-[#2563EB]">
+                    {hotel?.amenities.lenght || "No amenities"}
+                  </p> */}
+                  <div className="flex flex-row ">
+                    {amenities.map((item) => {
+                      const Icon = item.icon;
+
+                      return (
+                        <div
+                          key={item.label}
+                          className="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium  text-lightPurple bg-lightColor"
+                        >
+                          <Icon size={14} />
+                          {item.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <MatrixCard showShadow={false} icon={ShopOutlined}/>
+        <MatrixCard showShadow={false} icon={ShopOutlined} data={cardsData} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 mt-6">
@@ -121,8 +329,16 @@ const HotelProfile = () => {
       </div>
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-        <h3 className="text-[18px] font-bold text-[#1B2559] mb-4">Recent Bookings</h3>
-        <BookingTable bookingsData={[]} />
+        <h3 className="text-[18px] font-bold text-[#1B2559] mb-4">
+          Recent Bookings
+        </h3>
+        {/* <BookingTable bookingsData={[]} /> */}
+        {/* <HotelDirectory  /> */}
+        <HotelDirectory
+          data={bookings}
+          title="Hotels Directory"
+          columns={columns}
+        />
       </div>
     </>
   );
