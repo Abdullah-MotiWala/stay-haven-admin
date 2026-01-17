@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom"; // useNavigate add kiya
 import { getHotelById } from "../../../services/hotel";
-import { Edit3, Wifi, Coffee, Droplets, Wind, Star } from "lucide-react";
 import MatrixCard from "../../../components/MatrixCard";
 import { ShopOutlined } from "@ant-design/icons";
 import RoomOccupancyCard from "../../../components/RoomOccupation";
@@ -15,11 +14,33 @@ import hotel2 from "../../../assets//icons/IconHotel1.png";
 import hotel3 from "../../../assets/icons/IconHotel2.png";
 import hotel4 from "../../../assets/icons/IconHotel3.png";
 import HotelDirectory from "../../../components/Table";
+import RevenueSnapshot from "../../../components/hotels/charts";
+import { getAllFeature } from "../../../services/features";
+import {
+  Wifi,
+  Utensils,
+  Waves,
+  ParkingCircle,
+  Droplets,
+  Coffee,
+  Star,
+  HelpCircle
+} from "lucide-react";
+
+  const AMENITY_ICONS = {
+    wifi: Wifi,
+    breakfast: Coffee,
+    dinner: Utensils,
+    pool: Waves,
+    parking: ParkingCircle,
+    coldandwarm: Droplets,
+  };
 
 const HotelProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // Navigation hook
+  const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
+  const [amenitiesList, setAmenitiesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const uiHotelId = location.state?.uiHotelId;
@@ -27,11 +48,34 @@ const HotelProfile = () => {
   console.log(uiHotelId, "uiHotelIduiHotelId");
   console.log("location.state =", location.state);
 
+
+  useEffect(() => {
+
+    const fetchFeatures = async () => {
+      // setFetching(true);
+      try {
+        const res = await getAllFeature("AMENITY");
+        const features = res.data;
+
+        setAmenitiesList(features);
+      } catch (err) {
+        console.error("Failed to load hotel:", err);
+        alert("Hotel load nahi ho saka");
+      } finally {
+        // setFetching(false);
+      }
+    };
+
+    fetchFeatures();
+  }, []);
+
+  console.log(amenitiesList, "amenitiesListamenitiesList");
   useEffect(() => {
     const fetchHotelData = async () => {
       try {
         setLoading(true);
         const res = await getHotelById(id);
+        console.log(res, "resresres");
         setHotel(res.data);
       } catch (err) {
         console.error("Hotel detail fetch karne mein error:", err);
@@ -42,10 +86,8 @@ const HotelProfile = () => {
     if (id) fetchHotelData();
   }, [id]);
 
-  // Update logic function
   const handleEditClick = () => {
-    // Aapke routes file ke mutabiq path 'hotel-edit' hai
-    navigate(`/admin/hotel-edit/${id}`);
+    navigate(`/admin/hotel/edit/${id}`);
   };
 
   const cardsData = [
@@ -82,12 +124,7 @@ const HotelProfile = () => {
     },
   ];
 
-  const amenities = [
-    { label: "Free Wifi", icon: Wifi, active: true },
-    { label: "Breakfast", icon: Coffee },
-    { label: "Pool", icon: Droplets },
-    { label: "Cold/Warm water", icon: Droplets },
-  ];
+
 
   if (loading)
     return (
@@ -164,35 +201,46 @@ const HotelProfile = () => {
       status: "Checked-In",
     },
   ];
+const AMENITY_ICON_BY_NAME = {
+  "break fast": Coffee,
+  "breakfast": Coffee,
+  "wifi": Wifi,
+  "pool": Waves,
+  "dinner": Utensils,
+  "parking": ParkingCircle,
+  "cold / warm water": Droplets,
+};
 
+
+  const getAmenityIcon = (name = "") => {
+  const key = name.toLowerCase().trim();
+  return AMENITY_ICON_BY_NAME[key] || HelpCircle;
+};
+
+  console.log(hotel.amenities, "asdsadsad12313");
   return (
     <>
-      <div className="mt-4 px-3 !overflow-x-hidden">
+      <div className="mt-4  !overflow-x-hidden">
         <Breadcrumb title="Hotels" subtitle="View hotel" />
       </div>
 
-      <div className="w-full bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 font-sans">
-        {/* Header Section */}
+
+      <div className="w-full overflow-x-hidden bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-[18px] font-bold text-[#1B2559]">
             Hotel Profile
           </h3>
 
-          {/* Edit Button linked to handleEditClick */}
           <button
             onClick={handleEditClick}
-            className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark  hover:text-extradark transition-all duration-300"
+            className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark hover:text-extradark transition-all duration-300"
           >
-            <div>
-              <img src={editIcon} alt="Edit Icon" />
-            </div>
+            <img src={editIcon} alt="Edit Icon" />
             Edit
           </button>
         </div>
 
-        {/* Main Content Layout */}
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-10">
-          {/* LEFT IMAGE */}
           <div className="w-full lg:w-[217px] h-[152px] shrink-0">
             <img
               src={hotel.img ?? DEFAULT_IMAGE}
@@ -201,10 +249,8 @@ const HotelProfile = () => {
             />
           </div>
 
-          {/* RIGHT CONTENT */}
-          <div className="flex-1 flex items-start gap-8">
-            {/* LEFT INFO COLUMN */}
-            <div className="w-[320px] shrink-0">
+          <div className="flex-1 flex flex-col lg:flex-row items-start gap-8">
+            <div className="w-full max-w-[320px] shrink-0">
               <h1 className="text-[28px] font-medium text-[#1B2559] leading-tight">
                 {hotel.name}
               </h1>
@@ -221,14 +267,11 @@ const HotelProfile = () => {
                 </div>
               </div>
 
-              {/* ID + STATUS */}
-              <div className="flex items-center gap-3 mt-4">
-                {/* ID */}
+              <div className="flex items-center gap-3 mt-4 flex-wrap">
                 <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-semibold uppercase">
                   #{uiHotelId ?? "N/A"}
                 </span>
 
-                {/* STATUS BADGE */}
                 <div
                   className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${
                     hotel.isActive
@@ -236,24 +279,15 @@ const HotelProfile = () => {
                       : "bg-[#FECACA] text-[#B91C1C]"
                   }`}
                 >
-
                   {hotel.isActive ? "Active" : "Inactive"}
-
-                  {/* dropdown arrow */}
-                  <img
-                    src={downArrowIcon}
-                    alt="arrow"
-                    // className="w-3 h-3 ml-1"
-                  />
+                  <img src={downArrowIcon} alt="arrow" />
                 </div>
               </div>
             </div>
 
-            {/* VERTICAL DIVIDER */}
-            <span className="self-stretch w-px bg-lightSeconday" />
+            <span className="hidden lg:block self-stretch w-px bg-lightSeconday" />
 
-            {/* RIGHT DETAILS */}
-            <div className="flex flex-1  gap-40">
+            <div className="flex flex-1 flex-col sm:flex-row gap-6 xl:gap-10">
               <div className="flex flex-col gap-5">
                 <div>
                   <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
@@ -274,7 +308,6 @@ const HotelProfile = () => {
                 </div>
               </div>
 
-              {/* EMAIL + PRICE */}
               <div className="flex flex-col gap-4">
                 <div>
                   <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
@@ -286,23 +319,22 @@ const HotelProfile = () => {
                 </div>
 
                 <div>
-                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-1">
+                  <p className="text-[10px] uppercase font-normal tracking-wider text-[#8B95B7] mb-2">
                     Amenities included
                   </p>
-                  {/* <p className="text-[18px] font-bold text-[#2563EB]">
-                    {hotel?.amenities.lenght || "No amenities"}
-                  </p> */}
-                  <div className="flex flex-row ">
-                    {amenities.map((item) => {
-                      const Icon = item.icon;
 
+                  <div className="flex flex-wrap gap-2">
+                    {hotel?.amenities?.map((item) => {
+                      // const Icon = AMENITY_ICONS[item.name];
+                      const Icon = getAmenityIcon(item.name);
+                      
                       return (
                         <div
-                          key={item.label}
-                          className="flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium  text-lightPurple bg-lightColor"
+                          key={item.id}
+                          className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-lightPurple bg-lightColor"
                         >
-                          <Icon size={14} />
-                          {item.label}
+                          {Icon && <Icon size={16} className="text-lightPurple" />}
+                          {item.name}
                         </div>
                       );
                     })}
@@ -316,8 +348,10 @@ const HotelProfile = () => {
         <MatrixCard showShadow={false} icon={ShopOutlined} data={cardsData} />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mt-6">
-        {/* Dynamic data binding example for Rooms */}
+      <div
+        className="grid mt-6 gap-6"
+        style={{ gridTemplateColumns: "40% 59%" }}
+      >
         <RoomOccupancyCard
           data={[
             { label: "One Bed Rooms", used: 18, total: 25 },
@@ -326,18 +360,17 @@ const HotelProfile = () => {
             { label: "Luxury Suites", used: 8, total: 10 },
           ]}
         />
+
+        <RevenueSnapshot />
       </div>
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-        <h3 className="text-[18px] font-bold text-[#1B2559] mb-4">
-          Recent Bookings
-        </h3>
-        {/* <BookingTable bookingsData={[]} /> */}
-        {/* <HotelDirectory  /> */}
         <HotelDirectory
           data={bookings}
-          title="Hotels Directory"
+          title="Recent Bookings"
           columns={columns}
+          filter={false}
+          view={true}
         />
       </div>
     </>

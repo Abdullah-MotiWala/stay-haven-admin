@@ -7,10 +7,10 @@ export const PublicRoutes = [
     element: <PublicGuard />, // Security layer
     children: [
       {
-        path: "login",
+        path: "/login",
         element: <Login />,
       },
-      { path: "signup", element: <Signup /> },
+      { path: "/signup", element: <Signup /> },
     ],
   },
 ];
