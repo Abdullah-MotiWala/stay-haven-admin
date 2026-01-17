@@ -21,6 +21,13 @@ content: [
         lightColor:"#F8FAFC", 
         lightYellow:"#F3FCC5", 
         shadeGreen:"#D7F6E4", 
+        lightGray:"#C4CADA", 
+        lightText:"#405588", 
+        myWhite:"#ffffff", 
+        darkGray:"#545454", 
+        lightBlue:"#DBE9FF", 
+
+        
   },
     },
   },

@@ -24,6 +24,7 @@ export const AdminRoute = [
           // { path: "hotels", element: <hotels /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
+          { path: "hotel/edit/:id", element: <AddHotel /> },
           { path: "hotel/view/:id", element: <HotelView /> },
           // { path: "rooms/add", element: <RoomDetailsForm /> },
           // { path: "rooms/addnext", element: <AddRooms /> },

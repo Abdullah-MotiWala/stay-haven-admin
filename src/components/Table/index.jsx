@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
+import { bulkActionApi } from "../../services/hotel";
 
 const HotelDirectory = ({
   data = [],
@@ -10,17 +11,20 @@ const HotelDirectory = ({
   onImportCSV,
   filter = true,
   title = "Directory",
+  view = false,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [rowActionOpen, setRowActionOpen] = useState(null);
+
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const getStatusStyle = (status) => {
     switch (status) {
       case "Active":
         return "bg-green-100 text-green-700";
       case "Inactive":
-        return "bg-blue-100 text-blue-600";
+        return "bg-lightBlue text-blue";
       case "Deleted":
         return "bg-red-100 text-red-600";
       case "Checked-In":
@@ -50,7 +54,43 @@ const HotelDirectory = ({
     return row.status;
   };
 
-  // 🔥 CELL RENDERER (CORE LOGIC)
+  const toggleRow = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.length === data.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(data.map((row) => row.id));
+    }
+  };
+
+  const handleBulkAction = async (action) => {
+    if (selectedIds.length === 0) {
+      alert("Please select at least one row");
+      return;
+    }
+
+    const payload = {
+      ids: selectedIds,
+      action, // ACTIVATE | DEACTIVATE | DELETE
+    };
+
+    console.log("Bulk action payload:", payload);
+
+    try {
+      console.log("Bulk payload:", payload);
+      await bulkActionApi(payload); 
+      setSelectedIds([]);
+      setBulkOpen(false);
+    } catch (err) {
+      console.error("Bulk action failed", err);
+    }
+  };
+
   const renderCell = (row, col, index) => {
     switch (col.type) {
       case "text":
@@ -154,10 +194,14 @@ const HotelDirectory = ({
 
               {bulkOpen && (
                 <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-                  {["Activate Selected", "Export Selected", "Delete"].map(
+                  {["Activate Selected", "DeActivate Selected", "Delete"].map(
                     (item) => (
                       <button
                         key={item}
+                        onClick={() => {
+                          handleBulkAction(item.split(" ")[0].toUpperCase());
+                          setBulkOpen(!bulkOpen);
+                        }}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                       >
                         {item}
@@ -177,6 +221,12 @@ const HotelDirectory = ({
             </button>
           </div>
         )}
+
+        {view && (
+          <button className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
+            View
+          </button>
+        )}
       </div>
 
       {/* TABLE */}
@@ -185,7 +235,14 @@ const HotelDirectory = ({
           <thead>
             <tr>
               <th className="w-10 border-b border-dashed">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={
+                    selectedIds.length === data.length && data.length > 0
+                  }
+                  onChange={toggleAll}
+                  className="checked:accent-blue"
+                />
               </th>
 
               {columns.map((col) => (
@@ -214,7 +271,12 @@ const HotelDirectory = ({
               return (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="border-b border-dashed">
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(row.id)}
+                      onChange={() => toggleRow(row.id)}
+                      className="checked:accent-blue"
+                    />
                   </td>
 
                   {columns.map((col) => (
@@ -229,7 +291,7 @@ const HotelDirectory = ({
 
                       {/* ACTION DROPDOWN */}
                       {col.type === "actions" && rowActionOpen === index && (
-                        <div className="absolute right-12 top-1/2 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
+                        <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
                           <button
                             onClick={() => {
                               setRowActionOpen(null);
@@ -240,6 +302,17 @@ const HotelDirectory = ({
                             className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                           >
                             View
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRowActionOpen(null);
+                              navigate(`/admin/hotel/edit/${row.id}`, {
+                                state: { uiHotelId },
+                              });
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                          >
+                            Edit
                           </button>
 
                           <button
