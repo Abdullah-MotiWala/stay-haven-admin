@@ -42,7 +42,7 @@ console.log("MatrixCard data:", data);
 
           {/* Value */}
           <div className="flex justify-between items-end mt-2 h-full ">
-            <h3 className="text-3xl font-bold position-relative bottom-8 ">
+            <h3 className="text-5xl font-semibold  position-relative bottom-8 ">
               {card.value.toString().padStart(2, "0")}
             </h3>
 
