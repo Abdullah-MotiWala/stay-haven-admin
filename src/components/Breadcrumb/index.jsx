@@ -1,32 +1,35 @@
-import React from 'react';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-import { Breadcrumb } from 'antd';
-import Breadpath from '../../assets/icons/braedpath.png';
-const App = (e) => (
-  <Breadcrumb
-    items={[
-      {
-        href: '',
-        title: (<>
-        {/* <img src={Breadpath} alt="" sizes='12'/> */}
-          <span className='text-[#0A5BE2]'>Dashboard</span>
-        </>
-        ),
-      },
+import React from "react"; 
+import { Breadcrumb } from "antd";
 
-      {
-        href: "",
-        title: e.title,
-      },
+const App = ({ title, subtitle }) => {
+  // Build breadcrumb items
+  const breadcrumbItems = [
+    {
+      href: "",
+      title: (
+        <div className="flex items-center gap-2 cursor-pointer hover:bg-transparent">
+          <img
+            src="/assets/icons/dashboardIcon.png"
+            alt="dashboardIcon"
+            className="w-4 h-4 !hover:bg-transparent"
+          />
+          <span className="text-blue font-medium !hover:bg-transparent">Dashboard</span>
+        </div>
+      ),
+    },
+    {
+      href: "",
+      title: <span className="text-lightSeconday font-medium !hover:bg-transparent">{title}</span>,
+    },
+    subtitle
+      ? {
+          href: "",
+          title: <span className="text-gray-500 font-medium hover:bg-transparent">{subtitle}</span>,
+        }
+      : null, // optional subtitle
+  ].filter(Boolean); // remove any nulls
 
-      e.subtitle ? {
-        href: "",
-        title: e.subtitle,
-      } : ""
+  return <Breadcrumb separator="/" items={breadcrumbItems} />;
+};
 
-
-    ]}
-  />
-);
 export default App;
-

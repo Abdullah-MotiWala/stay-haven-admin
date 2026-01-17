@@ -8,11 +8,11 @@ const AdminLayout = () => {
   return (
     <div className="flex h-screen w-full  overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto relative">
-        <div className="p-4 md:p-8">
+      <main className="flex-1 overflow-y-auto relative px-3">
+        {/* <div className=" "> */}
           <Navbar />
           <Outlet />
-        </div>
+        {/* </div> */}
       </main>
     </div>
   );
