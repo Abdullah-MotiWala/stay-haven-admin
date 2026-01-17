@@ -1,3 +1,7 @@
+export const DEFAULT_IMAGE = "https://placehold.net/default.png";
+export const BASE_HOTEL_CODE = 301;
+
+
 export const ENVIRONMENTS = {
   DEVELOPMENT: "development",
   PRODUCTION: "production"

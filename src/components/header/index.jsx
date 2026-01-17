@@ -11,12 +11,12 @@ import {
 
 const Header = () => {
   return (
-    <div className="flex justify-between items-center bg-transparent px-8 py-4">
+    <div className="flex justify-between items-center bg-transparent  py-4">
       {/* Figma Search Bar */}
       <Input 
         placeholder="Search" 
         prefix={<SearchOutlined className="text-gray-400" />} 
-        className="w-1/3 rounded-xl border-none h-11 shadow-sm"
+        className="w-1/3 rounded-mdborder-none h-11 shadow-sm"
       />
 
       <div className="flex items-center gap-6">

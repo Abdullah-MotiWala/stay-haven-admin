@@ -18,7 +18,7 @@ const ProgressRow = ({
       {/* Progress Bar */}
       <div className="w-full h-2.5 rounded-full bg-indigo-100 overflow-hidden">
         <div
-          className="h-full rounded-full bg-blue-600 transition-all duration-300"
+          className="h-full rounded-full bg-blue transition-all duration-300"
           style={{ width: `${percentage}%` }}
         />
       </div>

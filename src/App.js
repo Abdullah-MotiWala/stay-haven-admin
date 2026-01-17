@@ -24,12 +24,8 @@ function App() {
     >
       {/* Background Wrapper */}
       <div
-        className="App min-h-screen w-full bg-no-repeat bg-cover bg-center bg-fixed overflow-x-hidden"
-        style={{ 
-          backgroundImage: `url(${bgImage})`,
-          // Backup color agar image load na ho
-          backgroundColor: "#f8faff" 
-        }}
+        className="App"
+       
       >
         {loading < totalRequest && <AppLoader />}
         
