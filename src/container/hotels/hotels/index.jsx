@@ -35,7 +35,7 @@ const HotelsListing = () => {
         // 1. Basic Stats Logic
         if (hotel.isDeleted) {
             draft++;
-        } else if (hotel.active) {
+        } else if (hotel.isActive) {
             active++;
         } else {
             inactive++;
