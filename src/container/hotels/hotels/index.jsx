@@ -9,6 +9,7 @@ import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
 import home4 from "../../../assets/icons/home-4.png";
+import { openNotification } from "../../../network/notification";
 
 const HotelsListing = () => {
   const navigate = useNavigate();
@@ -39,10 +40,12 @@ const HotelsListing = () => {
         await deleteHotel(id);
 
         setHotels(hotels.filter((hotel) => hotel.id !== id));
-        alert("Hotel deleted");
+        // alert("Hotel deleted");
+        openNotification("success", "Hotel deleted successfully");
       } catch (err) {
         console.error("Any Problem in deleteing", err);
-        alert("Can not be deleted.");
+        // alert("Can not be deleted.");
+        openNotification("error", "Internal Server Error");
       }
     }
   };

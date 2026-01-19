@@ -2,6 +2,7 @@ import React from "react";
 import { Form, Input, Button, Card, Checkbox } from "antd";
 import { loginApi } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
+import { openNotification } from "../../../network/notification";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ const Login = () => {
 
     } catch (err) {
       console.error(err);
-      alert("Invalid email or password");
+            openNotification("error", "Invalid email or password");
+      
     }
   };
   return (
