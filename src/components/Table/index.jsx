@@ -3,6 +3,8 @@ import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
 import { bulkActionApi } from "../../services/hotel";
+import { openNotification } from "../../network/notification";
+import { exportToExcel } from "../../utils/exportExcel";
 
 const HotelDirectory = ({
   data = [],
@@ -56,7 +58,7 @@ const HotelDirectory = ({
 
   const toggleRow = (id) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -70,7 +72,7 @@ const HotelDirectory = ({
 
   const handleBulkAction = async (action) => {
     if (selectedIds.length === 0) {
-      alert("Please select at least one row");
+      openNotification("info", "Please select at least one row");
       return;
     }
 
@@ -83,12 +85,30 @@ const HotelDirectory = ({
 
     try {
       console.log("Bulk payload:", payload);
-      await bulkActionApi(payload); 
+      await bulkActionApi(payload);
       setSelectedIds([]);
       setBulkOpen(false);
     } catch (err) {
       console.error("Bulk action failed", err);
     }
+  };
+
+  const handleExportExcel = () => {
+    const rowsToExport =
+      selectedIds.length > 0
+        ? data.filter((row) => selectedIds.includes(row.id))
+        : data;
+
+    if (rowsToExport.length === 0) {
+      openNotification("info", "No data to export");
+      return;
+    }
+
+    exportToExcel({
+      data: rowsToExport,
+      columns,
+      fileName: "hotels.xlsx",
+    });
   };
 
   const renderCell = (row, col, index) => {
@@ -148,7 +168,7 @@ const HotelDirectory = ({
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-              status
+              status,
             )}`}
           >
             {status}
@@ -206,14 +226,14 @@ const HotelDirectory = ({
                       >
                         {item}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
               )}
             </div>
 
             <button
-              onClick={onImportCSV}
+              onClick={ handleExportExcel}
               className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2"
             >
               <Upload size={16} />
@@ -263,7 +283,7 @@ const HotelDirectory = ({
           <tbody>
             {data.map((row, index) => {
               const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
-                index + 1
+                index + 1,
               ).padStart(2, "0")}`;
 
               const enrichedRow = { ...row, uiHotelId };

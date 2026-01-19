@@ -15,3 +15,4 @@ export const deleteRoom = async (id, data) => {
 export const getStats = async (data) => {
     return Api.get("rooms/stats", data);
 };
+

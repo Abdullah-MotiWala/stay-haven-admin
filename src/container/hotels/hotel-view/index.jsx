@@ -24,17 +24,19 @@ import {
   Droplets,
   Coffee,
   Star,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
+import { openNotification } from "../../../network/notification";
+import { getStats } from "../../../services/rooms";
 
-  const AMENITY_ICONS = {
-    wifi: Wifi,
-    breakfast: Coffee,
-    dinner: Utensils,
-    pool: Waves,
-    parking: ParkingCircle,
-    coldandwarm: Droplets,
-  };
+const AMENITY_ICONS = {
+  wifi: Wifi,
+  breakfast: Coffee,
+  dinner: Utensils,
+  pool: Waves,
+  parking: ParkingCircle,
+  coldandwarm: Droplets,
+};
 
 const HotelProfile = () => {
   const { id } = useParams();
@@ -43,14 +45,14 @@ const HotelProfile = () => {
   const [amenitiesList, setAmenitiesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [stats, setStats] = useState(null);
+
   const uiHotelId = location.state?.uiHotelId;
 
   console.log(uiHotelId, "uiHotelIduiHotelId");
   console.log("location.state =", location.state);
 
-
   useEffect(() => {
-
     const fetchFeatures = async () => {
       // setFetching(true);
       try {
@@ -60,7 +62,7 @@ const HotelProfile = () => {
         setAmenitiesList(features);
       } catch (err) {
         console.error("Failed to load hotel:", err);
-        alert("Hotel load nahi ho saka");
+        openNotification("error", "Internal Server Error");
       } finally {
         // setFetching(false);
       }
@@ -69,7 +71,20 @@ const HotelProfile = () => {
     fetchFeatures();
   }, []);
 
-  console.log(amenitiesList, "amenitiesListamenitiesList");
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getStats();
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   useEffect(() => {
     const fetchHotelData = async () => {
       try {
@@ -90,41 +105,42 @@ const HotelProfile = () => {
     navigate(`/admin/hotel/edit/${id}`);
   };
 
+  const formatCount = (value) => {
+    if (value === null || value === undefined) return "00";
+    return String(value).padStart(2, "0");
+  };
+
   const cardsData = [
     {
       title: "Total Rooms",
-      value: 120,
+      value: formatCount(stats?.total),
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: hotel1,
-      // trend: "+12%",
-      // trendText: "vs last week",
       showTrend: false,
     },
     {
       title: "Occupied",
-      value: 84,
+      value: formatCount(stats?.occupied),
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: hotel1,
     },
     {
       title: "Available Rooms",
-      value: 34,
+      value: formatCount(stats?.available),
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: hotel3,
     },
     {
-      title: "In Draft",
-      value: "02",
+      title: "In maintenance",
+      value: formatCount(stats?.maintenance),
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: hotel4,
     },
   ];
-
-
 
   if (loading)
     return (
@@ -201,29 +217,27 @@ const HotelProfile = () => {
       status: "Checked-In",
     },
   ];
-const AMENITY_ICON_BY_NAME = {
-  "break fast": Coffee,
-  "breakfast": Coffee,
-  "wifi": Wifi,
-  "pool": Waves,
-  "dinner": Utensils,
-  "parking": ParkingCircle,
-  "cold / warm water": Droplets,
-};
-
+  const AMENITY_ICON_BY_NAME = {
+    "break fast": Coffee,
+    breakfast: Coffee,
+    wifi: Wifi,
+    pool: Waves,
+    dinner: Utensils,
+    parking: ParkingCircle,
+    "cold / warm water": Droplets,
+  };
 
   const getAmenityIcon = (name = "") => {
-  const key = name.toLowerCase().trim();
-  return AMENITY_ICON_BY_NAME[key] || HelpCircle;
-};
+    const key = name.toLowerCase().trim();
+    return AMENITY_ICON_BY_NAME[key] || HelpCircle;
+  };
 
-  console.log(hotel.amenities, "asdsadsad12313");
+  console.log(stats, "asdsadsad12313");
   return (
     <>
       <div className="mt-4  !overflow-x-hidden">
         <Breadcrumb title="Hotels" subtitle="View hotel" />
       </div>
-
 
       <div className="w-full overflow-x-hidden bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
         <div className="flex justify-between items-center mb-6">
@@ -327,13 +341,15 @@ const AMENITY_ICON_BY_NAME = {
                     {hotel?.amenities?.map((item) => {
                       // const Icon = AMENITY_ICONS[item.name];
                       const Icon = getAmenityIcon(item.name);
-                      
+
                       return (
                         <div
                           key={item.id}
                           className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-lightPurple bg-lightColor"
                         >
-                          {Icon && <Icon size={16} className="text-lightPurple" />}
+                          {Icon && (
+                            <Icon size={16} className="text-lightPurple" />
+                          )}
                           {item.name}
                         </div>
                       );
