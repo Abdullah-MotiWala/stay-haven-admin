@@ -1,8 +1,7 @@
 import { ArrowUpOutlined, HomeOutlined } from "@ant-design/icons";
 
 const MatrixCard = ({ showShadow = true ,data }) => {
-
-
+  
   return (
     <div
       className={`
@@ -19,13 +18,7 @@ const MatrixCard = ({ showShadow = true ,data }) => {
           }`}
           style={{ backgroundColor: card.bg }}
         >
-          {/* Icon */}
-          {/* <div
-            className="absolute top-4 right-4 p-2 rounded-lg"
-            style={{ backgroundColor: card.iconBg }}
-          >
-            <HomeOutlined className="text-base text-dark" />
-          </div> */}
+
           <div
             className="absolute top-4 right-4 p-2 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: card.iconBg }}
@@ -43,10 +36,9 @@ const MatrixCard = ({ showShadow = true ,data }) => {
           {/* Value */}
           <div className="flex justify-between items-end mt-2 h-full ">
             <h3 className="text-3xl font-bold position-relative bottom-8 ">
-              {card.value.toString().padStart(2, "0")}
+              {card.value}
             </h3>
 
-            {/* Trend (only first card) */}
             {card.showTrend && (
               <div className="flex flex-col items-center gap-2 mt-8 mb-4 text-sm">
                 <span className="flex items-center gap-1 text-lightGreen px-3 py-1 rounded-full bg-extraLightGreen   font-medium">

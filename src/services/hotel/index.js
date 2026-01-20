@@ -4,6 +4,10 @@ export const getAllHotels = async () => {
   return Api.get("/hotels");
 };
 
+export const getAllHotelsStatistics = async (id) => {
+  return Api.get(`/hotels/dashboard?hotelId=${id}`);
+};
+
 export const getHotelById = async (id) => {
   return Api.get(`/hotels/${id}`);
 };
@@ -21,4 +25,11 @@ export const bulkActionApi = async (data) => {
 
 export const deleteHotel = async (id) => {
   return Api.delete(`/hotels/${id}`);
+};
+export const hotelStatusUpdate = async (id,data) => {
+  return Api.patch(`/hotels/${id}/status`,data);
+};
+
+export const getStats = async (data) => {
+    return Api.get("hotels/stats", data);
 };

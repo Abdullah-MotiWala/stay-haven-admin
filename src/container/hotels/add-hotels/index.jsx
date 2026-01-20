@@ -43,7 +43,7 @@ const HotelForm = () => {
           address: hotel.address,
           email: hotel.email,
           cancellation_policy: hotel.cancellation_policy,
-          isActive: hotel.isActive ? "true" : "false",
+          status: hotel.status ,
           amenities: hotel.amenities?.map((a) => a.id) || [],
           rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
         });
@@ -84,7 +84,7 @@ const HotelForm = () => {
       address: values.address,
       email: values.email,
       cancellation_policy: values.cancellation_policy,
-      isActive: values.isActive,
+      status: values.isActive,
       featureIds: [...values.amenities, ...values.rooms],
     };
 
@@ -310,8 +310,9 @@ const HotelForm = () => {
                 </label>
                 <Form.Item name="isActive">
                   <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                    <Option value="true">Active</Option>
-                    <Option value="false">Inactive</Option>
+                    <Option value="active">Active</Option>
+                    <Option value="inactive">Inactive</Option>
+                    <Option value="maintenance">Maintenance</Option>
                   </Select>
                 </Form.Item>
               </div>

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../../components/Navbar";
 import MatrixCard from "../../../components/MatrixCard";
 import Breadcrumb from "../../../components/Breadcrumb";
-import HotelDirectory from "../../../components/Table"; // Ensure path is correct
-import { getAllHotels, deleteHotel } from "../../../services/hotel";
+import HotelDirectory from "../../../components/Table";
+import { getAllHotels, deleteHotel, getStats } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
@@ -15,44 +15,59 @@ const HotelsListing = () => {
   const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getStats();
+        console.log(res.data, "HOTEL===");
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    console.log("UseEffect Run Times");
     const fetchData = async () => {
       try {
         setLoading(true);
         const res = await getAllHotels();
-
         setHotels(res.data || []);
+        setRefresh(false);
       } catch (err) {
-        console.error("Data fetch karne mein masla:", err);
+        console.error("Data fetch error", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [refresh]);
 
-  // Delete Function
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
       try {
         await deleteHotel(id);
-
         setHotels(hotels.filter((hotel) => hotel.id !== id));
-        // alert("Hotel deleted");
         openNotification("success", "Hotel deleted successfully");
       } catch (err) {
         console.error("Any Problem in deleteing", err);
-        // alert("Can not be deleted.");
         openNotification("error", "Internal Server Error");
       }
     }
   };
+
   const cardsData = [
     {
       title: "Total Hotels",
-      value: 24,
+      value: stats?.totalHotels,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
@@ -62,26 +77,27 @@ const HotelsListing = () => {
     },
     {
       title: "Active Hotels",
-      value: 14,
+      value: stats?.activeHotels,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: home2,
     },
     {
       title: "Inactive Hotels",
-      value: 8,
+      value: stats?.inactiveHotels,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: home3,
     },
     {
       title: "In Draft",
-      value: 2,
+      value: stats?.inDraft,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: home4,
     },
   ];
+
   const columns = [
     { key: "uiHotelId", label: "Hotel ID", type: "text" },
     { key: "name", label: "Hotel Name", type: "hotel" },
@@ -93,10 +109,9 @@ const HotelsListing = () => {
     { key: "actions", label: "Actions", type: "actions" },
   ];
 
+  console.log(hotels,"hotelshotelshotels")
   return (
     <div className="p-0">
-      {/* <Navbar /> */}
-
       <div className="mt-4 px-3">
         <Breadcrumb title="Hotels" />
       </div>
@@ -105,7 +120,6 @@ const HotelsListing = () => {
         <MatrixCard data={cardsData} />
       </div>
 
-      {/* Table Section */}
       <div className="bg-white p-6 rounded-3xl shadow-sm mt-12">
         {loading ? (
           <div className="flex justify-center items-center p-20">
@@ -116,10 +130,11 @@ const HotelsListing = () => {
           </div>
         ) : (
           <HotelDirectory
-            data={hotels}
+            data={hotels?.data}
             onDelete={handleDelete}
             title="Hotels Directory"
             columns={columns}
+            setRefresh={setRefresh}
           />
         )}
       </div>

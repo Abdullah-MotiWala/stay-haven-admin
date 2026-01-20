@@ -12,3 +12,9 @@ export const updateBooking = async (id, data) => {
 export const getStats = async (data) => {
     return Api.get("bookings/stats", data);
 };
+
+export const getRecentBooking = async (data) => {
+    return Api.get("/bookings/recent", data);
+};
+
+
