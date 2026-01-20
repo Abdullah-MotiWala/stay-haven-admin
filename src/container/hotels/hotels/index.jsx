@@ -4,7 +4,7 @@ import Navbar from "../../../components/Navbar";
 import MatrixCard from "../../../components/MatrixCard";
 import Breadcrumb from "../../../components/Breadcrumb";
 import HotelDirectory from "../../../components/Table";
-import { getAllHotels, deleteHotel, getStats } from "../../../services/hotel";
+import { getAllHotels, deleteHotel, getStats, lastHotelId } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
@@ -16,6 +16,8 @@ const HotelsListing = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
+
+  const [lastId,setLastId] = useState(null);
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -29,8 +31,21 @@ const HotelsListing = () => {
         openNotification("error", "Failed to load stats");
       }
     };
-
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchLastId = async () => {
+      try {
+        const res = await lastHotelId();
+        console.log(res?.data, "lastID===");
+        setLastId(res?.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+    fetchLastId();
   }, []);
 
   useEffect(() => {
@@ -109,7 +124,8 @@ const HotelsListing = () => {
     { key: "actions", label: "Actions", type: "actions" },
   ];
 
-  console.log(hotels,"hotelshotelshotels")
+
+  console.log(lastId,"hot213123elshotelshotels")
   return (
     <div className="p-0">
       <div className="mt-4 px-3">
@@ -135,6 +151,7 @@ const HotelsListing = () => {
             title="Hotels Directory"
             columns={columns}
             setRefresh={setRefresh}
+            lastId={lastId?.nextNumericId}
           />
         )}
       </div>

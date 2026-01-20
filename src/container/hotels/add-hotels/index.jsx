@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   createHotel,
   getHotelById,
+  lastHotelId,
   updateHotel,
 } from "../../../services/hotel";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
@@ -22,11 +23,28 @@ const HotelForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amenitiesList, setAmenitiesList] = useState([]);
   const [roomsList, setRoomsList] = useState([]);
+  const [hotel, setHotel] = useState([]);
+
+  const [lastId, setLastId] = useState(null);
 
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
 
   const { Option } = Select;
+
+  useEffect(() => {
+    const fetchLastId = async () => {
+      try {
+        const res = await lastHotelId();
+        console.log(res?.data, "lastID===");
+        setLastId(res?.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+    fetchLastId();
+  }, []);
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -36,14 +54,14 @@ const HotelForm = () => {
       try {
         const res = await getHotelById(id);
         const hotel = res.data;
-
+        setHotel(hotel);
         form.setFieldsValue({
           name: hotel.name,
           city: hotel.city,
           address: hotel.address,
           email: hotel.email,
           cancellation_policy: hotel.cancellation_policy,
-          status: hotel.status ,
+          status: hotel.status,
           amenities: hotel.amenities?.map((a) => a.id) || [],
           rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
         });
@@ -56,6 +74,8 @@ const HotelForm = () => {
 
     fetchHotel();
   }, [id, isEditMode, form]);
+
+  console.log(hotel.hotelId,"hotelhotel")
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -178,7 +198,7 @@ const HotelForm = () => {
                   </span>
                 </div>
                 <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
-                  <span className="py-2">301</span>
+                  <span className="py-2">{isEditMode ? hotel.hotelId : lastId?.nextNumericId}</span>
                 </div>
               </div>
             </div>

@@ -47,7 +47,8 @@ const HotelProfile = () => {
   const [statistics, setStatistics] = useState(false);
   const [recentBookings, setRecentBookings] = useState([]);
 
-  const uiHotelId = location.state?.uiHotelId;
+  const uiHotelId = location.state?.lastId;
+  console.log(uiHotelId,"uiHotelIduiHotelId32423")
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -340,7 +341,7 @@ const HotelProfile = () => {
 
               <div className="flex items-center gap-3 mt-4 flex-wrap">
                 <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-semibold uppercase">
-                  {uiHotelId ?? "N/A"}
+                  #{uiHotelId ?? "N/A"}
                 </span>
 
                 {/* <div
@@ -470,7 +471,7 @@ const HotelProfile = () => {
             statistics?.analytics?.analytics?.roomTypeOccupancy?.map(
               (item) => ({
                 label: item.label,
-                used: item.total - item.available, // 🔥 derived from API
+                used: item.total - item.available, 
                 total: item.total,
               }),
             ) || []
@@ -482,7 +483,7 @@ const HotelProfile = () => {
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
-          data={recentBookings}
+          data={statistics?.recentBookings}
           title="Recent Bookings"
           columns={columns}
           filter={false}

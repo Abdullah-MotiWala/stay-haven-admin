@@ -4,6 +4,10 @@ export const getAllHotels = async () => {
   return Api.get("/hotels");
 };
 
+export const lastHotelId = async () => {
+  return Api.get("/hotels/next-id");
+};
+
 export const getAllHotelsStatistics = async (id) => {
   return Api.get(`/hotels/dashboard?hotelId=${id}`);
 };

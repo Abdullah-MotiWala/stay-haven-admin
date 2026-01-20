@@ -16,6 +16,7 @@ const HotelDirectory = ({
   title = "Directory",
   view = false,
   setRefresh,
+  lastId = null
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -214,6 +215,10 @@ const HotelDirectory = ({
     }
   };
 
+
+  console.log(lastId,"lastIdlastIdlastId")
+
+
   return (
     <div className="w-full bg-white rounded-xl">
       {/* HEADER */}
@@ -342,7 +347,7 @@ const HotelDirectory = ({
                             onClick={() => {
                               setRowActionOpen(null);
                               navigate(`/admin/hotel/view/${row.id}`, {
-                                state: { uiHotelId },
+                                state: { lastId },
                               });
                             }}
                             className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
@@ -353,7 +358,7 @@ const HotelDirectory = ({
                             onClick={() => {
                               setRowActionOpen(null);
                               navigate(`/admin/hotel/edit/${row.id}`, {
-                                state: { uiHotelId },
+                                state: { lastId },
                               });
                             }}
                             className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"

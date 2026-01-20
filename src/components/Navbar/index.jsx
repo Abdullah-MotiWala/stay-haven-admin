@@ -28,7 +28,7 @@ const Navbar = () => {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center ">
+        <div className="flex items-center   ">
           {/* List Hotel / Room Button (Naya Button) */}
           <button
             onClick={() => navigate("/admin/hotel/add")} // Aapka add hotel route
