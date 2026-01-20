@@ -12,6 +12,7 @@ content: [
         extradark: "#212121",         
         light: "#f3f4f6",  
         blue:"#0A5BE2",
+        lightBrown:"#E3E3E3",
         lightSeconday:"#6C7293",
         havengray:"#F9F9F9", 
         extraLightGreen:"#e2f1dd", 
@@ -26,6 +27,10 @@ content: [
         myWhite:"#ffffff", 
         darkGray:"#545454", 
         lightBlue:"#DBE9FF", 
+        darkGreen:"#107326", 
+        lightRed:"#FFDCDE", 
+        red:"#E21C26", 
+        lightDark:"#172025"
 
         
   },

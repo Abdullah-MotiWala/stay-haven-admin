@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom"; // useNavigate add kiya
-import { getHotelById } from "../../../services/hotel";
+import {
+  getAllHotelsStatistics,
+  getHotelById,
+  hotelStatusUpdate,
+} from "../../../services/hotel";
 import MatrixCard from "../../../components/MatrixCard";
 import { ShopOutlined } from "@ant-design/icons";
 import RoomOccupancyCard from "../../../components/RoomOccupation";
@@ -28,15 +32,7 @@ import {
 } from "lucide-react";
 import { openNotification } from "../../../network/notification";
 import { getStats } from "../../../services/rooms";
-
-const AMENITY_ICONS = {
-  wifi: Wifi,
-  breakfast: Coffee,
-  dinner: Utensils,
-  pool: Waves,
-  parking: ParkingCircle,
-  coldandwarm: Droplets,
-};
+import { getRecentBooking } from "../../../services/booking";
 
 const HotelProfile = () => {
   const { id } = useParams();
@@ -44,27 +40,25 @@ const HotelProfile = () => {
   const [hotel, setHotel] = useState(null);
   const [amenitiesList, setAmenitiesList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(true);
   const location = useLocation();
   const [stats, setStats] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [statistics, setStatistics] = useState(false);
+  const [recentBookings, setRecentBookings] = useState([]);
 
   const uiHotelId = location.state?.uiHotelId;
 
-  console.log(uiHotelId, "uiHotelIduiHotelId");
-  console.log("location.state =", location.state);
-
   useEffect(() => {
     const fetchFeatures = async () => {
-      // setFetching(true);
       try {
         const res = await getAllFeature("AMENITY");
         const features = res.data;
-
         setAmenitiesList(features);
       } catch (err) {
         console.error("Failed to load hotel:", err);
         openNotification("error", "Internal Server Error");
       } finally {
-        // setFetching(false);
       }
     };
 
@@ -75,6 +69,7 @@ const HotelProfile = () => {
     const fetchStats = async () => {
       try {
         const res = await getStats();
+        console.log(res.data, "asdadsaasdas2321413");
         setStats(res.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
@@ -83,6 +78,36 @@ const HotelProfile = () => {
     };
 
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const res = await getAllHotelsStatistics(id);
+        console.log(res.data, "asdadsaasdas2321413");
+        setStatistics(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  useEffect(() => {
+    const fetchRecentBookings = async () => {
+      try {
+        const res = await getRecentBooking();
+        console.log(res.data, "asdadsaasdas2321413");
+        setRecentBookings(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchRecentBookings();
   }, []);
 
   useEffect(() => {
@@ -96,10 +121,11 @@ const HotelProfile = () => {
         console.error("Hotel detail fetch karne mein error:", err);
       } finally {
         setLoading(false);
+        setRefresh(false);
       }
     };
     if (id) fetchHotelData();
-  }, [id]);
+  }, [id, refresh]);
 
   const handleEditClick = () => {
     navigate(`/admin/hotel/edit/${id}`);
@@ -113,7 +139,7 @@ const HotelProfile = () => {
   const cardsData = [
     {
       title: "Total Rooms",
-      value: formatCount(stats?.total),
+      value: stats?.totalRooms,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: hotel1,
@@ -121,21 +147,21 @@ const HotelProfile = () => {
     },
     {
       title: "Occupied",
-      value: formatCount(stats?.occupied),
+      value: stats?.occupiedRooms,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: hotel1,
     },
     {
       title: "Available Rooms",
-      value: formatCount(stats?.available),
+      value: stats?.availableRooms,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: hotel3,
     },
     {
-      title: "In maintenance",
-      value: formatCount(stats?.maintenance),
+      title: "In Maintenance",
+      value: stats?.maintenanceRooms,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: hotel4,
@@ -232,7 +258,38 @@ const HotelProfile = () => {
     return AMENITY_ICON_BY_NAME[key] || HelpCircle;
   };
 
-  console.log(stats, "asdsadsad12313");
+  const options = [
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" },
+  ];
+
+  const handleStatusSelect = async (newStatus) => {
+    if (newStatus === hotel.isActive) return;
+
+    try {
+      await hotelStatusUpdate(id, {
+        status: newStatus,
+      });
+
+      setHotel((prev) => ({
+        ...prev,
+        isActive: newStatus,
+      }));
+      setRefresh(true);
+
+      openNotification("success", "Status updated successfully");
+    } catch (err) {
+      openNotification("error", "Failed to update status");
+    } finally {
+      setOpen(false);
+    }
+  };
+
+  const currentStatus =
+    options.find((o) => o.value === hotel.status) || options[0];
+
+  console.log(recentBookings, "recentBookings.data");
+
   return (
     <>
       <div className="mt-4  !overflow-x-hidden">
@@ -283,10 +340,10 @@ const HotelProfile = () => {
 
               <div className="flex items-center gap-3 mt-4 flex-wrap">
                 <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-semibold uppercase">
-                  #{uiHotelId ?? "N/A"}
+                  {uiHotelId ?? "N/A"}
                 </span>
 
-                <div
+                {/* <div
                   className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${
                     hotel.isActive
                       ? "bg-[#A5E3B8] text-[#2D6A4F]"
@@ -295,6 +352,40 @@ const HotelProfile = () => {
                 >
                   {hotel.isActive ? "Active" : "Inactive"}
                   <img src={downArrowIcon} alt="arrow" />
+                </div> */}
+
+                <div className="relative inline-block">
+                  <div
+                    onClick={() => setOpen((prev) => !prev)}
+                    className={`flex items-center gap-3 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer
+      ${
+        hotel.status === "active"
+          ? "bg-lightGreenOne text-darkGreen"
+          : "bg-lightRed text-red"
+      }
+    `}
+                  >
+                    {currentStatus.label}
+                    <img
+                      src={downArrowIcon}
+                      alt="arrow"
+                      className="w-2 h-1.5"
+                    />
+                  </div>
+
+                  {open && (
+                    <div className="absolute top-full left-0 mt-1 w-28 bg-white border rounded-lg shadow-md z-50">
+                      {options.map((opt) => (
+                        <button
+                          key={opt.label}
+                          onClick={() => handleStatusSelect(opt.value)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-100"
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -339,9 +430,7 @@ const HotelProfile = () => {
 
                   <div className="flex flex-wrap gap-2">
                     {hotel?.amenities?.map((item) => {
-                      // const Icon = AMENITY_ICONS[item.name];
                       const Icon = getAmenityIcon(item.name);
-
                       return (
                         <div
                           key={item.id}
@@ -368,21 +457,32 @@ const HotelProfile = () => {
         className="grid mt-6 gap-6"
         style={{ gridTemplateColumns: "40% 59%" }}
       >
-        <RoomOccupancyCard
+        {/* <RoomOccupancyCard
           data={[
             { label: "One Bed Rooms", used: 18, total: 25 },
             { label: "Two Bed Rooms", used: 32, total: 45 },
             { label: "Three Bed Rooms", used: 14, total: 20 },
             { label: "Luxury Suites", used: 8, total: 10 },
           ]}
+        /> */}
+        <RoomOccupancyCard
+          data={
+            statistics?.analytics?.analytics?.roomTypeOccupancy?.map(
+              (item) => ({
+                label: item.label,
+                used: item.total - item.available, // 🔥 derived from API
+                total: item.total,
+              }),
+            ) || []
+          }
         />
 
-        <RevenueSnapshot />
+        <RevenueSnapshot revenue={statistics?.analytics?.revenue} />
       </div>
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
-          data={bookings}
+          data={recentBookings}
           title="Recent Bookings"
           columns={columns}
           filter={false}

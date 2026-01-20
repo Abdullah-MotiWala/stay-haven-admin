@@ -1,140 +1,103 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../../components/Navbar";
 import MatrixCard from "../../../components/MatrixCard";
 import Breadcrumb from "../../../components/Breadcrumb";
-import HotelDirectory from "../../../components/Table"; // Ensure path is correct
-import { getAllHotels, deleteHotel } from "../../../services/hotel";
+import HotelDirectory from "../../../components/Table";
+import { getAllHotels, deleteHotel, getStats } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
 import home4 from "../../../assets/icons/home-4.png";
-import dayjs from 'dayjs'
 import { openNotification } from "../../../network/notification";
 
 const HotelsListing = () => {
   const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const stats = useMemo(() => {
-    // Current Dates setup
-    const now = dayjs();
-    const startOfCurrentWeek = now.startOf('week');
-    const startOfLastWeek = now.subtract(1, 'week').startOf('week');
-    const endOfLastWeek = now.subtract(1, 'week').endOf('week');
+  const [refresh, setRefresh] = useState(false);
+  const [stats, setStats] = useState(null);
 
-    let currentWeekCount = 0;
-    let lastWeekCount = 0;
-    
-    let active = 0;
-    let inactive = 0;
-    let draft = 0;
-
-    hotels.forEach(hotel => {
-        const createdDate = dayjs(hotel.createdAt);
-
-        // 1. Basic Stats Logic
-        if (hotel.isDeleted) {
-            draft++;
-        } else if (hotel.isActive) {
-            active++;
-        } else {
-            inactive++;
-        }
-
-        // 2. Growth Logic (Percentage ke liye counts)
-        if (createdDate.isAfter(startOfCurrentWeek)) {
-            currentWeekCount++;
-        } else if (createdDate.isAfter(startOfLastWeek) && createdDate.isBefore(endOfLastWeek)) {
-            lastWeekCount++;
-        }
-    });
-
-    // 3. Percentage Calculation Logic
-    let percentageString = "0%";
-    if (lastWeekCount === 0) {
-        percentageString = currentWeekCount > 0 ? `+100%` : "0%";
-    } else {
-        const diff = ((currentWeekCount - lastWeekCount) / lastWeekCount) * 100;
-        const sign = diff >= 0 ? "+" : "";
-        percentageString = `${sign}${diff.toFixed(0)}%`; // String format like +12%
-    }
-
-    return {
-        totalHotels: hotels.length,
-        activeHotels: active,
-        inactiveHotels: inactive,
-        draftHotels: draft,
-        growth: percentageString
-    };
-}, [hotels]);
-const { totalHotels, activeHotels, inactiveHotels, draftHotels, growth } = stats;
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getStats();
+        console.log(res.data, "HOTEL===");
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    console.log("UseEffect Run Times");
     const fetchData = async () => {
       try {
         setLoading(true);
         const res = await getAllHotels();
-        console.log("fetch hotels ", res)
         setHotels(res.data || []);
+        setRefresh(false);
       } catch (err) {
-        console.error("Data fetch karne mein masla:", err);
+        console.error("Data fetch error", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-  console.log(totalHotels, activeHotels, inactiveHotels, draftHotels);
-  // Delete Function
+  }, [refresh]);
+
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
       try {
         await deleteHotel(id);
-
         setHotels(hotels.filter((hotel) => hotel.id !== id));
-        // alert("Hotel deleted");
         openNotification("success", "Hotel deleted successfully");
       } catch (err) {
         console.error("Any Problem in deleteing", err);
-        // alert("Can not be deleted.");
         openNotification("error", "Internal Server Error");
       }
     }
   };
+
   const cardsData = [
     {
       title: "Total Hotels",
-      value: totalHotels,
+      value: stats?.totalHotels,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: `${growth}`,
+      trend: "+12%",
       trendText: "vs last week",
       showTrend: true,
     },
     {
       title: "Active Hotels",
-      value: activeHotels,
+      value: stats?.activeHotels,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: home2,
     },
     {
       title: "Inactive Hotels",
-      value: inactiveHotels,
+      value: stats?.inactiveHotels,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: home3,
     },
     {
       title: "In Draft",
-      value: draftHotels,
+      value: stats?.inDraft,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: home4,
     },
   ];
+
   const columns = [
     { key: "uiHotelId", label: "Hotel ID", type: "text" },
     { key: "name", label: "Hotel Name", type: "hotel" },
@@ -146,10 +109,9 @@ const { totalHotels, activeHotels, inactiveHotels, draftHotels, growth } = stats
     { key: "actions", label: "Actions", type: "actions" },
   ];
 
+  console.log(hotels,"hotelshotelshotels")
   return (
     <div className="p-0">
-      {/* <Navbar /> */}
-
       <div className="mt-4 px-3">
         <Breadcrumb title="Hotels" />
       </div>
@@ -158,7 +120,6 @@ const { totalHotels, activeHotels, inactiveHotels, draftHotels, growth } = stats
         <MatrixCard data={cardsData} />
       </div>
 
-      {/* Table Section */}
       <div className="bg-white p-6 rounded-3xl shadow-sm mt-12">
         {loading ? (
           <div className="flex justify-center items-center p-20">
@@ -169,10 +130,11 @@ const { totalHotels, activeHotels, inactiveHotels, draftHotels, growth } = stats
           </div>
         ) : (
           <HotelDirectory
-            data={hotels}
+            data={hotels?.data}
             onDelete={handleDelete}
             title="Hotels Directory"
             columns={columns}
+            setRefresh={setRefresh}
           />
         )}
       </div>

@@ -5,6 +5,7 @@ import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
 import { bulkActionApi } from "../../services/hotel";
 import { openNotification } from "../../network/notification";
 import { exportToExcel } from "../../utils/exportExcel";
+import { deriveBookingStatus } from "../../helper";
 
 const HotelDirectory = ({
   data = [],
@@ -14,6 +15,7 @@ const HotelDirectory = ({
   filter = true,
   title = "Directory",
   view = false,
+  setRefresh,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -22,12 +24,27 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
 
   const getStatusStyle = (status) => {
+    console.log(status, "status12sadasd");
     switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-700";
+      case "Booked":
+        return "bg-lightYellow text-black";
+      case "Checked-In":
+        return "bg-lightGreenOne text-darkGreen";
+      case "Checked-Out":
+        return "bg-shadeGreen text-black";
+      case "maintenance":
+        return "bg-lightYellow text-lightSeconday";
+      case "Draft":
+        return "bg-lightBrown text-lightSeconday";
       case "Inactive":
         return "bg-lightBlue text-blue";
-      case "Deleted":
+      case "Active":
+        return "bg-lightGreenOne text-darkGreen";
+      case "Inactive  || DeActive ":
+        return "bg-lightRed text-red";
+      case "Delete":
+        return "bg-red-100 text-red-600";
+      case "Draft":
         return "bg-red-100 text-red-600";
       case "Checked-In":
         return "bg-lightYellow text-black";
@@ -43,16 +60,23 @@ const HotelDirectory = ({
       case "Deluxe":
         return "bg-lightYellow text-black";
       case "Standard":
-        return "bg-lightGreenOne text-black";
+        return "bg-shadeGreen text-black";
       default:
         return "bg-gray-100 text-gray-600";
     }
   };
 
   const getRowStatus = (row) => {
+    console.log(row, "rowrow1234");
+     if (row.checkInOut) {
+    return deriveBookingStatus(row.checkInOut);
+  }
     if (row.isDeleted) return "Deleted";
-    if (row.isActive === true) return "Active";
-    if (row.isActive === false) return "Inactive";
+    if (row.status === "active") return "Active";
+    if (row.status === "deactivate" || row.status === "inactive")
+      return "Inactive";
+    if (row.status === "draft") return "Draft";
+    if (row.status === "maintenance") return "Maintenance";
     return row.status;
   };
 
@@ -88,6 +112,7 @@ const HotelDirectory = ({
       await bulkActionApi(payload);
       setSelectedIds([]);
       setBulkOpen(false);
+      setRefresh(true);
     } catch (err) {
       console.error("Bulk action failed", err);
     }
@@ -156,15 +181,12 @@ const HotelDirectory = ({
 
       case "dateRange":
         return (
-          <span className="text-sm text-gray-900">
-            {row.checkIn && row.checkOut
-              ? `${row.checkIn} - ${row.checkOut}`
-              : "-"}
-          </span>
+          <span className="text-sm text-gray-900">{row.checkInOut ?? "-"}</span>
         );
 
       case "status":
         const status = getRowStatus(row);
+        console.log(status, "statusstatusstatus");
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
@@ -214,26 +236,30 @@ const HotelDirectory = ({
 
               {bulkOpen && (
                 <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-                  {["Activate Selected", "DeActivate Selected", "Delete"].map(
-                    (item) => (
-                      <button
-                        key={item}
-                        onClick={() => {
-                          handleBulkAction(item.split(" ")[0].toUpperCase());
-                          setBulkOpen(!bulkOpen);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                      >
-                        {item}
-                      </button>
-                    ),
-                  )}
+                  {[
+                    "Active Selected",
+                    "InActive Selected",
+                    "Delete",
+                    "Draft",
+                    "Maintenance",
+                  ].map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        handleBulkAction(item.split(" ")[0].toUpperCase());
+                        setBulkOpen(!bulkOpen);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      {item}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
             <button
-              onClick={ handleExportExcel}
+              onClick={handleExportExcel}
               className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2"
             >
               <Upload size={16} />

@@ -71,3 +71,12 @@ a :hover{
     text-decoration-line: none !important;
     text-decoration: none !important;
 }
+/* Jo page active ho, uska text white kar do */
+.ant-pagination-item-active a {
+  color: white !important;
+}
+
+/* Hover karne par bhi white hi rahe */
+.ant-pagination-item-active:hover a {
+  color: white !important;
+}

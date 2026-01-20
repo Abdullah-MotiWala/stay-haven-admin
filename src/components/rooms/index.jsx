@@ -159,7 +159,7 @@
 //     </>);
 // }
 
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { rooms, roomTypes } from "../../container/data/rooms";
 import RoomCard from "../RoomCard";
 import RoomDetail from "../roomDetail";
@@ -168,6 +168,14 @@ import MatrixCard from "../MatrixCard";
 import home from "../../assets/icons/home.png"
 import search from "../../assets/icons/search.png"
 import right_arrow from "../../assets/icons/right_arrow.png"
+import { Pagination , ConfigProvider} from 'antd';
+import { useNavigate } from "react-router-dom";
+import { getAllHotels, deleteHotel, getStats } from "../../services/hotel";
+import home1 from "../../assets/icons/home-1.png";
+import home2 from "../../assets//icons/home-2.png";
+import home3 from "../../assets/icons/home-3.png";
+import home4 from "../../assets/icons/home-4.png";
+import { openNotification } from "../../network/notification";
 export default function Rooms() {
   const [activeType, setActiveType] = useState("All Rooms");
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -178,6 +186,59 @@ export default function Rooms() {
     activeType === "All Rooms"
       ? rooms
       : rooms.filter((r) => r.type === activeType);
+
+const navigate = useNavigate();
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getStats();
+        console.log(res.data, "HOTEL===");
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+        openNotification("error", "Failed to load stats");
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    console.log("UseEffect Run Times");
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await getAllHotels();
+        setHotels(res.data || []);
+        setRefresh(false);
+      } catch (err) {
+        console.error("Data fetch error", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [refresh]);
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you want to delete this hotel?")) {
+      try {
+        await deleteHotel(id);
+        setHotels(hotels.filter((hotel) => hotel.id !== id));
+        openNotification("success", "Hotel deleted successfully");
+      } catch (err) {
+        console.error("Any Problem in deleteing", err);
+        openNotification("error", "Internal Server Error");
+      }
+    }
+  };
+
       //  const cardsData = [
       //     {
       //       title: "Total Rooms",
@@ -327,19 +388,23 @@ export default function Rooms() {
         ))}
 
         {/* Pagination */}
-        <div className="flex justify-center gap-2 py-4">
-          {[1, 2, 3].map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`w-9 h-9 rounded-md text-sm font-medium transition-colors ${
-                page === p ? "bg-[#0056D2] text-white shadow-md" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
+      <div className="flex justify-center gap-2 py-4">
+  <ConfigProvider
+    theme={{
+      components: {
+        Pagination: {
+          itemActiveBg: '#0A5BE2',      // Background Blue
+          itemActiveColor: '#FFFFFF',   // Selected Text White
+          colorPrimary: '#0A5BE2',      // Border color
+          colorPrimaryHover: '#0A5BE2', // Hover par border color
+          colorPrimaryActive: '#0A5BE2',
+        },
+      },
+    }}
+  >
+    <Pagination defaultCurrent={1} total={20} className="custom-pagination" />
+  </ConfigProvider>
+</div>
       </div>
     </div>
 
