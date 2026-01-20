@@ -19,7 +19,7 @@ function RoomDetail({ room }) {
       
       {/* Top Header: Detail & Edit */}
       <div className="flex justify-between items-center mb-4">
-        <span className="text-[#7C8DB5] text-xs md:text-sm font-medium uppercase tracking-wider">Room Details</span>
+        <span className="text-[#7C8DB5] text-md  font-medium tracking-wider">Room Details</span>
         <button className="flex items-center gap-2 border border-gray-200 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-medium hover:bg-gray-50 transition-all">
           <Edit2 size={14} /> Edit
         </button>
@@ -28,13 +28,13 @@ function RoomDetail({ room }) {
       {/* Title & Pricing Section */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-4">
         <div className="flex flex-wrap items-center gap-2 md:gap-4">
-          <h1 className="text-2xl md:text-[32px] font-bold text-[#111827] leading-tight">{room.title}</h1>
+          <h1 className="text-2xl md:text-[24px] font-semibold text-[#111827] leading-tight">{room.title}</h1>
           <span className="bg-[#90E6A7] text-[#1A4D2E] px-2 py-0.5 md:px-3 md:py-1 rounded-md text-[10px] md:text-xs font-bold uppercase whitespace-nowrap">
             {room.status}
           </span>
         </div>
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl md:text-[32px] font-bold text-[#111827]">${room.price}</span>
+          <span className="text-2xl md:text-[24px] font-bold text-[#111827]">${room.price}</span>
           <span className="text-[#7C8DB5] text-xs md:text-lg font-medium">/night</span>
         </div>
       </div>
