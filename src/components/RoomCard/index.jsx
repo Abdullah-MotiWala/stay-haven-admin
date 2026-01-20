@@ -49,16 +49,16 @@ function RoomCard({ room, active, onClick }) {
       `}
     >
       {/* Room Image */}
-      <div className="w-full md:w-60 h-60 shrink-0">
+      <div className="w-full md:w-60 h-50 shrink-0">
         <img
           src={cardImage}
           alt={room.title}
-          className="w-full h-full object-cover rounded-[15px]"
+          className="w-full h-full object-cover rounded-[15px] h-[185px] w-[236px]"
         />
       </div>
 
       {/* Content Area */}
-      <div className="flex flex-col flex-1 justify-between  py-1">
+      <div className="flex flex-col flex-1 ">
         <div>
           {/* Header: Room No & Status */}
           <div className="flex justify-between items-center items-start mb-0">
@@ -113,11 +113,11 @@ function RoomCard({ room, active, onClick }) {
 
         {/* Footer: Guest & Price */}
         <div className="flex justify-between items-end mt-0">
-          <div className="text-[#7C8DB5] font-md text-lg">
+          <div className="text-[#7C8DB5] font-medium text-[14px]">
             Guest: <span className="text-[#7C8DB5]">N/A</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-[32px] font-bold text-gray-900">${room.price}</span>
+            <span className="text-[24px] font-bold text-gray-900">${room.price}</span>
             <span className="text-[#7C8DB5] text-xl font-medium">/night</span>
           </div>
         </div>
