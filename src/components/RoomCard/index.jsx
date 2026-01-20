@@ -37,13 +37,14 @@ import React, { useState } from 'react';
 import { MoreVertical, SquareArrowOutUpRight, Edit2, Trash2, Maximize, Bed, Users } from 'lucide-react';
 import cardImage from "../../assets/images/cardImage.png"
 import gests from "../../assets/icons/gests.png"
+import location from "../../assets/icons/location.png"
 function RoomCard({ room, active, onClick }) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div
       onClick={onClick}
-      className={`relative flex flex-col md:flex-row gap-4 bg-white p-2 rounded-[20px] cursor-pointer border transition-all duration-200 shadow-sm
+      className={`relative flex flex-col md:flex-row gap-4 bg-white p-2 rounded-xl cursor-pointer border transition-all duration-200 shadow-sm
         ${active ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-100 hover:border-gray-200"}
       `}
     >
@@ -57,15 +58,15 @@ function RoomCard({ room, active, onClick }) {
       </div>
 
       {/* Content Area */}
-      <div className="flex flex-col flex-1 justify-between py-1">
+      <div className="flex flex-col flex-1 justify-between  py-1">
         <div>
           {/* Header: Room No & Status */}
-          <div className="flex justify-between items-start mb-0">
-            <span className="text-[17px] font-medium text-gray-800">
+          <div className="flex justify-between items-center items-start mb-0">
+            <span className="text-[14px] font-medium text-gray-800">
               {room.roomNo}
             </span>
             <div className="flex items-center gap-2">
-              <span className="bg-[#90E6A7] text-[#1A4D2E] px-4 py-1 rounded-lg text-sm font-semibold">
+              <span className="text-[13px] bg-[#90E6A7] text-[#1A4D2E] px-2 py-1 rounded-lg  font-medium">
                 {room.status}
               </span>
               
@@ -90,22 +91,22 @@ function RoomCard({ room, active, onClick }) {
           </div>
 
           {/* Title & Location */}
-          <h2 className="text-[32px] font-bold text-gray-900 leading-tight mb-2">
+          <h2 className="text-[24px] font-semibold text-gray-900 leading-tight mb-2">
             {room.title}
           </h2>
           
-          <div className="flex items-center gap-2 text-[#7C8DB5] font-medium mb-6">
-            <span className="flex items-center gap-1">📍 {room.view}</span>
-            <span className="mx-2 text-gray-300">|</span>
+          <div className="flex items-center gap-2 text-[#7C8DB5] font-medium mb-3">
+            <span className="flex items-center font-medium text-[14px] gap-1 border-r-2 border-gray-100"><img src={location} alt="" /> {room.view}</span>
+  
             <div className="flex items-center gap-2">
-               <span className="flex items-center gap-1.5  px-2  rounded-md text-sm"><img src={gests} alt="" />{room.size}</span>
-               <span className="flex items-center gap-1.5  rounded-md text-sm"><img src={gests} alt="" /> {room.bed}</span>
-               <span className="flex items-center gap-1.5  rounded-md text-sm"><img src={gests} alt="" /> {room.guests}</span>
+               <span className="flex items-center gap-1  text-[13px] fount-medium  rounded-md text-sm"><img src={gests} alt="" />{room.size}</span>
+               <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm"><img src={gests} alt="" /> {room.bed}</span>
+               <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm"><img src={gests} alt="" /> {room.guests}</span>
             </div>
           </div>
 
           {/* Description */}
-          <p className="text-[#1F2937] text-md   font-medium leading-relaxed">
+          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0">
             {room.description}
           </p>
         </div>
