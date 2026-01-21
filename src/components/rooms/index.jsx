@@ -224,8 +224,8 @@ export default function Rooms() {
 
   const filteredRooms =
     activeType === "All Rooms"
-      ? roomsdata
-      : roomsdata.filter((r) => r.type === activeType);
+      ? rooms
+      : rooms.filter((r) => r.type === activeType);
 
 
 

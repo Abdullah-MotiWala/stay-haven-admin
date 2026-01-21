@@ -232,7 +232,7 @@ const [showFilter, setShowFilter] = useState(false);
       </span>
       <input 
         type="text" 
-        className="border border-2 rounded-md bg-[#F9FAFC] font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
+        className="border border-2 rounded-md bg-inpgraysecondary    font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
         placeholder="Search" 
       />
     </div>
@@ -306,14 +306,14 @@ showFilter && (
   <div className="flex justify-end w-full">
  <div className="bg-white  border rounded-2xl p-6 shadow-sm w-full mb-6">
   {/* Header */}
-  <h3 className="text-gray-900 font-bold text-lg mb-5">Apply Filters</h3>
+  <h3 className="text-gray-900 font-bold text-lg mb-2 ">Apply Filters</h3>
 
   {/* Filters Grid */}
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     
     {/* Select Room */}
     <div className="relative group">
-      <select className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
         <option>Select Room</option>
       </select>
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -323,7 +323,7 @@ showFilter && (
 
     {/* Select Hotel */}
     <div className="relative">
-      <select className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
         <option>Select Hotel</option>
       </select>
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -333,7 +333,7 @@ showFilter && (
 
     {/* Sort by Duration */}
     <div className="relative">
-      <select className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
         <option>Sort by Duration</option>
       </select>
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -343,7 +343,7 @@ showFilter && (
 
     {/* Sort by Status */}
     <div className="relative">
-      <select className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
+      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
         <option>Sort by status</option>
       </select>
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -358,7 +358,7 @@ showFilter && (
         placeholder="Date From"
         onFocus={(e) => (e.target.type = "date")}
         onBlur={(e) => (e.target.type = "text")}
-        className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        className="w-full bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
       />
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
         <Calendar size={18} className="text-gray-500" />
@@ -372,7 +372,7 @@ showFilter && (
         placeholder="Date To"
         onFocus={(e) => (e.target.type = "date")}
         onBlur={(e) => (e.target.type = "text")}
-        className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        className="w-full bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
       />
       <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
         <Calendar size={18} className="text-gray-500" />
@@ -384,11 +384,11 @@ showFilter && (
 
     {/* Action Buttons */}
     <div className="flex items-center justify-end gap-3 mt-2 lg:mt-0">
-      <button className="flex items-center gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100">
+      <button className="flex items-center bg-inpgray gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100">
         <RotateCcw size={16} />
         Reset All Filters
       </button>
-      <button className="px-10 py-3 bg-[#0061F2] text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
+      <button className="px-10 py-3 bg-blue text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
         Apply
       </button>
     </div>

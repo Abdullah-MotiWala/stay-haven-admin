@@ -243,7 +243,7 @@ const RoomDetailsForm = () => {
                   ]}
                 >
                   <Input
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                     placeholder="Enter room name"
                   />
                 </Form.Item>
@@ -260,7 +260,7 @@ const RoomDetailsForm = () => {
                   rules={[{ required: true, message: "Room Number is required" }]}
                 >
                   <Input
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                     placeholder="Enter room number"
                   />
                 </Form.Item>
@@ -283,8 +283,8 @@ const RoomDetailsForm = () => {
                   rules={[{ required: true, message: "hotel is required" }]}
                 >
                   <Input
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter hotal name"
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
+                    placeholder="Enter hotel name"
                   />
                 </Form.Item>
               </div>
@@ -298,7 +298,7 @@ const RoomDetailsForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                   placeholder="Enter email"
                 /> */}
                 <Form.Item
@@ -308,7 +308,7 @@ const RoomDetailsForm = () => {
                     { message: "Room type required" },
                   ]}
                 >
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
                     <Option value="true">Single Bed Room</Option>
                     <Option value="false">Double Bed Room</Option>
                   </Select>
@@ -324,7 +324,7 @@ const RoomDetailsForm = () => {
                   name="cancellation_policy"
                   value={formData.cancellation_policy}
                   onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                   placeholder="Enter policy"
                 /> */}
                 <Form.Item
@@ -337,7 +337,7 @@ const RoomDetailsForm = () => {
                   ]}
 
                 >
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
                     <Option value="single_bed">Single Bed</Option>
                     <Option value="queen_bed">Queen Bed</Option>
                     <Option value="king_bed">King Bed</Option>
@@ -351,7 +351,7 @@ const RoomDetailsForm = () => {
                   Room Size
                 </label>
                 <Form.Item name="size">
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
                     <Option value="true">25 m2</Option>
                     <Option value="false">50 m2</Option>
                   </Select>
@@ -367,7 +367,7 @@ const RoomDetailsForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                   placeholder="Enter email"
                 /> */}
                 <Form.Item
@@ -377,7 +377,7 @@ const RoomDetailsForm = () => {
                     { message: "Room type required" },
                   ]}
                 >
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
                     <Option value="two_gest">2 Gests</Option>
                     <Option value="four_gest">4 Gests</Option>
                   </Select>
@@ -405,9 +405,9 @@ const RoomDetailsForm = () => {
                     { message: "Room type required" },
                   ]}
                 >
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                    <Option value="two_gest">2 Gests</Option>
-                    <Option value="four_gest">4 Gests</Option>
+                  <Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
+                    <Option value="two_gest">2 Childrens</Option>
+                    <Option value="four_gest">4 Childrens </Option>
                   </Select>
                 </Form.Item>
               </div>
@@ -436,7 +436,7 @@ const RoomDetailsForm = () => {
                 ]}
               >
                 <Input
-                  className="w-full h-12 p-10 border border-lightSeconday rounded-md font-medium"
+                  className="w-full h-12 p-10 border border-dark rounded-md font-medium"
                   placeholder="Enter room description"
                 />
               </Form.Item>
@@ -464,7 +464,7 @@ const RoomDetailsForm = () => {
                       ]}
                     >
                       <Input
-                        className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                        className="w-full h-12 p-2 border border-dark rounded-md font-medium"
                         placeholder="Enter room description"
                         type='number'
                       />
@@ -490,7 +490,7 @@ const RoomDetailsForm = () => {
                         { required: true },
                         { message: "Room type required" },
                       ]}
-                    ><Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    ><Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
                         <Option value="availble">Available</Option>
                         <Option value="maintenance">Maintenace</Option>
                         <Option value="occupied">Occupied</Option>
@@ -617,7 +617,7 @@ const RoomDetailsForm = () => {
             disabled={loading}
             className="px-10 py-2 bg-blue text-white rounded-md"
           >
-            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save"}
+            {loading ? "loading..." : isEditMode ? "Next" : "Next"}
           </button>
         </div>
       </Form>

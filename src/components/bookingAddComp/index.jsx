@@ -3,6 +3,7 @@ import { ChevronDown, Info } from 'lucide-react';
 import selection from "../../assets/icons/selection.png"
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import calenderIcon from "../../assets/icons/calendarIcon.png"
 const BookingAddComp = () => {
     const { id } = useParams();
     const isEditMode = Boolean(id);
@@ -18,38 +19,38 @@ const BookingAddComp = () => {
 
             <h3 className="font-semibold pb-2 px-3"> Add New Booking</h3>
 
-            <div className="bg-white rounded-2xl shadow-md  min-h-screen p-4 md:p-8">
+            <div className="bg-white rounded-2xl shadow-md min-h-screen p-4 md:p-8 w-full">
                 {/* Main Grid: 3 columns on desktop */}
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                     {/* LEFT SIDE: Inputs (Occupies 2/3 of space) */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-8 space-y-6">
 
                         {/* Section 1: Guest Information */}
-                        <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                            <h3 className="text-dark font-bold text-[18px] mb-6 pb-2 border-b border-gray-100">
+                        <div className=" bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
+                            <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">
                                 Guest Information
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                 {/* Full Name */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Guest Full Name</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Guest Full Name</label>
                                     <input type="text" required placeholder="Enter full Name" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0 " />
                                 </div>
                                 {/* Phone */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Phone Number</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Phone Number</label>
                                     <input type="text" required placeholder="Enter Number" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
                                 </div>
                                 {/* Email */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Email (Optional)</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Email (Optional)</label>
                                     <input type="email" required placeholder="Enter email" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
                                 </div>
                                 {/* CNIC */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">CNIC</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">CNIC</label>
                                     <input type="text" required placeholder="enter CNIC" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
                                 </div>
                             </div>
@@ -64,7 +65,7 @@ const BookingAddComp = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                 {/* Hotel Select */}
                                 <div className="flex flex-col ">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Hotel Name</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Hotel Name</label>
                                     <div className="relative">
                                         <select className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer m-0">
                                             <option>Ocean View Resort</option>
@@ -74,7 +75,7 @@ const BookingAddComp = () => {
                                 </div>
                                 {/* Room Type Select */}
                                 <div className="flex flex-col ">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Select Room</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Select Room</label>
                                     <div className="relative">
                                         <select className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer m-0">
                                             <option>Deluxe / Standard</option>
@@ -84,7 +85,7 @@ const BookingAddComp = () => {
                                 </div>
                                 {/* Room Number Select */}
                                 <div className="flex flex-col ">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Room Number</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Room Number</label>
                                     <div className="relative">
                                         <select className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer m-0">
                                             <option>Room No 105</option>
@@ -94,7 +95,7 @@ const BookingAddComp = () => {
                                 </div>
                                 {/* Guests Select */}
                                 <div className="flex flex-col ">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Number of Guests</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Number of Guests</label>
                                     <div className="relative">
                                         <select className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer m-0">
                                             <option>02 Adults</option>
@@ -105,30 +106,100 @@ const BookingAddComp = () => {
                             </div>
                         </div>
 
+
                         <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                            <h3 className="text-dark font-bold text-[18px] mb-6 pb-2 border-b border-gray-100">
+                            <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">
+                                Stay Details
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                                {/* Full Name */}
+                               <div className="flex flex-col w-full">
+  <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">
+    Checked in Date
+  </label>
+
+  <div className="relative group">
+    <input
+      type="date"
+      required
+      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0 appearance-none
+      /* 1. Default icon ko bilkul hide karne ke liye */
+      [&::-webkit-calendar-picker-indicator]:opacity-0 
+      [&::-webkit-calendar-picker-indicator]:absolute 
+      [&::-webkit-calendar-picker-indicator]:inset-0 
+      [&::-webkit-calendar-picker-indicator]:cursor-pointer 
+      [&::-webkit-calendar-picker-indicator]:z-10"
+    />
+    
+    {/* 2. Aapka apna Custom Icon */}
+    <img
+      src={calenderIcon}
+      alt="calendar"
+      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-0"
+    />
+  </div>
+</div>
+                                {/* Phone */}
+                                <div className="flex flex-col w-full">
+  <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">
+    Checked out Date
+  </label>
+
+  <div className="relative group">
+    <input
+      type="date"
+      required
+      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0 appearance-none
+      /* 1. Default icon ko bilkul hide karne ke liye */
+      [&::-webkit-calendar-picker-indicator]:opacity-0 
+      [&::-webkit-calendar-picker-indicator]:absolute 
+      [&::-webkit-calendar-picker-indicator]:inset-0 
+      [&::-webkit-calendar-picker-indicator]:cursor-pointer 
+      [&::-webkit-calendar-picker-indicator]:z-10"
+    />
+    
+    {/* 2. Aapka apna Custom Icon */}
+    <img
+      src={calenderIcon}
+      alt="calendar"
+      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-0"
+    />
+  </div>
+</div>
+                                {/* Email */}
+                                <div className="flex flex-col">
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Total Night</label>
+                                    <input type="email" required placeholder="Enter Nights" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
+                            <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">
                                 Pricing & Payment
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                 {/* Full Name */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Price per Night</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Price per Night</label>
                                     <input type="text" required placeholder="Enter Price" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0 " />
                                 </div>
                                 {/* Phone */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Taxes & Fee</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Taxes & Fee</label>
                                     <input type="text" required placeholder="Enter Taxes & Fee" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
                                 </div>
                                 {/* Email */}
                                 <div className="flex flex-col">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Discount</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Discount</label>
                                     <input type="email" required placeholder="Enter Discount" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all m-0" />
                                 </div>
                                 {/* CNIC */}
                                 <div className="flex flex-col ">
-                                    <label className="text-[#8E99B7] text-[13px] font-bold ml-1">Payment Method</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">Payment Method</label>
                                     <div className="relative">
                                         <select className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer m-0">
                                             <option>Bank</option>
@@ -145,7 +216,7 @@ const BookingAddComp = () => {
                             </h3>
 
                             <div className="flex flex-wrap items-center gap-12 py-2">
-                                <span className="text-dark font-semibold text-[15px]">Set Booking Status</span>
+                                <span className="text-dark font-semibold text-15">Set Booking Status</span>
 
                                 <div className="flex items-center gap-8">
                                     {/* Checked In Option */}
@@ -154,12 +225,12 @@ const BookingAddComp = () => {
                                             <input
                                                 type="radio"
                                                 name="bookingStatus"
-                                                className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#0061F2] transition-all"
+                                                className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all"
                                                 defaultChecked
                                             />
-                                            <div className="absolute w-2.5 h-2.5 bg-[#0061F2] rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                                            <div className="absolute w-2.5 h-2.5 bg-blue rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
                                         </div>
-                                        <span className="text-dark font-medium text-[15px] group-hover:text-[#0061F2] transition-colors">
+                                        <span className="text-dark font-medium text-15 group-hover:text-blue transition-colors">
                                             Checked in
                                         </span>
                                     </label>
@@ -170,11 +241,11 @@ const BookingAddComp = () => {
                                             <input
                                                 type="radio"
                                                 name="bookingStatus"
-                                                className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#0061F2] transition-all"
+                                                className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all"
                                             />
-                                            <div className="absolute w-2.5 h-2.5 bg-[#0061F2] rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
+                                            <div className="absolute w-2.5 h-2.5 bg-blue rounded-full scale-0 peer-checked:scale-100 transition-transform"></div>
                                         </div>
-                                        <span className="text-dark font-medium text-[15px] group-hover:text-[#0061F2] transition-colors">
+                                        <span className="text-dark font-medium text-15 group-hover:text-blue transition-colors">
                                             Reserved
                                         </span>
                                     </label>
@@ -184,15 +255,15 @@ const BookingAddComp = () => {
                     </div>
 
                     {/* RIGHT SIDE: Booking Summary Container */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-4">
                         <div className="bg-[#EDFDF2] border-2 border-[#107326] rounded-[24px] p-6 sticky top-8 ">
-                            <h3 className="text-[#107326] font-semibold  text-lg mb-5 border-b-2 border-[#BBBBBB] pb-2">Booking Summary</h3>
+                            <h3 className="text-[#107326] font-semibold  text-lg mb-5 border-b-2 border-darkgrayline pb-2">Booking Summary</h3>
 
                             <div className="space-y-5">
                                 {/* Room Selected Row */}
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <p className="text-[#718096] text-[13px] font-semibold mb-0 tracking-wider">Room Selected</p>
+                                        <p className="text-[#718096] text-13 font-semibold mb-0 tracking-wider">Room Selected</p>
                                         <p className="text-dark font-bold text-base">Double Bed Room #101</p>
                                     </div>
                                     <span className="pt-2.5  rounded-xl shadow-sm text-lg"><img src={selection} alt="" /></span>
@@ -200,7 +271,7 @@ const BookingAddComp = () => {
 
                                 {/* Stay Duration */}
                                 <div className="flex justify-between   item-center">
-                                    <div className="flex flex-col justify-between text-[14px]">
+                                    <div className="flex flex-col justify-between text-14">
                                         <span className="text-[#718096] font-medium">Stay Duration</span>
                                         <span className="text-dark font-bold">02 Jan 2026 - 05 Jan 2026</span>
                                     </div>
@@ -208,8 +279,8 @@ const BookingAddComp = () => {
                                 </div>
 
                                 {/* Pricing Breakdown */}
-                                <div className="border-t-2 border-[#BBBBBB] pt-4 space-y-3 text-[14px]">
-                                    <p className="text-[#6C7293] font-bold text-sm">Pricing Breakdown</p>
+                                <div className="border-t-2 border-darkgrayline pt-4 space-y-3 text-14">
+                                    <p className="text-lightSeconday font-bold text-sm">Pricing Breakdown</p>
                                     <div className="flex justify-between font-medium  text-dark">
                                         <span>Bases Price 3 night ($150 x 3)</span>
                                         <span className="font-bold text-dark">$450.00</span>
@@ -225,19 +296,19 @@ const BookingAddComp = () => {
                                 </div>
 
                                 {/* Totals Section */}
-                                <div className="border-t-2 border-[#BBBBBB] pt-4 space-y-4">
+                                <div className="border-t-2 border-darkgrayline pt-4 space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-dark font-semibold text-[20px]">Total Payable</span>
-                                        <span className="text-xl font-bold text-[#0061F2]">$450.00</span>
+                                        <span className="text-dark font-semibold text-sm">Total Payable</span>
+                                        <span className="text-xl font-bold text-blue">$450.00</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-dark font-medium">Amount Paid</span>
-                                        <div className=" border border-[#6C7293] rounded-lg px-3 py-1.5 font-bold text-dark text-sm ">
+                                        <div className=" border border-lightSeconday rounded-lg px-3 py-1.5 font-bold text-dark text-sm ">
                                             $450.00
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[#4A5568] font-medium">Remaining Balance</span>
+                                        <span className="text-dark font-medium">Remaining Balance</span>
                                         <span className="font-bold text-dark">$0.00</span>
                                     </div>
                                 </div>
@@ -269,7 +340,7 @@ const BookingAddComp = () => {
                     disabled={loading}
                     className="px-10 py-2 bg-blue text-white rounded-md"
                 >
-                    {loading ? "Adding..." : isEditMode ? "Save" : "Added"}
+                    {loading ? "Adding..." : isEditMode ? "Save" : "Save Bookig"}
                 </button>
             </div>
         </>
