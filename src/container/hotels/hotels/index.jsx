@@ -73,7 +73,7 @@ const HotelsListing = () => {
       image: home1,
       trend: "+12%",
       trendText: "vs last week",
-      showTrend: true,
+      showTrend: false,
     },
     {
       title: "Active Hotels",

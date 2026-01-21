@@ -9,6 +9,9 @@ import HotelView from "../../container/hotels/hotel-view/index";
 // import RoomDetail from '../../components/roomDetail';
  import AddRooms from '../../container/rooms/addRooms';
 import Room from "../../container/rooms";
+import Booking from "../../container/booking";
+import BookingView from "../../container/booking/bookingView"
+import AddBooking from "../../container/booking/addBooking"
 // import Ticket from "../../container/hotels/tickets";
 // import TicketView from "../../container";
 export const AdminRoute = [
@@ -29,6 +32,10 @@ export const AdminRoute = [
           
            { path: "rooms/addnext", element: <AddRooms /> },
             {path:"rooms" , element:<Room/>},
+            {path:"booking" , element:<Booking/>},
+            {path:"booking/view/:id" , element:<BookingView/>},
+            {path:"booking/add" , element:<AddBooking/>},
+
             // {path:"tickets" , element:<Ticket/>},
             // {path:"ticket/view" ,element:<TicketView/>}
 
