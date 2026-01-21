@@ -79,3 +79,24 @@ a :hover{
     text-decoration-line: none !important;
     text-decoration: none !important;
 }
+
+
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  color: #000000;
+  background-color: #008000;
+}
+.ant-checkbox-checked .ant-checkbox-inner:hover {
+  color: #000000;
+  background-color: #008000;
+}
+
+.ant-checkbox-checked .ant-checkbox-input {
+  color: #000000;
+}
+
+:where(.css-dev-only-do-not-override-qghzx5).ant-pagination .ant-pagination-item-active{
+    border-color: #8B0002 !important;
+    background-color: #8B0002 !important;
+    color: white !important;
+}

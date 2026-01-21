@@ -45,13 +45,12 @@ export default function RevenueSnapshot({ revenue }) {
         borderRadius: 2,
         backgroundColor: ctx =>
           ctx.dataIndex === activeIndex
-            ? "#2563EB" // dark blue (active)
-            : "#9DBDFF", // light blue
+            ? "#2563EB" 
+            : "#9DBDFF", 
       },
     ],
   }), [values, labels, activeIndex]);
 
-  /* ---------------- CHART OPTIONS ---------------- */
   const options = {
     responsive: true,
     maintainAspectRatio: false,

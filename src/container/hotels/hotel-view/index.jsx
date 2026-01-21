@@ -9,7 +9,6 @@ import MatrixCard from "../../../components/MatrixCard";
 import { ShopOutlined } from "@ant-design/icons";
 import RoomOccupancyCard from "../../../components/RoomOccupation";
 import Breadcrumb from "../../../components/Breadcrumb";
-import BookingTable from "../../../components/RecentTable";
 import editIcon from "../../../assets/icons/editIcon.png";
 import downArrowIcon from "../../../assets/icons/downArrowIcon.png";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
@@ -66,20 +65,20 @@ const HotelProfile = () => {
     fetchFeatures();
   }, []);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await getStats();
-        console.log(res.data, "asdadsaasdas2321413");
-        setStats(res.data);
-      } catch (err) {
-        console.error("Failed to load stats:", err);
-        openNotification("error", "Failed to load stats");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const res = await getStats();
+  //       console.log(res.data, "asdadsaasdas2321413");
+  //       setStats(res.data);
+  //     } catch (err) {
+  //       console.error("Failed to load stats:", err);
+  //       openNotification("error", "Failed to load stats");
+  //     }
+  //   };
 
-    fetchStats();
-  }, []);
+  //   fetchStats();
+  // }, []);
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -96,20 +95,20 @@ const HotelProfile = () => {
     fetchStatistics();
   }, []);
 
-  useEffect(() => {
-    const fetchRecentBookings = async () => {
-      try {
-        const res = await getRecentBooking();
-        console.log(res.data, "asdadsaasdas2321413");
-        setRecentBookings(res.data);
-      } catch (err) {
-        console.error("Failed to load stats:", err);
-        openNotification("error", "Failed to load stats");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchRecentBookings = async () => {
+  //     try {
+  //       const res = await getRecentBooking();
+  //       console.log(res.data, "asdadsaasdas2321413");
+  //       setRecentBookings(res.data);
+  //     } catch (err) {
+  //       console.error("Failed to load stats:", err);
+  //       openNotification("error", "Failed to load stats");
+  //     }
+  //   };
 
-    fetchRecentBookings();
-  }, []);
+  //   fetchRecentBookings();
+  // }, []);
 
   useEffect(() => {
     const fetchHotelData = async () => {
@@ -136,11 +135,12 @@ const HotelProfile = () => {
     if (value === null || value === undefined) return "00";
     return String(value).padStart(2, "0");
   };
+  const output = statistics?.analytics?.summary
 
   const cardsData = [
     {
       title: "Total Rooms",
-      value: stats?.totalRooms,
+      value: output?.totalRooms,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: hotel1,
@@ -148,21 +148,21 @@ const HotelProfile = () => {
     },
     {
       title: "Occupied",
-      value: stats?.occupiedRooms,
+      value: output?.occupiedRooms,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: hotel1,
     },
     {
       title: "Available Rooms",
-      value: stats?.availableRooms,
+      value: output?.availableRooms,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: hotel3,
     },
     {
       title: "In Maintenance",
-      value: stats?.maintenanceRooms,
+      value: output?.maintenanceRooms,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: hotel4,
@@ -290,6 +290,8 @@ const HotelProfile = () => {
     options.find((o) => o.value === hotel.status) || options[0];
 
 
+    console.log(statistics.analytics?.summary,"statisticsstatisticsstatistics")
+
   return (
     <>
       <div className="mt-4  !overflow-x-hidden">
@@ -339,7 +341,7 @@ const HotelProfile = () => {
               </div>
 
               <div className="flex items-center gap-3 mt-4 flex-wrap">
-                <span className="bg-[#DBE9FF] text-[#0A5BE2] px-3 py-2 rounded-full text-xs font-semibold uppercase">
+                <span className="bg-[#DBE9FF] text- px-3 py-2 rounded-full text-xs font-semibold uppercase">
                   #{uiHotelId ?? "N/A"}
                 </span>
 

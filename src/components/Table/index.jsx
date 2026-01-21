@@ -16,7 +16,7 @@ const HotelDirectory = ({
   title = "Directory",
   view = false,
   setRefresh,
-  lastId = null
+  lastId = null,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -69,9 +69,9 @@ const HotelDirectory = ({
 
   const getRowStatus = (row) => {
     console.log(row, "rowrow1234");
-     if (row.checkInOut) {
-    return deriveBookingStatus(row.checkInOut);
-  }
+    if (row.checkInOut) {
+      return deriveBookingStatus(row.checkInOut);
+    }
     if (row.isDeleted) return "Deleted";
     if (row.status === "active") return "Active";
     if (row.status === "deactivate" || row.status === "inactive")
@@ -172,10 +172,10 @@ const HotelDirectory = ({
           </span>
         );
 
-      case "computed":
-        return row.totalRooms && row.availableRooms
-          ? row.totalRooms - row.availableRooms
-          : "-";
+      // case "computed":
+      //   return row.totalRooms && row.availableRooms
+      //     ? row.totalRooms - row.availableRooms
+      //     : "-";
 
       case "fallback":
         return "-";
@@ -215,12 +215,10 @@ const HotelDirectory = ({
     }
   };
 
-
-  console.log(lastId,"lastIdlastIdlastId")
-
+  // console.log(lastId, "lastIdlastIdlastId");
 
   return (
-    <div className="w-full bg-white rounded-xl">
+    <div className="w-full ">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
@@ -283,9 +281,9 @@ const HotelDirectory = ({
       {/* TABLE */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
-          <thead>
+          <thead className="">
             <tr>
-              <th className="w-10 border-b border-dashed">
+              <th className="w-10 border-b border-t border-r  border-dashed">
                 <input
                   type="checkbox"
                   checked={
@@ -299,11 +297,12 @@ const HotelDirectory = ({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`p-4 text-xs font-semibold uppercase tracking-wide text-blue
-                    border-b border-dashed
-                    ${col.type === "status" ? "text-center" : ""}
-                    ${col.type === "actions" ? "text-right" : ""}
-                  `}
+                  className={`
+    p-4 text-xs font-semibold uppercase tracking-wide text-blue
+    border-b border-t  border-l border-dashed border-gray-200
+    ${col.type === "status" ? "text-center" : ""}
+    ${col.type === "actions" ? "text-right" : ""}
+  `}
                 >
                   {col.label}
                 </th>
@@ -312,73 +311,90 @@ const HotelDirectory = ({
           </thead>
 
           <tbody>
-            {data.map((row, index) => {
-              const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
-                index + 1,
-              ).padStart(2, "0")}`;
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="py-12 text-center text-sm text-gray-500"
+                >
+                  No data found
+                </td>
+              </tr>
+            ) : (
+              data.map((row, index) => {
+                const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
+                  index + 1,
+                ).padStart(2, "0")}`;
 
-              const enrichedRow = { ...row, uiHotelId };
+                const enrichedRow = { ...row, uiHotelId };
 
-              return (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="border-b border-dashed">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(row.id)}
-                      onChange={() => toggleRow(row.id)}
-                      className="checked:accent-blue"
-                    />
-                  </td>
+                return (
+                  <tr
+                    key={index}
+                    className={`
+    ${index % 2 === 0 ? "bg-white" : "bg-lightWhite"}
+    hover:bg-blue-50 transition-colors
+  `}
+                  >
+                    <td className="border-b border-t border-r border-dashed">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => toggleRow(row.id)}
+                        className="checked:accent-blue"
+                      />
+                    </td>
 
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`p-4 text-sm border-b border-dashed
+                    {columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`p-4 text-sm border-b border-t  border-l border-dashed
                         ${col.type === "status" ? "text-center" : ""}
                         ${col.type === "actions" ? "text-right relative" : ""}
                       `}
-                    >
-                      {renderCell(enrichedRow, col, index)}
+                      >
+                        {renderCell(enrichedRow, col, index)}
 
-                      {/* ACTION DROPDOWN */}
-                      {col.type === "actions" && rowActionOpen === index && (
-                        <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
-                          <button
-                            onClick={() => {
-                              setRowActionOpen(null);
-                              navigate(`/admin/hotel/view/${row.id}`, {
-                                state: { lastId },
-                              });
-                            }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => {
-                              setRowActionOpen(null);
-                              navigate(`/admin/hotel/edit/${row.id}`, {
-                                state: { lastId },
-                              });
-                            }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                          >
-                            Edit
-                          </button>
+                        {/* ACTION DROPDOWN */}
+                        {col.type === "actions" && rowActionOpen === index && (
+                          <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
+                            <button
+                              onClick={() => {
+                                setRowActionOpen(null);
+                                navigate(`/admin/hotel/view/${row.id}`, {
+                                  state: { lastId },
+                                });
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRowActionOpen(null);
+                                navigate(`/admin/hotel/edit/${row.id}`, {
+                                  state: { lastId },
+                                });
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >
+                              Edit
+                            </button>
 
-                          <button
-                            onClick={() => onDelete(row.id)}
-                            className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+                            <button
+                              onClick={() => onDelete(row.id)}
+                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
@@ -387,3 +403,9 @@ const HotelDirectory = ({
 };
 
 export default HotelDirectory;
+
+
+
+
+
+
