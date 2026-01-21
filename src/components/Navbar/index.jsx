@@ -32,7 +32,7 @@ const Navbar = () => {
           {/* List Hotel / Room Button (Naya Button) */}
           <button
             onClick={() => navigate("/admin/hotel/add")} // Aapka add hotel route
-            className="hidden lg:flex items-center gap-2 bg-[#0A5BE2] text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
+            className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >
             Add New Hotel
           </button>

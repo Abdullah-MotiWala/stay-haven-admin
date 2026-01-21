@@ -45,18 +45,26 @@ div[style*="background: green"] {
 }
 
 /* Sidebar Active Item Styling */
-.sidebar-menu .ant-menu-item-selected {
-    background-color: #0A5BE2 !important;
-    color: white !important;
-    /* Figma Blue */
-    font-weight: 700;
-    border-radius: 15px !important;
-}
+
 
 .sidebar-menu .ant-menu-item {
     margin-bottom: 8px !important;
-    border-radius: 20px !important;
+    border-radius: 10px !important;
+    color: #6C7293 !important; 
     text-decoration-line: none !important;
+    font-weight: 500;
+}
+
+.sidebar-menu .ant-menu-item-selected {
+    background-color: #8B0002 !important;
+
+    color: white !important;
+    /* Figma Blue */
+    font-weight: 500;
+    border-radius: 7px !important;
+}
+.sidebar-menu .ant-menu-item-selected img {
+  filter: brightness(0) invert(1);
 }
 
 .logout-btn {

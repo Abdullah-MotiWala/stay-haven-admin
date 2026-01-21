@@ -282,7 +282,7 @@ const HotelDirectory = ({
 
       {/* TABLE */}
       <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-0">
+        <table className="w-full border-collapse">
           <thead>
             <tr>
               <th className="w-10 border-b border-dashed">

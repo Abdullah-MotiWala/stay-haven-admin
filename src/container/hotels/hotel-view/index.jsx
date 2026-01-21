@@ -48,7 +48,7 @@ const HotelProfile = () => {
   const [recentBookings, setRecentBookings] = useState([]);
 
   const uiHotelId = location.state?.lastId;
-  console.log(uiHotelId,"uiHotelIduiHotelId32423")
+  console.log(uiHotelId, "uiHotelIduiHotelId32423");
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -289,7 +289,6 @@ const HotelProfile = () => {
   const currentStatus =
     options.find((o) => o.value === hotel.status) || options[0];
 
-  console.log(recentBookings, "recentBookings.data");
 
   return (
     <>
@@ -466,19 +465,31 @@ const HotelProfile = () => {
             { label: "Luxury Suites", used: 8, total: 10 },
           ]}
         /> */}
+        {/* <RoomOccupancyCard
+          data={
+            statistics?.analytics?.analytics?.roomTypeOccupancy?.map(
+              (item) => ({
+                label: item.label,
+                used: Math.max(item.total - item.available, 0),
+                total: item.total,
+              }),
+            ) || []
+          }
+        /> */}
+
         <RoomOccupancyCard
           data={
             statistics?.analytics?.analytics?.roomTypeOccupancy?.map(
               (item) => ({
                 label: item.label,
-                used: item.total - item.available, 
+                used: item.total - item.available,
                 total: item.total,
               }),
             ) || []
           }
         />
 
-        <RevenueSnapshot revenue={statistics?.analytics?.revenue} />
+        <RevenueSnapshot revenue={statistics?.analytics?.analytics?.revenue} />
       </div>
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
