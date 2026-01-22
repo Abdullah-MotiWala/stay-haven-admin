@@ -3,6 +3,9 @@ import Api from "../../network/axiosClients";
 export const getAllHotels = async (currentPage, itemsPerPage) => {
   return Api.get("/hotels",currentPage, itemsPerPage);
 };
+export const getHotelNamesList = async (currentPage, itemsPerPage) => {
+  return Api.get("/hotels/list");
+};
 
 export const lastHotelId = async () => {
   return Api.get("/hotels/next-id");

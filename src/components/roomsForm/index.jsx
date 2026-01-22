@@ -1,257 +1,642 @@
-// import React, { useState } from 'react';
-// import FormInput from '../../container/dashboard/room-from';
-// import { CloudUpload, FileText, Eye, Trash2 } from 'lucide-react';
-// import leftangle from "../../assets/icons/leftangle.png"
-// const RoomDetailsForm = () => {
-//   const [formData, setFormData] = useState({
-//     roomName: '', roomNumber: '', hotel: '', roomType: '',
-//     bedType: '', roomSize: '', adults: '', children: '',
-//     description: '', price: '', status: ''
-//   });
-// const [mainImage, setMainImage] = useState(null);
-//   const [gallery, setGallery] = useState([]);
-
-//   // Handle Main Image
-//   const handleMainImageChange = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       setMainImage({
-//         name: file.name,
-//         size: (file.size / 1024).toFixed(2) + " KB",
-//         date: new Date().toLocaleString(),
-//       });
-//     }
-//   };
-
-//   // Handle Gallery Images
-//   const handleGalleryChange = (e) => {
-//     const files = Array.from(e.target.files);
-//     const newFiles = files.map(file => ({
-//       name: file.name,
-//       date: new Date().toLocaleString(),
-//     }));
-//     setGallery([...gallery, ...newFiles]);
-//   };
-
-//   const removeGalleryImage = (index) => {
-//     setGallery(gallery.filter((_, i) => i !== index));
-//   };
-//   const handleChange = (field, value) => {
-//     setFormData(prev => ({ ...prev, [field]: value }));
-//   };
-
-
-//   return (
-//     <>
-//     <div className='flex gap-1 border-solid border-b border-gray-300 mb-2 pb-4 flex items-center gap-4'>
-//       <img src={leftangle} alt="" />
-//         <button className='text-gray-600 flex'>Back</button>
-    
-//         </div>
-//          <div className="max-full mx-auto mb-6">
-//         <h1 className="text-2xl font-bold text-gray-900">Add New Room</h1>
-//         <p className="text-sm text-gray-500 font-medium">Fill in the details below to add a new room to your hotel inventory.</p>
-//       </div>
-//     <div className="min-h-screen  p-2 md:p-8 flex justify-center items-start">
-//       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        
-//         {/* Header Section */}
-//         <div className="px-8 py-6 border-b border-gray-100 bg-white">
-//           <h2 className="text-xl font-bold text-gray-800">Room Details</h2>
-//         </div>
-
-//         <form className="p-[10%] pt-[2%] space-y-2" onSubmit={(e) => e.preventDefault()}>
-          
-//           {/* Section 1: Room Details Grid */}
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
-//             <FormInput 
-//               label="Room Name" type="select" 
-//               options={['Deluxe', 'Standard', 'Luxury Suites']}
-//               placeholder="Select Room Name"
-//             />
-//             <FormInput label="Room Number" placeholder="105" />
-            
-//             <FormInput label="Select Hotel" placeholder="Grand Plaza Hotel" />
-//             <FormInput 
-//               label="Room Type" type="select"
-//               options={['Single Bed Room', 'Double Bed Room']}
-//               placeholder="Single Bed Room"
-//             />
-            
-//             <FormInput 
-//               label="Bed Type" type="select"
-//               options={['Single Bed', 'Queen Bed', 'King Bed']}
-//               placeholder="Single Bed / Queen Bed / King Bed"
-//             />
-//             <FormInput 
-//               label="Room Size" type="select"
-//               options={['25 m²', '35 m²', '50 m²']}
-//               placeholder="e.g. 25 m²"
-//             />
-            
-//             <FormInput 
-//               label="Guest Adults" type="select"
-//               options={['1 Guest', '2 Guests', '3 Guests']}
-//               placeholder="2 Guests"
-//             />
-//             <FormInput 
-//               label="Childrens" type="select"
-//               options={['0 Childrens', '1 Childrens', '2 Childrens']}
-//               placeholder="2 Childrens"
-//             />
-//           </div>
-
-//           {/* Description - Full Width */}
-//           <div className="w-full">
-//             <FormInput 
-//               label="Room Description" type="textarea"
-//               placeholder="A comfortable and well-furnished room..."
-//             />
-//           </div>
-
-//           <hr className="border-gray-100" />
-
-//           {/* Pricing & Status Section */}
-//           <div>
-//             <h3 className="text-lg font-bold text-gray-800 mb-6 ">
-//               Pricing & Status
-//             </h3>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-//               <FormInput label="Price Per Night" placeholder="$100" />
-//               <FormInput 
-//                 label="Room Status" type="select"
-//                 options={['Available', 'Occupied', 'Maintenance']}
-//                 placeholder="Available / Occupied / Maintenace"
-//               />
-//             </div>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-
-
-
-//    <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 font-sans overflow-hidden">
-//       <div className="px-6 py-3 border-b border-gray-100">
-//         <h2 className="text-[18px] mb-0 font-bold text-gray-900">Room Images</h2>
-//       </div>
-
-//       <div className="p-[8%] pt-2">
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          
-//           {/* LEFT: Main Image Section */}
-//           <div className="flex flex-col gap-4">
-//             <label className="text-[15px] font-bold text-gray-900">Upload Room (Main) image</label>
-//             <div className="relative group w-full h-[140px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-//               <div className="bg-white p-1 rounded-full shadow-sm mb-3">
-//                 <CloudUpload className="w-6 h-6 text-gray-700" />
-//               </div>
-//               <p className="text-sm text-gray-700 font-medium text-center px-4">
-//                 Drop your image here or <span className="text-blue-600 underline">Browse</span>
-//               </p>
-//               <p className="text-[11px] text-gray-400 mt-1">Only JPG/PNG Files under 2 MB</p>
-//               <input type="file" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-//             </div>
-
-//             {/* Main Image File Info Card */}
-//             {mainImage && (
-//               <div className=" max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
-//                 <div className="flex items-center gap-3  overflow-hidden">
-//                   <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-//                     <FileText className="w-6 h-6 text-blue-600" />
-//                   </div>
-//                   <div className="truncate">
-//                     <p className="text-[13px] font-bold text-gray-800 truncate mb-0">{mainImage.name}</p>
-//                     <p className="text-[11px] text-gray-400 mb-0">{mainImage.date}</p>
-//                   </div>
-//                 </div>
-//                 <div className="flex gap-2 shrink-0 ml-2">
-//                   <button className="p-1.5 bg-[#DBEAFE] text-blue-600 rounded-md hover:bg-blue-200 transition-colors"><Eye size={16} /></button>
-//                   <button onClick={() => setMainImage(null)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-
-//           {/* RIGHT: Gallery Section */}
-//           <div className="flex flex-col gap-4">
-//             <label className="text-[15px] font-bold text-gray-900">Gallery (Optional)</label>
-//             <div className="relative group w-full h-[140px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-//               <div className="bg-white p-1 rounded-full shadow-sm mb-3">
-//                 <CloudUpload className="w-8 h-8 text-gray-700" />
-//               </div>
-//               <p className="text-sm text-gray-700 font-medium text-center px-4">Upload multiple image</p>
-//               <p className="text-[11px] text-gray-400 mt-1">Only JPG/PNG Files under 2 MB</p>
-//               <input type="file" multiple onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-//             </div>
-
-//             {/* Gallery File List (Scrollable if many files) */}
-//             <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-//               {gallery.map((file, index) => (
-//                 <div key={index} className="flex items-center justify-between p-3 bg-[#F3F8FF] rounded-lg border border-blue-50">
-//                   <div className="flex items-center gap-3 overflow-hidden">
-//                     <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-//                       <FileText className="w-6 h-6 text-blue-600" />
-//                     </div>
-//                     <div className="truncate">
-//                       <p className="text-[13px] font-bold text-gray-800 truncate">{file.name}</p>
-//                       <p className="text-[11px] text-gray-400">{file.date}</p>
-//                     </div>
-//                   </div>
-//                   <div className="flex gap-2 shrink-0 ml-2">
-//                     <button className="p-1.5 bg-[#DBEAFE] text-blue-600 rounded-md hover:bg-blue-200 transition-colors"><Eye size={16} /></button>
-//                     <button onClick={() => removeGalleryImage(index)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-
-//         </div>
-//       </div>
-//     </div>
-
-//        <div className="w-full max-w-[1200px] mx-auto mt-8 mb-10 px-4 md:px-0">
-//                 <div className="flex justify-end items-center gap-4">
-
-//                     {/* White Button (Cancel/Back) */}
-//                     <button
-//                         type="button"
-//                         onClick={() => console.log("Cancel Clicked")}
-//                         className="px-14 py-4 rounded-lg border border-gray-300 bg-white text-gray-700 font-bold text-[15px] 
-//                      hover:bg-[#0A5BE2] hover:text-white hover:border-gray-400 transition-all duration-200 shadow-sm active:scale-95"
-//                     >
-//                         Cancel
-//                     </button>
-
-//                     {/* Blue Button (Save/Update) */}
-//                     <button
-//                         type="submit"
-//                         onClick={() => console.log("Save Clicked")}
-//                         className="px-14 py-4 rounded-lg bg-blue  text-white font-bold text-[15px] 
-//                      hover:bg-white hover:text-[#0A5BE2]  shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
-//                     >
-//                         Next
-//                     </button>
-
-//                 </div>
-//             </div>
-//     </>
-//   );
-// };
-
-// export default RoomDetailsForm;
-
-
-
-import React from 'react'
-
+import React, { useState } from 'react';
+import FormInput from '../../container/rooms/room-from';
+import { CloudUpload, FileText, Eye, Trash2 } from 'lucide-react';
+import leftangle from "../../assets/icons/leftangle.png"
+import { Form, Input, Select, Checkbox } from "antd";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  createRoom,
+  updateRoom,
+} from "../../services/rooms";
+import { DEFAULT_IMAGE } from "../../shared/constant";
+import arrowImg from "../../assets/icons/arrow.png";
+import { getAllFeature } from "../../services/features";
+import { openNotification } from "../../network/notification";
+import SuccessModal from "../../components/shared/successModal";
+import cloudimg from "../../assets/icons/cloud-upload.png";
+import eye from "../../assets/icons/eye.png"
 const RoomDetailsForm = () => {
-  return (
-    <div>
-      <h1>hello world</h1>
-    </div>
-  )
-}
+  const [formData, setFormData] = useState({
+    roomName: '', roomNumber: '', hotel: '', roomType: '',
+    bedType: '', roomSize: '', adults: '', children: '',
+    description: '', price: '', status: ''
+  });
+  const [mainImage, setMainImage] = useState(null);
+  const [gallery, setGallery] = useState([]);
 
-export default RoomDetailsForm
+  // Handle Main Image
+  const handleMainImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMainImage({
+        name: file.name,
+        size: (file.size / 1024).toFixed(2) + " KB",
+        date: new Date().toLocaleString(),
+      });
+    }
+  };
+
+  // Handle Gallery Images
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newFiles = files.map(file => ({
+      name: file.name,
+      date: new Date().toLocaleString(),
+    }));
+    setGallery([...gallery, ...newFiles]);
+  };
+
+  const removeGalleryImage = (index) => {
+    setGallery(gallery.filter((_, i) => i !== index));
+  };
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+  const [form] = Form.useForm();
+
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [amenitiesList, setAmenitiesList] = useState([]);
+  const [roomsList, setRoomsList] = useState([]);
+
+  const selectedRooms = Form.useWatch("rooms", form) || [];
+  const selectedAmenities = Form.useWatch("amenities", form) || [];
+
+  const { Option } = Select;
+
+  useEffect(() => {
+    if (!isEditMode) return;
+ 
+    const fetchRooms = async () => {
+      setFetching(true);
+      try {
+        const res = await updateRoom(id);
+        const rooms = res.data;
+       console.log("Rooms response", rooms)
+        form.setFieldsValue({
+          name: rooms.name,
+          roomNumber: rooms.room_number,
+          hotel: rooms.rooms,
+          room_type: rooms.room_type,
+          bed_type: rooms.bed_type,
+          size: rooms.siza ? "25 m2" : "50 m2",
+          guest: rooms.guest,
+          childrens: rooms.childrens,
+          description: rooms.description,
+          status: rooms.status ? "maintenace" : "avalabe"
+
+
+          // guest: hotel.amenities?.map((a) => a.id) || [],
+          // rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
+        });
+      } catch (err) {
+        openNotification(err, "Failed to load hotel");
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchRooms();
+  }, [id, isEditMode, form]);
+
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        const [amenityRes, roomRes] = await Promise.all([
+          getAllFeature("AMENITY"),
+          getAllFeature("ROOM_TYPE"),
+        ]);
+
+        setAmenitiesList(amenityRes.data);
+        setRoomsList(roomRes.data);
+      } catch {
+        openNotification("error", "Failed to load features");
+      }
+    };
+
+    fetchFeatures();
+  }, []);
+
+  const handleSubmit = async (values) => {
+    // setLoading(true);
+
+    const payload = {
+      name: values.name,
+      roomNumber: values.room_number,
+      select_hotel: values.select_hotel,
+      type: values.room_type,
+      bed_type: values.bed_type,
+      size: values.siza,
+      guest: values.guest,
+      childrens: values.childrens,
+      description: values.description,
+      status: values.status,
+      price: values.price,
+      status: values.status
+      // featureIds: [...values.amenities, ...values.rooms],
+    };
+
+    console.log(payload, "payloadpayloadpayload");
+    try {
+      if (isEditMode) {
+        await updateRoom(id, payload);
+        openNotification("success", "Hotel updated successfully");
+      } else {
+        await createRoom(payload);
+        openNotification("success", "Hotel created successfully");
+      }
+
+      setIsModalOpen(true);
+    } catch (err) {
+      openNotification("error", "Internal Server Error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (fetching) {
+    return (
+      <div className="p-20 text-center text-blue font-semibold">
+        Loading Rooms details...
+      </div>
+    );
+  }
+
+
+
+  return (
+    <>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        className="min-h-screen w-full md:p-8 font-sans "
+      >
+        <div className='flex gap-1 border-solid border-b border-gray-300 mb-2 pb-4 flex items-center gap-4'>
+          <img src={leftangle} alt="" />
+          <button className='text-gray-600 flex'>Back</button>
+
+        </div>
+        <div className="max-full mx-auto mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Add New Room</h1>
+          <p className="text-sm text-gray-500 font-medium">Fill in the details below to add a new room to your hotel inventory.</p>
+        </div>
+
+
+        <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 ">
+          <div className="px-6 py-4 mb-6 ">
+            <h2 className="text-lg font-semibold text-black  ">
+              Room Details
+            </h2>
+            <hr />
+          </div>
+          <div className="p-6 px-36 pb-14">
+            {/* <div className="flex   justify-between mb-10">
+              <div className="flex items-center gap-20 ">
+                <img
+                  src={DEFAULT_IMAGE}
+                  className="w-[330px] h-[152px] rounded-[16px] object-cover border"
+                  alt="hotel"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold text-blue">
+                    Upload Hotel Image
+                  </h2>
+                  <p className="text-lightSeconday">Make sure image is clear</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="py-2">
+                  <span className="text-black font-semibold underline">
+                    Hotel ID
+                  </span>
+                </div>
+                <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
+                  <span className="py-2">301</span>
+                </div>
+              </div>
+            </div> */}
+
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Room Name
+                </label>
+                {/* <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter hotel name"
+                /> */}
+                <Form.Item
+                  name="name"
+                  rules={[
+                    { required: true, message: "Room name is required" },
+                  ]}
+                >
+                  <Input
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter room name"
+                  />
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Room Number
+                </label>
+
+                <Form.Item
+                  name="room_number"
+                  label=""
+                  rules={[{ required: true, message: "Room Number is required" }]}
+                >
+                  <Input
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter room number"
+                  />
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Select Hotel
+                </label>
+                {/* <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter location"
+                /> */}
+                <Form.Item
+                  name="select_hotel"
+                  rules={[{ required: true, message: "hotel is required" }]}
+                >
+                  <Input
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter hotal name"
+                  />
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Room Type
+                </label>
+                {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+                <Form.Item
+                  name="room_type"
+                  rules={[
+                    { required: true },
+                    { message: "Room type required" },
+                  ]}
+                >
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Option value="true">Single Bed Room</Option>
+                    <Option value="false">Double Bed Room</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Bed Type
+                </label>
+                {/* <input
+                  type="text"
+                  name="cancellation_policy"
+                  value={formData.cancellation_policy}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter policy"
+                /> */}
+                <Form.Item
+                  name="bed_type"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Bed type is required",
+                    },
+                  ]}
+
+                >
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Option value="single_bed">Single Bed</Option>
+                    <Option value="queen_bed">Queen Bed</Option>
+                    <Option value="king_bed">King Bed</Option>
+
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Room Size
+                </label>
+                <Form.Item name="size">
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Option value="true">25 m2</Option>
+                    <Option value="false">50 m2</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Guest Adults
+                </label>
+                {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+                <Form.Item
+                  name="guest"
+                  rules={[
+                    { required: true },
+                    { message: "Room type required" },
+                  ]}
+                >
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Option value="two_gest">2 Gests</Option>
+                    <Option value="four_gest">4 Gests</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">
+                  Childrens
+                </label>
+                {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+                <Form.Item
+                  name="childrens"
+                  rules={[
+                    { required: true },
+                    { message: "Room type required" },
+                  ]}
+                >
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Option value="two_gest">2 Gests</Option>
+                    <Option value="four_gest">4 Gests</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+
+
+
+            </div>
+            <div className="w-full">
+              <label className="text-base text-lightSeconday font-medium">
+                Room Description
+              </label>
+              {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+              <Form.Item
+                name="description"
+                rules={[
+                  { required: true },
+                  { message: "Room type required" },
+                ]}
+              >
+                <Input
+                  className="w-full h-12 p-10 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter room description"
+                />
+              </Form.Item>
+              <div>
+                <h3 className='font-semibold mb-4'>Pricing & Status</h3>
+                <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10'>
+
+                  <div className="w-full">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Price Per Night
+                    </label>
+                    {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+                    <Form.Item
+                      name="price"
+                      rules={[
+                        { required: true },
+                        { message: "Room price required" },
+                      ]}
+                    >
+                      <Input
+                        className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                        placeholder="Enter room description"
+                        type='number'
+                      />
+                    </Form.Item>
+                  </div>
+
+
+                  <div className="w-full">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Room Status
+                    </label>
+                    {/* <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                  placeholder="Enter email"
+                /> */}
+                    <Form.Item
+                      name="status"
+                      rules={[
+                        { required: true },
+                        { message: "Room type required" },
+                      ]}
+                    ><Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                        <Option value="availble">Available</Option>
+                        <Option value="maintenance">Maintenace</Option>
+                        <Option value="occupied">Occupied</Option>
+
+                      </Select>
+
+                    </Form.Item>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+
+
+        <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 font-sans overflow-hidden">
+          <div className="px-6 py-3 border-b border-gray-100">
+            <h2 className="text-[18px] mb-0 font-semibold text-gray-900">Room Images</h2>
+          </div>
+
+          <div className="p-[8%] pt-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+              {/* LEFT: Main Image Section */}
+              <div className="flex flex-col gap-4">
+                <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
+                <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                  <div className="flex justify-center mt-4">
+                    {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
+                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+                    <p className="text-sm text-gray-700 font-medium text-center px-4">
+                      Drop your image here or <span className="text-blue underline">Browse</span>
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+                    <input type="file" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </div>
+
+                </div>
+
+                {/* Main Image File Info Card */}
+                {mainImage && (
+                  <div className=" max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
+                    <div className="flex items-center gap-3  overflow-hidden">
+                      <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+                        <FileText className="w-6 h-6 text-blue" />
+                      </div>
+                      <div className="truncate">
+                        <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">{mainImage.name}</p>
+                        <p className="text-[11px] text-gray-400 mb-0">{mainImage.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                      <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors"><img src={eye} alt="" /></button>
+                      <button onClick={() => setMainImage(null)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT: Gallery Section */}
+              <div className="flex flex-col gap-4">
+                <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
+                <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                  <div className="flex justify-center mt-4">
+                    {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
+                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+                    <p className="text-sm text-gray-700 font-medium text-center px-4">
+                      Upload multiple image
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+                    <input type="file" onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </div>
+                </div>
+
+                {/* Gallery File List (Scrollable if many files) */}
+                <div className="max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
+                  {gallery.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 ">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+                          <FileText className="w-6 h-6 text-blue" />
+                        </div>
+                        <div className="truncate">
+                          <p className="text-[13px] font-medium text-gray-800 truncate mb-0">{file.name}</p>
+                          <p className="text-[11px] text-gray-400">{file.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0 ml-2">
+                        <button className="p-1.5 bg-[#DBEAFE] text-blue  rounded-md hover:bg-blue-200 transition-colors"><img src={eye} alt="" /></button>
+                        <button onClick={() => removeGalleryImage(index)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className=" border-2 border-lightSeconday bg-myWhite px-10 text-lightSeconday rounded-md py-2 font-medium hover:bg-gray-50 transition-all"
+          >
+            Back
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-10 py-2 bg-blue text-white rounded-md"
+          >
+            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save"}
+          </button>
+        </div>
+      </Form>
+
+      {/* {isModalOpen && (
+        <>
+          <SuccessModal
+            open={isModalOpen}
+            // onClose={() => setIsModalOpen(false)}
+            onClose={() => navigate("admin/rooms")}
+            showButton
+            buttonText="View Hotels"
+            onButtonClick={() => navigate("/admin/hotels")}
+          />
+        </>
+      )} */}
+    </>
+  );
+};
+
+export default RoomDetailsForm;
+

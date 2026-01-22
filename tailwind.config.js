@@ -32,7 +32,8 @@ module.exports = {
         lightRed: "#FFDCDE",
         red: "#E21C26",
         lightDark: "#172025",
-        lightWhite:"#F1F3F57A"
+        lightWhite:"#F1F3F57A",
+        havenLight:"#E9E9E9"
       },
     },
   },

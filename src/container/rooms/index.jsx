@@ -1,9 +1,9 @@
 import Breadcrumb from "../../components/Breadcrumb";
 import Rooms from "../../components/rooms";
-const Room = ()=>{
+const RoomsParent = ()=>{
     return(<>
      <Breadcrumb title="Rooms" />
      <Rooms/>
     </>);
 }
-export default Rooms;
+export default RoomsParent;

@@ -453,7 +453,7 @@ const HotelForm = () => {
       {isModalOpen && (
         <>
           <SuccessModal
-            open={isModalOpen}
+            open={true}
             // onClose={() => setIsModalOpen(false)}
             onClose={() => navigate("/admin/hotels")}
             title={

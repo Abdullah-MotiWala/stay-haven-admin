@@ -1,5 +1,23 @@
 export const DEFAULT_IMAGE = "https://placehold.net/default.png";
 export const BASE_HOTEL_CODE = 301;
+export const ENTIRES_PER_PAGE_OPTION  = [10, 20, 30, 40];
+
+export const STETPS_FIELDS = {
+  0: [
+    "name",
+    "roomNumber",
+    "hotel",
+    "roomType",
+    "bedType",
+    "roomSize",
+    "guests",
+    "childrens",
+    "description",
+    "pricePerNight",
+    "status",
+  ],
+  1: ["features", "amenities", "facility"],
+};
 
 
 export const ENVIRONMENTS = {

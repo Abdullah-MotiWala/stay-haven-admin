@@ -10,7 +10,7 @@ const MatrixCard = ({ showShadow = true ,data }) => {
         ${showShadow ? "shadow-sm" : ""}
       `}
     >
-      {data?.map((card, i) => (
+      {Array.isArray(data) && data?.map((card, i) => (
         <div
           key={i}
           className={`relative p-6 pb-4 rounded-3xl ${

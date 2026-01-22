@@ -1,15 +1,21 @@
 import React from "react";
-import { Search, Calendar, Moon, Bell, Plus } from "lucide-react"; // Plus icon add kiya
-import { useNavigate } from "react-router-dom"; // Navigation ke liye
+// import { Search } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import userImg from "../../assets/images/dummy.png";
 import bellIcon from "../../assets/icons/bellIcon.png";
 import themeIcon from "../../assets/icons/theme.png";
 import calendarIcon from "../../assets/icons/Calendar.png";
 import headPhone from "../../assets/icons/headPhone.png";
+import search from "../../assets/icons/search.svg";
+
 import { DEFAULT_IMAGE } from "../../shared/constant";
+import { Input } from "antd";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isRoomPage = location.pathname === "/admin/rooms";
 
   return (
     <header className="w-full px-3 ">
@@ -17,27 +23,25 @@ const Navbar = () => {
         className="flex items-center justify-between
         bg-transparent  py-3"
       >
-        {/* Search */}
-        <div className="flex items-center gap-2 bg-white/70 rounded-md px-4 py-2 w-full max-w-xs shadow-sm">
-          <Search size={18} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-transparent outline-none text-sm w-full h-51 text-gray-700 placeholder-gray-500"
-          />
-        </div>
+      
+          <div className="w-96">
+            <Input
+              placeholder="Search"
+              prefix={<img src={search} className="w-4 h-4" />}
+              className="searchInput w-full p-2 border border-lightSeconday rounded-xl font-medium"
+            />
+          </div>
 
-        {/* Right Section */}
         <div className="flex items-center   ">
-          {/* List Hotel / Room Button (Naya Button) */}
           <button
-            onClick={() => navigate("/admin/hotel/add")} // Aapka add hotel route
+            onClick={() =>
+              navigate(isRoomPage ? "/admin/rooms/add" : "/admin/hotel/add")
+            }
             className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >
-            Add New Hotel
+            {isRoomPage ? "Add New Room" : "Add New Hotel"}
           </button>
 
-          {/* Date */}
           <div className="hidden md:flex items-center gap-2 bg-white px-4 py-2.5 rounded-full text-sm text-lightDark font-medium shadow-sm border border-white/50">
             <img src={calendarIcon ?? DEFAULT_IMAGE} alt="themeIcon" />
             <span>Mon, 02 Jan 2026</span>
@@ -53,13 +57,11 @@ const Navbar = () => {
             </button>
 
             <button className="relative bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50">
-              {/* <Bell size={18} /> */}
               <img src={bellIcon ?? DEFAULT_IMAGE} alt="themeIcon" />
               <span className="absolute top-2 right-2.5 w-2. 5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
             </button>
           </div>
 
-          {/* Profile Section */}
           <div className="flex items-center border-l border-[#AEB2C9] pl-4 ml-1">
             <img
               src={userImg ?? DEFAULT_IMAGE}
