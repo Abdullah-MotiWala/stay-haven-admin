@@ -6,8 +6,8 @@ import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import HotelDirectory from "../../components/Table";
-import { getRecentBooking } from "../../services/booking";
-import { useState, useEffect } from "react";
+import { getRecentBooking , getAllBooking } from "../../services/booking";
+import { useState, useEffect , useMemo} from "react";
 import { openNotification } from "../../network/notification";
 const Booking = ()=>{
    const [activeType, setActiveType] = useState("All Booking");
@@ -22,10 +22,11 @@ const Booking = ()=>{
     { key: "bookingId", label: "Booking ID", type: "text" },
     { key: "guestName", label: "Guest Name", type: "text" },
     { key: "roomType", label: "Room Type", type: "roomType" },
-    { key: "roomNumber", label: "Room No", type: "text" },
+    { key: "roomNumber", label: "Room Number", type: "text" },
     { key: "duration", label: "Duration", type: "text" },
     { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
     { key: "status", label: "Status", type: "status" },
+    { key: "action", label: "Action", type: "actions" },
   ];
 
     const cardsData = [
@@ -64,9 +65,10 @@ const Booking = ()=>{
          useEffect(() => {
             const fetchRecentBookings = async () => {
               try {
-                const res = await getRecentBooking();
+                const res = await getAllBooking();
                 console.log(res.data, "asdadsaasdas2321413");
                 setRecentBookings(res.data);
+                console.log(recentBookings, "recentBookings")
               } catch (err) {
                 console.error("Failed to load stats:", err);
                 openNotification("error", "Failed to load stats");
@@ -75,7 +77,20 @@ const Booking = ()=>{
         
             fetchRecentBookings();
           }, [])
-      
+
+
+          const filteredBookings = useMemo(() => {
+    if (activeType === "All Booking") return recentBookings;
+    
+    return recentBookings.filter((booking) => {
+      // API status values check karein (Booked, Completed, Cancelled)
+      if (activeType === "Active Booking") return booking.status?.toLowerCase() === "booked";
+      if (activeType === "Completed Bookings") return booking.status?.toLowerCase() === "completed";
+      if (activeType === "Cancelled Bookings") return booking.status?.toLowerCase() === "cancelled";
+      return true;
+    });
+  }, [activeType, recentBookings]);
+      console.log(recentBookings, "filteredBookings")
     return(<>
     <Breadcrumb title={"Booking"}/>
     <MatrixCard data={cardsData}/>
@@ -105,11 +120,12 @@ const Booking = ()=>{
 
             <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
                   <HotelDirectory
-                    data={recentBookings}
+                    data={filteredBookings}
                     title="All Bookings"
                     columns={columns}
                     filter={true}
                     view={false}
+                    path={`/admin/booking/view`}
                     inp={true}
                     onlyFilter={true}
                   />

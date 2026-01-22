@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
@@ -7,7 +7,7 @@ import { openNotification } from "../../network/notification";
 import { exportToExcel } from "../../utils/exportExcel";
 import { deriveBookingStatus } from "../../helper";
 import search from "../../assets/icons/search.png"
-import {Calendar , RotateCcw} from "lucide-react"
+import { Calendar, RotateCcw } from "lucide-react"
 
 const HotelDirectory = ({
   data = [],
@@ -18,14 +18,97 @@ const HotelDirectory = ({
   title = "Directory",
   view = false,
   setRefresh,
+  lastId = null,
   inp,
-  onlyFilter
+  onlyFilter,
+  path
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [rowActionOpen, setRowActionOpen] = useState(null);
-const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+
+  // Filter State
+  const [filters, setFilters] = useState({
+    roomType: "",
+    hotelName: "",
+    duration: "",
+    status: "",
+    dateFrom: "",
+    dateTo: "",
+  });
+
+  // Updated Filter Logic
+const filteredData = useMemo(() => {
+  return data.filter((item) => {
+    // Basic Filters
+    const matchesSearch = !searchTerm || item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRoom = !filters.roomType || item.roomType === filters.roomType;
+    const matchesHotel = !filters.hotelName || item.hotelName === filters.hotelName;
+    const itemStatus = item.checkInOut ? deriveBookingStatus(item.checkInOut) : item.status;
+    const matchesStatus = !filters.status || itemStatus?.toLowerCase() === filters.status.toLowerCase();
+
+    // 1. Date Logic (Pehle ki tarah split karke)
+    let matchesDate = true;
+    if (item.checkInOut && (filters.dateFrom || filters.dateTo)) {
+      const startDateStr = item.checkInOut.split(" - ")[0];
+      const bookingStartDate = new Date(startDateStr);
+      bookingStartDate.setHours(0, 0, 0, 0);
+
+      if (filters.dateFrom) {
+        const dFrom = new Date(filters.dateFrom);
+        dFrom.setHours(0, 0, 0, 0);
+        if (bookingStartDate < dFrom) matchesDate = false;
+      }
+      if (filters.dateTo) {
+        const dTo = new Date(filters.dateTo);
+        dTo.setHours(0, 0, 0, 0);
+        if (bookingStartDate > dTo) matchesDate = false;
+      }
+    }
+
+    // 2. Duration Logic (Stay ke dino ke hisaab se)
+    let matchesDuration = true;
+    if (filters.duration && item.duration) {
+      // item.duration se number nikalein (e.g., "4 Nights" -> 4)
+      const stayNights = parseInt(item.duration); 
+
+      if (filters.duration === "24h") {
+        // Sirf 1 raat wala stay
+        if (stayNights !== 1) matchesDuration = false;
+      } else if (filters.duration === "1w") {
+        // 1 hafte tak ka stay (1 se 7 raatein)
+        if (stayNights > 7) matchesDuration = false;
+      } else if (filters.duration === "3w") {
+        // 3 hafte tak ka stay (1 se 21 raatein)
+        if (stayNights > 21) matchesDuration = false;
+      }
+    }
+
+    return matchesSearch && matchesRoom && matchesHotel && matchesStatus && matchesDate && matchesDuration;
+  });
+}, [searchTerm, data, filters]);
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      roomType: "",
+      hotelName: "",
+      duration: "",
+      status: "",
+      dateFrom: "",
+      dateTo: "",
+    });
+    setSearchTerm("");
+  };
+
+  // Extract unique hotels from data for the dropdown
+  const uniqueHotels = [...new Set(data.map(item => item.hotelName))];
 
   const getStatusStyle = (status) => {
     console.log(status, "status12sadasd");
@@ -175,10 +258,10 @@ const [showFilter, setShowFilter] = useState(false);
           </span>
         );
 
-      case "computed":
-        return row.totalRooms && row.availableRooms
-          ? row.totalRooms - row.availableRooms
-          : "-";
+      // case "computed":
+      //   return row.totalRooms && row.availableRooms
+      //     ? row.totalRooms - row.availableRooms
+      //     : "-";
 
       case "fallback":
         return "-";
@@ -218,194 +301,204 @@ const [showFilter, setShowFilter] = useState(false);
     }
   };
 
+  // console.log(lastId, "lastIdlastIdlastId");
+
   return (
-    <div className="w-full bg-white rounded-xl">
+    <div className="w-full ">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
-  {/* Left Section: Heading aur Input ko yahan group kar diya */}
-  <div className="flex items-center gap-4"> 
-    <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-{inp && (
-<div className="relative"> {/* Isko relative rakhein taake icon sahi position ho */}
-      <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-        <img src={search} className="w-4 h-4" alt="search" />
-      </span>
-      <input 
-        type="text" 
-        className="border border-2 rounded-md bg-inpgraysecondary    font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
-        placeholder="Search" 
-      />
-    </div>
-
-)}
-    
-  </div>
-
-  {/* Right Section: Buttons aur Filters */}
-  <div className="flex items-center gap-2">
-  {filter && (
-  <div className="flex items-center gap-2">
-    {/* Ye Filter button hamesha dikhega agar 'filter' prop true hai */}
-    <button className="p-2 border rounded-lg hover:bg-gray-50" onClick={() => setShowFilter(!showFilter)}>
-      <Filter size={16} />
-    </button>
-
-    {/* Agar 'onlyFilter' true nahi hai, sirf tabhi ye baaki buttons dikhayen */}
-    {!onlyFilter && (
-      <>
-        {/* Bulk Actions Button */}
-        <div className="relative">
-          <button
-            onClick={() => setBulkOpen(!bulkOpen)}
-            className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1"
-          >
-            Bulk Actions <ChevronDown size={14} />
-          </button>
-
-          {bulkOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-              {["Active Selected", "InActive Selected", "Delete", "Draft", "Maintenance"].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => {
-                    handleBulkAction(item.split(" ")[0].toUpperCase());
-                    setBulkOpen(!bulkOpen);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                >
-                  {item}
-                </button>
-              ))}
+        {/* Left Section: Heading aur Input ko yahan group kar diya */}
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          {inp && (
+            <div className="relative"> {/* Isko relative rakhein taake icon sahi position ho */}
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <img src={search} className="w-4 h-4" alt="search" />
+              </span>
+              <input
+                type="text"
+                className="border border-2 rounded-md bg-[#F9FAFC] font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
+                placeholder="Search"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
+
+          )}
+
+        </div>
+
+        {/* Right Section: Buttons aur Filters */}
+        <div className="flex items-center gap-2">
+          {filter && (
+            <div className="flex items-center gap-2">
+              {/* Ye Filter button hamesha dikhega agar 'filter' prop true hai */}
+              <button className="p-2 border rounded-lg hover:bg-gray-50" onClick={() => setShowFilter(!showFilter)}>
+                <Filter size={16} />
+              </button>
+
+              {/* Agar 'onlyFilter' true nahi hai, sirf tabhi ye baaki buttons dikhayen */}
+              {!onlyFilter && (
+                <>
+                  {/* Bulk Actions Button */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setBulkOpen(!bulkOpen)}
+                      className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1"
+                    >
+                      Bulk Actions <ChevronDown size={14} />
+                    </button>
+
+                    {bulkOpen && (
+                      <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
+                        {["Active Selected", "InActive Selected", "Delete", "Draft", "Maintenance"].map((item) => (
+                          <button
+                            key={item}
+                            onClick={() => {
+                              handleBulkAction(item.split(" ")[0].toUpperCase());
+                              setBulkOpen(!bulkOpen);
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Import / Export Button */}
+                  <button
+                    onClick={handleExportExcel}
+                    className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2"
+                  >
+                    <Upload size={16} />
+                    Import / Export CSV
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {view && (
+            <button className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
+              View
+            </button>
           )}
         </div>
 
-        {/* Import / Export Button */}
-        <button
-          onClick={handleExportExcel}
-          className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2"
-        >
-          <Upload size={16} />
-          Import / Export CSV
-        </button>
-      </>
-    )}
-  </div>
-)}
-
-    {view && (
-      <button className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
-        View
-      </button>
-    )}
-  </div>
- 
-</div>
-{
-showFilter && (
-  <div className="flex justify-end w-full">
- <div className="bg-white  border rounded-2xl p-6 shadow-sm w-full mb-6">
-  {/* Header */}
-  <h3 className="text-gray-900 font-bold text-lg mb-2 ">Apply Filters</h3>
-
-  {/* Filters Grid */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    
-    {/* Select Room */}
-    <div className="relative group">
-      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-        <option>Select Room</option>
-      </select>
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <ChevronDown size={18} className="text-gray-900" />
       </div>
-    </div>
+      {showFilter && (
+        <div className="flex justify-end w-full">
+          <div className="bg-white border rounded-2xl p-6 shadow-sm w-full mb-6">
+            <h3 className="text-gray-900 font-bold text-lg mb-5">Apply Filters</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
-    {/* Select Hotel */}
-    <div className="relative">
-      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-        <option>Select Hotel</option>
-      </select>
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <ChevronDown size={18} className="text-gray-900" />
-      </div>
-    </div>
+              {/* Select Room */}
+              <div className="relative">
+                <select
+                  value={filters.roomType}
+                  onChange={(e) => handleFilterChange("roomType", e.target.value)}
+                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+                >
+                  <option value="">Select Room</option>
+                  <option value="One Bed Rooms">One Bed Rooms</option>
+                  <option value="Two Bed Rooms">Two Bed Rooms</option>
+                  <option value="Three Bed Rooms">Three Bed Rooms</option>
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                  <ChevronDown size={18} className="text-gray-900" />
+                </div>
+              </div>
 
-    {/* Sort by Duration */}
-    <div className="relative">
-      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-        <option>Sort by Duration</option>
-      </select>
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <ChevronDown size={18} className="text-gray-900" />
-      </div>
-    </div>
+              {/* Select Hotel */}
+              <div className="relative">
+                <select
+                  value={filters.hotelName}
+                  onChange={(e) => handleFilterChange("hotelName", e.target.value)}
+                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+                >
+                  <option value="">Select Hotel</option>
+                  {uniqueHotels.map(hotel => <option key={hotel} value={hotel}>{hotel}</option>)}
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                  <ChevronDown size={18} className="text-gray-900" />
+                </div>
+              </div>
 
-    {/* Sort by Status */}
-    <div className="relative">
-      <select className="w-full appearance-none bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer">
-        <option>Sort by status</option>
-      </select>
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <ChevronDown size={18} className="text-gray-900" />
-      </div>
-    </div>
+              {/* Sort by Duration */}
+              <div className="relative">
+                <select
+                  value={filters.duration}
+                  onChange={(e) => handleFilterChange("duration", e.target.value)}
+                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+                >
+                  <option value="">Sort by Duration</option>
+                  <option value="24h">24 Hours</option>
+                  <option value="1w">1 Week</option>
+                  <option value="3w">3 Weeks</option>
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                  <ChevronDown size={18} className="text-gray-900" />
+                </div>
+              </div>
 
-    {/* Date From */}
-    <div className="relative">
-      <input 
-        type="text" 
-        placeholder="Date From"
-        onFocus={(e) => (e.target.type = "date")}
-        onBlur={(e) => (e.target.type = "text")}
-        className="w-full bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-      />
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <Calendar size={18} className="text-gray-500" />
-      </div>
-    </div>
+              {/* Sort by Status */}
+              <div className="relative">
+                <select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange("status", e.target.value)}
+                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+                >
+                  <option value="">Sort by Status</option>
+                  <option value="Booked">Booked</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Checked-In">Checked In</option>
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                  <ChevronDown size={18} className="text-gray-900" />
+                </div>
+              </div>
 
-    {/* Date To */}
-    <div className="relative">
-      <input 
-        type="text" 
-        placeholder="Date To"
-        onFocus={(e) => (e.target.type = "date")}
-        onBlur={(e) => (e.target.type = "text")}
-        className="w-full bg-inpgray border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-      />
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-        <Calendar size={18} className="text-gray-500" />
-      </div>
-    </div>
+              {/* Date From */}
+              <div className="relative">
+                <input
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
+                  className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none"
+                />
+              </div>
 
-    {/* Empty Space for alignment on Desktop */}
-    <div className="hidden lg:block"></div>
+              {/* Date To */}
+              <div className="relative">
+                <input
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => handleFilterChange("dateTo", e.target.value)}
+                  className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none"
+                />
+              </div>
 
-    {/* Action Buttons */}
-    <div className="flex items-center justify-end gap-3 mt-2 lg:mt-0">
-      <button className="flex items-center bg-inpgray gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100">
-        <RotateCcw size={16} />
-        Reset All Filters
-      </button>
-      <button className="px-10 py-3 bg-blue text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all">
-        Apply
-      </button>
-    </div>
-
-  </div>
-</div>
-</div>
-)
-}
-
+              <div className="lg:col-span-2 flex items-center justify-end gap-3">
+                <button onClick={resetFilters} className="flex items-center gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100">
+                  <RotateCcw size={16} /> Reset All Filters
+                </button>
+                <button onClick={() => setShowFilter(false)} className="px-10 py-3 bg-[#0061F2] text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TABLE */}
       <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-0">
-          <thead>
+        <table className="w-full border-collapse">
+          <thead className="">
             <tr>
-              <th className="w-10 border-b border-dashed">
+              <th className="w-10 border-b border-t border-r  border-dashed">
                 <input
                   type="checkbox"
                   checked={
@@ -419,11 +512,12 @@ showFilter && (
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`p-4 text-xs font-semibold uppercase tracking-wide text-blue
-                    border-b border-dashed
-                    ${col.type === "status" ? "text-center" : ""}
-                    ${col.type === "actions" ? "text-right" : ""}
-                  `}
+                  className={`
+    p-4 text-xs font-semibold uppercase tracking-wide text-blue
+    border-b border-t  border-l border-dashed border-gray-200
+    ${col.type === "status" ? "text-center" : ""}
+    ${col.type === "actions" ? "text-right" : ""}
+  `}
                 >
                   {col.label}
                 </th>
@@ -432,73 +526,90 @@ showFilter && (
           </thead>
 
           <tbody>
-            {data.map((row, index) => {
-              const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
-                index + 1,
-              ).padStart(2, "0")}`;
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="py-12 text-center text-sm text-gray-500"
+                >
+                  No data found
+                </td>
+              </tr>
+            ) : (
+              filteredData.map((row, index) => {
+                const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
+                  index + 1,
+                ).padStart(2, "0")}`;
 
-              const enrichedRow = { ...row, uiHotelId };
+                const enrichedRow = { ...row, uiHotelId };
 
-              return (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="border-b border-dashed">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(row.id)}
-                      onChange={() => toggleRow(row.id)}
-                      className="checked:accent-blue"
-                    />
-                  </td>
+                return (
+                  <tr
+                    key={index}
+                    className={`
+    ${index % 2 === 0 ? "bg-white" : "bg-lightWhite"}
+    hover:bg-blue-50 transition-colors
+  `}
+                  >
+                    <td className="border-b border-t border-r border-dashed">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => toggleRow(row.id)}
+                        className="checked:accent-blue"
+                      />
+                    </td>
 
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`p-4 text-sm border-b border-dashed
+                    {columns.map((col) => (
+                      <td
+                        key={col.key}
+                        className={`p-4 text-sm border-b border-t  border-l border-dashed
                         ${col.type === "status" ? "text-center" : ""}
                         ${col.type === "actions" ? "text-right relative" : ""}
                       `}
-                    >
-                      {renderCell(enrichedRow, col, index)}
+                      >
+                        {renderCell(enrichedRow, col, index)}
 
-                      {/* ACTION DROPDOWN */}
-                      {col.type === "actions" && rowActionOpen === index && (
-                        <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
-                          <button
-                            onClick={() => {
-                              setRowActionOpen(null);
-                              navigate(`/admin/hotel/view/${row.id}`, {
-                                state: { uiHotelId },
-                              });
-                            }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => {
-                              setRowActionOpen(null);
-                              navigate(`/admin/hotel/edit/${row.id}`, {
-                                state: { uiHotelId },
-                              });
-                            }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                          >
-                            Edit
-                          </button>
+                        {/* ACTION DROPDOWN */}
+                        {col.type === "actions" && rowActionOpen === index && (
+                          <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
+                            <button
+                              onClick={() => {
+                                setRowActionOpen(null);
+                                navigate(`${path}/${row.id}`, {
+                                  state: { lastId },
+                                });
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRowActionOpen(null);
+                                navigate(`${path}/${row.id}`, {
+                                  state: { lastId },
+                                });
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >
+                              Edit
+                            </button>
 
-                          <button
-                            onClick={() => onDelete(row.id)}
-                            className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+                            <button
+                              onClick={() => onDelete(row.id)}
+                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
