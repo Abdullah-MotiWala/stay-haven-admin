@@ -5,7 +5,6 @@ import AdminLayout from "../../layouts/adminLayout";
 import Hotels from "../../container/hotels/hotels/index";
 import AddHotel from "../../container/hotels/add-hotels/index";
 import HotelView from "../../container/hotels/hotel-view/index";
-import RoomDetailsForm from "../../components/roomsForm";
 import AddRooms from "../../container/rooms/addRoom";
 import Room from "../../container/rooms";
 import Booking from "../../container/booking";

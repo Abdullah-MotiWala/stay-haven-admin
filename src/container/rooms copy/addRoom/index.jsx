@@ -144,6 +144,7 @@ const AddNewRoom = () => {
       featureIds: [...values.features, ...values.amenities, ...values.facility],
     };
 
+
     try {
       if (isEditMode) {
         await updateRoom(id, payload);
