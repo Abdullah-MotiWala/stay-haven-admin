@@ -11,7 +11,10 @@ import { updateStats } from "../../services/booking";
 import tablecalender from "../../assets/icons/calendarIcon.png"
 import { Select } from 'antd';
 import SuccessModal from "../../components/shared/successModal";
-
+import { Phone, Mail } from 'lucide-react';
+import inbox from "../../assets/icons/inbox.png"
+import { getAllApartment } from "../../services/apartment"
+import phone from "../../assets/icons/phone.png"
 
 const BookingAddComp = () => {
     const { id } = useParams();
@@ -22,27 +25,40 @@ const BookingAddComp = () => {
     const [ids, setids] = useState();
     const { Option } = Select;
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [apartment, setApartment] = useState([])
     const [formData, setFormData] = useState({
-        guestName: "",
-        phone: "",
-        email: "",
-        cnic: "",
-        hotelId: "", // Store Hotel ID
-        hotelName: "",
-        roomId: "",    // Store Room ID
-        roomType: "",
-        roomNumber: "",
-        numGuests: "01 Adult",
-        checkIn: "",
-        checkOut: "",
-        duration: 0,
-        pricePerNight: 0,
-        taxes: 0,
-        discount: 0,
-        paymentMethod: "Bank",
-        status: "Checked-In"
+         bookingType: "Room",
+    guestName: "",
+    phone: "",
+    email: "",
+    cnic: "",
+
+    hotelId: "",
+    hotelName: "",
+
+    roomId: "",
+    apartmentId: "",
+
+    roomType: "",
+    roomNumber: "",
+
+    numGuests: "01 Adult",
+    checkIn: "",
+    checkOut: "",
+    duration: 0,
+    pricePerNight: 0,
+    taxes: 0,
+    discount: 0,
+    paymentMethod: "Bank",
+    status: "Checked-In"
     });
+    const hostData = {
+        name: "Ali Raza Hussain",
+        role: "Superhost",
+        profileImg: "https://via.placeholder.com/150", // Aapki image ka path
+        phone: "+92 331 672 5657579",
+        email: "aliraza03@gmail.com"
+    };
     // const handleStatusUpdate = async (newStatus) => {
     //     setLoading(true);
     //     try {
@@ -74,54 +90,132 @@ const BookingAddComp = () => {
         };
         fetchRooms();
     }, []);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === "hotelName") {
-            // Hotel select hote hi uski ID dhoondo
-            const selectedRoomObj = rooms.find(r => (r.hotel?.name || "Ocean View Resort") === value);
-            setFormData(prev => ({
-                ...prev,
-                hotelName: value,
-                hotelId: selectedRoomObj?.hotel?.id || ""
-            }));
-
-        } else if (name === "roomNumber") {
-            // Room select hote hi uski ID aur Price dhoondo
-            const selectedRoomObj = rooms.find(r => r.roomNumber === value);
-            setFormData(prev => ({
-                ...prev,
-                roomNumber: value,
-                roomId: selectedRoomObj?.id || "",
-                pricePerNight: selectedRoomObj?.pricePerNight || 0
-            }));
-
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            // API ko send karne wala data
-            const res = await createBooking(formData);
-            if (res.status === 200 || res.status === 201) {
-                openNotification("success", "Booking saved successfully!");
-                // navigate("/admin/bookings");
+    useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                const res = await getAllApartment();
+                const data = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+                setApartment(data);
+                console.log(res.data, "Apartment")
+            } catch (err) {
+                console.error("Error fetching rooms:", err);
+                openNotification("error", "Failed to load rooms");
             }
-            setIsModalOpen(true)
-            // if (typeof handleStatusUpdate === "function") {
-            //     await handleStatusUpdate(formData.status);
-            // }
-        } catch (err) {
-            openNotification("error", "Error saving booking");
-        } finally {
-            setLoading(false);
+        };
+        fetchRooms();
+    }, []);
+
+   const handleChange = (e) => {
+    const { name, value } = e.target;
+    const isApartment = formData.bookingType === "Apartment";
+
+    // BOOKING TYPE CHANGE
+    if (name === "bookingType") {
+        setFormData(prev => ({
+            ...prev,
+            bookingType: value,
+            hotelName: "",
+            hotelId: "",
+            roomId: "",
+            apartmentId: "",
+            roomType: "",
+            roomNumber: "",
+            pricePerNight: 0,
+        }));
+        return;
+    }
+
+    // HOTEL / APARTMENT NAME
+    if (name === "hotelName") {
+        const dataSource = isApartment ? apartment : rooms;
+
+        const selectedObj = dataSource.find(item =>
+            isApartment
+                ? item.apartmentName === value
+                : item.hotel?.name === value
+        );
+
+        setFormData(prev => ({
+            ...prev,
+            hotelName: value,
+            hotelId: selectedObj?.hotelId || selectedObj?.hotel?._id || "",
+            roomType: selectedObj?.type || "",
+            pricePerNight: selectedObj?.price || selectedObj?.pricePerNight || 0,
+        }));
+        return;
+    }
+
+    // ROOM / APARTMENT NUMBER
+    if (name ) {
+        const dataSource = isApartment ? apartment : rooms;
+
+        const selectedObj = dataSource.find(item =>
+            isApartment
+                ? item.apartmentNumber === value
+                : item.roomNumber === value
+        );
+
+        setFormData(prev => ({
+            ...prev,
+            roomNumber: value,
+            roomId: !isApartment ? selectedObj?._id || "" : "",
+            apartmentId: isApartment ? selectedObj?.id || "" : "",
+            pricePerNight: selectedObj?.price || selectedObj?.pricePerNight || 0,
+        }));
+        return;
+    }
+
+    setFormData(prev => ({ ...prev, [name]: value }));
+};
+
+
+    const getHotelOptions = () => {
+        if (formData.bookingType === "Apartment") {
+            return [...new Set(apartment.map(a => a.apartmentName))];
         }
+        return [...new Set(rooms.map(r => r.hotel?.name || "Ocean View Resort"))];
     };
+
+    const getTypeOptions = () => {
+        if (formData.bookingType === "Apartment") {
+            return [...new Set(apartment.map(a => a.type))];
+        }
+        return [...new Set(rooms.map(r => r.type))];
+    };
+
+    const getNumberOptions = () => {
+        if (formData.bookingType === "Apartment") {
+            // Filter based on selected apartment name
+            return apartment
+                .filter(a => !formData.hotelName || a.apartmentName === formData.hotelName)
+                .map(a => a.apartmentNumber);
+        }
+        return rooms
+            .filter(r => !formData.roomType || r.type === formData.roomType)
+            .map(r => r.roomNumber);
+    };
+
+
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+        console.log("Final Payload:", formData);
+
+        const res = await createBooking(formData);
+
+        if (res.status === 200 || res.status === 201) {
+            openNotification("success", "Booking saved successfully!");
+            setIsModalOpen(true);
+        }
+    } catch (err) {
+        openNotification("error", "Error saving booking");
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (<>
         <form onSubmit={handleSubmit}>
@@ -131,6 +225,38 @@ const BookingAddComp = () => {
             </div>
 
             <h3 className="font-semibold pb-2 px-3 text-lg"> {isEditMode ? "Edit Booking" : "Add New Booking"}</h3>
+
+
+            <div className="bg-white w-full border border-gray-100 rounded-[24px] p-6 shadow-sm mt-6 m-0 mb-2">
+                <div className="flex flex-wrap items-center gap-12 py-2">
+                    <span className="text-dark font-semibold text-15">Select Booking Type</span>
+                    <div className="flex items-center gap-8">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <div className="relative flex items-center justify-center">
+                                <input type="radio"
+                                    name="bookingType" // Same Name
+                                    value="Room"
+                                    checked={formData.bookingType === "Room"}
+                                    onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Room' } })} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                            </div>
+                            <span className="text-dark font-medium text-15">Room Booking</span>
+                        </label>
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <div className="relative flex items-center justify-center">
+                                <input type="radio"
+                                    name="bookingType" // Same Name
+                                    value="Apartment"
+                                    checked={formData.bookingType === "Apartment"}
+                                    onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Apartment' } })} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                            </div>
+                            <span className="text-dark font-medium text-15">Appartment Booking</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
 
             <div className="bg-white rounded-2xl m-0 shadow-md min-h-screen p-4 md:p-8 w-full">
                 <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -161,27 +287,27 @@ const BookingAddComp = () => {
 
                         {/* Section 2: Room Selection */}
                         <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                            <h3 className="text-dark font-bold text-lg mb-6 pb-2 border-b border-gray-100">Room Selection</h3>
+                            <h3 className="text-dark font-bold text-lg mb-6 pb-2 border-b border-gray-100">{formData.bookingType === "Apartment" ? "Apartment Selection" : "Room Selection"}</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                 {/* Hotel Name Dropdown */}
                                 <div className="flex flex-col">
-                                    <label className="text-lightSeconday text-13 font-bold ml-1">Hotel Name</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">{formData.bookingType === "Apartment" ? "Apartment Name" : "Hotel Name"}</label>
                                     <Select
                                         className="w-full h-[52px] custom-antd-select"
-                                        placeholder="Select Hotel"
+                                        placeholder={formData.bookingType === "Apartment" ? "Select Apartment" : "Select Hotel"}
                                         value={formData.hotelName || undefined}
                                         onChange={(val) => handleChange({ target: { name: 'hotelName', value: val } })}
                                         suffixIcon={<ChevronDown size={18} className="text-gray-400" />}
                                     >
-                                        {[...new Set(rooms.map(r => r.hotel?.name || "Ocean View Resort"))].map((hotel, i) => (
-                                            <Option key={i} value={hotel}>{hotel}</Option>
+                                        {getHotelOptions().map((name, i) => (
+                                            <Option key={i} value={name}>{name}</Option>
                                         ))}
                                     </Select>
                                 </div>
 
                                 {/* Select Room Type Dropdown */}
                                 <div className="flex flex-col">
-                                    <label className="text-lightSeconday text-13 font-bold ml-1">Select Room Type</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">{formData.bookingType === "Apartment" ? "Apartment Type" : "Select Room Type"}</label>
                                     <Select
                                         className="w-full h-[52px] custom-antd-select"
                                         placeholder="Select Type"
@@ -189,7 +315,7 @@ const BookingAddComp = () => {
                                         onChange={(val) => handleChange({ target: { name: 'roomType', value: val } })}
                                         suffixIcon={<ChevronDown size={18} className="text-dark" />}
                                     >
-                                        {[...new Set(rooms.map(r => r.type))].map((type, i) => (
+                                        {getTypeOptions().map((type, i) => (
                                             <Option key={i} value={type}>{type === "false" ? "Standard" : type}</Option>
                                         ))}
                                     </Select>
@@ -197,16 +323,18 @@ const BookingAddComp = () => {
 
                                 {/* Room Number Dropdown */}
                                 <div className="flex flex-col">
-                                    <label className="text-lightSeconday text-13 font-bold ml-1">Room Number</label>
+                                    <label className="text-lightSeconday text-13 font-bold ml-1">{formData.bookingType === "Apartment" ? "Apartment Number" : "Room Number"}</label>
                                     <Select
                                         className="w-full h-[52px] custom-antd-select"
-                                        placeholder="Select Room No"
+                                        placeholder={formData.bookingType === "Apartment" ? "Select Apartment No" : "Select Room No"}
                                         value={formData.roomNumber || undefined}
                                         onChange={(val) => handleChange({ target: { name: 'roomNumber', value: val } })}
                                         suffixIcon={<ChevronDown size={18} className="text-dark" />}
                                     >
-                                        {rooms.filter(r => !formData.roomType || r.type === formData.roomType).map((room, i) => (
-                                            <Option key={i} value={room.roomNumber}>Room No {room.roomNumber}</Option>
+                                        {getNumberOptions().map((num, i) => (
+                                            <Option key={i} value={num}>
+                                                {num}
+                                            </Option>
                                         ))}
                                     </Select>
                                 </div>
@@ -311,8 +439,8 @@ const BookingAddComp = () => {
                     </div>
 
                     {/* RIGHT SIDE: Summary */}
-                    <div className="lg:col-span-4">
-                        <div className="bg-[#EDFDF2] border-2 border-[#107326] rounded-[24px] p-6 sticky top-8 ">
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-[#EDFDF2] border-2 border-[#107326] rounded-[24px] p-6  top-8  ">
                             <h3 className="text-[#107326] font-semibold  text-lg mb-5 border-b-2 border-darkgrayline pb-2">Booking Summary</h3>
 
                             <div className="space-y-5">
@@ -378,7 +506,72 @@ const BookingAddComp = () => {
                                 </div>
                             </div>
                         </div>
+                        {formData.bookingType === "Apartment" && (
+                            <div className="w-full">
+                                {/* Title */}
+                                <h3 className="text-[#0061F2] font-bold text-[16px] mb-3 ml-1">
+                                    Host Details
+                                </h3>
+
+                                {/* Main Card Container */}
+                                <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all hover:shadow-md">
+
+                                    {/* Profile Image */}
+                                    <div className="relative">
+                                        <img
+                                            src={hostData.profileImg}
+                                            alt={hostData.name}
+                                            className="w-[85px] h-[85px] rounded-full object-cover border-2 border-gray-50 shadow-sm"
+                                        />
+                                    </div>
+
+                                    {/* Info Content */}
+                                    <div className="flex flex-col justify-center text-center sm:text-left">
+                                        {/* Name and Badge */}
+                                        <div className="mb-4 pr-4 mr-4 mt-4">
+                                            <h4 className="text-dark font-bold text-medium leading-tight">
+                                                {hostData.name}
+                                            </h4>
+                                            <p className="text-lightSeconday text-14 font-medium mt-0.5 text-start">
+                                                {hostData.role}
+                                            </p>
+                                        </div>
+
+                                        {/* Contact Details */}
+                                        <div className="space-y-2.5">
+                                            {/* Phone */}
+                                            <div className="flex items-center justify-center sm:justify-start gap-3 group">
+                                                <div className="text-[#0061F2] opacity-80 group-hover:opacity-100 transition-opacity">
+                                                    {/* <Phone size={16} fill="currentColor" className="text-[#0061F2]/20" /> */}
+                                                    <img src={phone} alt="" />
+                                                </div>
+                                                <span className="text-[#374151] font-semibold text-[15px]">
+                                                    {hostData.phone}
+                                                </span>
+                                            </div>
+
+                                            {/* Email */}
+                                            <div className="flex items-center justify-center sm:justify-start gap-3 group">
+                                                <div className="text-[#0061F2] opacity-80 group-hover:opacity-100 transition-opacity">
+                                                    {/* <Mail size={16} fill="currentColor" className="text-[#0061F2]/20" /> */}
+                                                    <img src={inbox} alt="" />
+                                                </div>
+                                                <span className="text-[#374151] font-semibold text-[15px]">
+                                                    {hostData.email}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        )}
+
+
+
                     </div>
+
+
                 </div>
             </div>
 
