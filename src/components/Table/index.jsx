@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
@@ -8,7 +8,8 @@ import { exportToExcel } from "../../utils/exportExcel";
 import { deriveBookingStatus } from "../../helper";
 import search from "../../assets/icons/search.png"
 import { Calendar, RotateCcw } from "lucide-react"
-
+import tablecalender from "../../assets/icons/tablecalender.png"
+import { Select } from 'antd';
 const HotelDirectory = ({
   data = [],
   columns = [],
@@ -21,7 +22,8 @@ const HotelDirectory = ({
   lastId = null,
   inp,
   onlyFilter,
-  path
+  path,
+  checkbox,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -29,6 +31,7 @@ const HotelDirectory = ({
   const [showFilter, setShowFilter] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { Option } = Select;
 
 
   // Filter State
@@ -42,55 +45,55 @@ const HotelDirectory = ({
   });
 
   // Updated Filter Logic
-const filteredData = useMemo(() => {
-  return data.filter((item) => {
-    // Basic Filters
-    const matchesSearch = !searchTerm || item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRoom = !filters.roomType || item.roomType === filters.roomType;
-    const matchesHotel = !filters.hotelName || item.hotelName === filters.hotelName;
-    const itemStatus = item.checkInOut ? deriveBookingStatus(item.checkInOut) : item.status;
-    const matchesStatus = !filters.status || itemStatus?.toLowerCase() === filters.status.toLowerCase();
+  const filteredData = useMemo(() => {
+    return data.filter((item) => {
+      // Basic Filters
+      const matchesSearch = !searchTerm || item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRoom = !filters.roomType || item.roomType === filters.roomType;
+      const matchesHotel = !filters.hotelName || item.hotelName === filters.hotelName;
+      const itemStatus = item.checkInOut ? deriveBookingStatus(item.checkInOut) : item.status;
+      const matchesStatus = !filters.status || itemStatus?.toLowerCase() === filters.status.toLowerCase();
 
-    // 1. Date Logic (Pehle ki tarah split karke)
-    let matchesDate = true;
-    if (item.checkInOut && (filters.dateFrom || filters.dateTo)) {
-      const startDateStr = item.checkInOut.split(" - ")[0];
-      const bookingStartDate = new Date(startDateStr);
-      bookingStartDate.setHours(0, 0, 0, 0);
+      // 1. Date Logic (Pehle ki tarah split karke)
+      let matchesDate = true;
+      if (item.checkInOut && (filters.dateFrom || filters.dateTo)) {
+        const startDateStr = item.checkInOut.split(" - ")[0];
+        const bookingStartDate = new Date(startDateStr);
+        bookingStartDate.setHours(0, 0, 0, 0);
 
-      if (filters.dateFrom) {
-        const dFrom = new Date(filters.dateFrom);
-        dFrom.setHours(0, 0, 0, 0);
-        if (bookingStartDate < dFrom) matchesDate = false;
+        if (filters.dateFrom) {
+          const dFrom = new Date(filters.dateFrom);
+          dFrom.setHours(0, 0, 0, 0);
+          if (bookingStartDate < dFrom) matchesDate = false;
+        }
+        if (filters.dateTo) {
+          const dTo = new Date(filters.dateTo);
+          dTo.setHours(0, 0, 0, 0);
+          if (bookingStartDate > dTo) matchesDate = false;
+        }
       }
-      if (filters.dateTo) {
-        const dTo = new Date(filters.dateTo);
-        dTo.setHours(0, 0, 0, 0);
-        if (bookingStartDate > dTo) matchesDate = false;
+
+      // 2. Duration Logic (Stay ke dino ke hisaab se)
+      let matchesDuration = true;
+      if (filters.duration && item.duration) {
+        // item.duration se number nikalein (e.g., "4 Nights" -> 4)
+        const stayNights = parseInt(item.duration);
+
+        if (filters.duration === "24h") {
+          // Sirf 1 raat wala stay
+          if (stayNights !== 1) matchesDuration = false;
+        } else if (filters.duration === "1w") {
+          // 1 hafte tak ka stay (1 se 7 raatein)
+          if (stayNights > 7) matchesDuration = false;
+        } else if (filters.duration === "3w") {
+          // 3 hafte tak ka stay (1 se 21 raatein)
+          if (stayNights > 21) matchesDuration = false;
+        }
       }
-    }
 
-    // 2. Duration Logic (Stay ke dino ke hisaab se)
-    let matchesDuration = true;
-    if (filters.duration && item.duration) {
-      // item.duration se number nikalein (e.g., "4 Nights" -> 4)
-      const stayNights = parseInt(item.duration); 
-
-      if (filters.duration === "24h") {
-        // Sirf 1 raat wala stay
-        if (stayNights !== 1) matchesDuration = false;
-      } else if (filters.duration === "1w") {
-        // 1 hafte tak ka stay (1 se 7 raatein)
-        if (stayNights > 7) matchesDuration = false;
-      } else if (filters.duration === "3w") {
-        // 3 hafte tak ka stay (1 se 21 raatein)
-        if (stayNights > 21) matchesDuration = false;
-      }
-    }
-
-    return matchesSearch && matchesRoom && matchesHotel && matchesStatus && matchesDate && matchesDuration;
-  });
-}, [searchTerm, data, filters]);
+      return matchesSearch && matchesRoom && matchesHotel && matchesStatus && matchesDate && matchesDuration;
+    });
+  }, [searchTerm, data, filters]);
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -302,7 +305,14 @@ const filteredData = useMemo(() => {
   };
 
   // console.log(lastId, "lastIdlastIdlastId");
+  const dateInputRef = useRef(null);
 
+  const handleIconClick = () => {
+    // Yeh function input ka calendar open karega jab image par click hoga
+    if (dateInputRef.current) {
+      dateInputRef.current.showPicker();
+    }
+  };
   return (
     <div className="w-full ">
       {/* HEADER */}
@@ -317,7 +327,7 @@ const filteredData = useMemo(() => {
               </span>
               <input
                 type="text"
-                className="border border-2 rounded-md bg-[#F9FAFC] font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
+                className="border border-2 rounded-md bg-inpgraysecondary font-medium pl-10 pr-5 py-2" // pl-10 taake text icon ke upar na aaye
                 placeholder="Search"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -393,90 +403,98 @@ const filteredData = useMemo(() => {
             <h3 className="text-gray-900 font-bold text-lg mb-5">Apply Filters</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
-              {/* Select Room */}
-              <div className="relative">
-                <select
-                  value={filters.roomType}
-                  onChange={(e) => handleFilterChange("roomType", e.target.value)}
-                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+              {/* Select Room - Ant Design */}
+              <div className="relative ant-select-custom">
+                <Select
+                  placeholder="Select Room"
+                  value={filters.roomType || undefined}
+                  onChange={(val) => handleFilterChange("roomType", val)}
+                  className="w-full h-[50px] custom-antd-select"
+                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
                 >
-                  <option value="">Select Room</option>
-                  <option value="One Bed Rooms">One Bed Rooms</option>
-                  <option value="Two Bed Rooms">Two Bed Rooms</option>
-                  <option value="Three Bed Rooms">Three Bed Rooms</option>
-                </select>
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <ChevronDown size={18} className="text-gray-900" />
-                </div>
+                  <Option value="" >Select Room</Option>
+                  <Option value="One Bed Rooms">One Bed Rooms</Option>
+                  <Option value="Two Bed Rooms">Two Bed Rooms</Option>
+                  <Option value="Three Bed Rooms">Three Bed Rooms</Option>
+                </Select>
               </div>
 
-              {/* Select Hotel */}
-              <div className="relative">
-                <select
-                  value={filters.hotelName}
-                  onChange={(e) => handleFilterChange("hotelName", e.target.value)}
-                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+              {/* Select Hotel - Ant Design */}
+              <div className="relative ant-select-custom">
+                <Select
+                  placeholder="Select Hotel"
+                  value={filters.hotelName || undefined}
+                  onChange={(val) => handleFilterChange("hotelName", val)}
+                  className="w-full h-[50px] custom-antd-select"
+                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
                 >
-                  <option value="">Select Hotel</option>
-                  {uniqueHotels.map(hotel => <option key={hotel} value={hotel}>{hotel}</option>)}
-                </select>
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <ChevronDown size={18} className="text-gray-900" />
-                </div>
+                  <Option value="">Select Hotel</Option>
+                  {uniqueHotels.map(hotel => (
+                    <Option key={hotel} value={hotel}>{hotel}</Option>
+                  ))}
+                </Select>
               </div>
 
-              {/* Sort by Duration */}
-              <div className="relative">
-                <select
-                  value={filters.duration}
-                  onChange={(e) => handleFilterChange("duration", e.target.value)}
-                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+              {/* Sort by Duration - Ant Design */}
+              <div className="relative ant-select-custom">
+                <Select
+                  placeholder="Sort by Duration"
+                  value={filters.duration || undefined}
+                  onChange={(val) => handleFilterChange("duration", val)}
+                  className="w-full h-[50px] custom-antd-select"
+                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
                 >
-                  <option value="">Sort by Duration</option>
-                  <option value="24h">24 Hours</option>
-                  <option value="1w">1 Week</option>
-                  <option value="3w">3 Weeks</option>
-                </select>
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <ChevronDown size={18} className="text-gray-900" />
-                </div>
+                  <Option value="">Sort by Duration</Option>
+                  <Option value="24h">24 Hours</Option>
+                  <Option value="1w">1 Week</Option>
+                  <Option value="3w">3 Weeks</Option>
+                </Select>
               </div>
 
-              {/* Sort by Status */}
-              <div className="relative">
-                <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange("status", e.target.value)}
-                  className="w-full appearance-none bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none cursor-pointer"
+              {/* Sort by Status - Ant Design */}
+              <div className="relative ant-select-custom">
+                <Select
+                  placeholder="Sort by Status"
+                  value={filters.status || undefined}
+                  onChange={(val) => handleFilterChange("status", val)}
+                  className="w-full h-[50px] custom-antd-select"
+                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
                 >
-                  <option value="">Sort by Status</option>
-                  <option value="Booked">Booked</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                  <option value="Checked-In">Checked In</option>
-                </select>
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <ChevronDown size={18} className="text-gray-900" />
-                </div>
+                  <Option value="">Sort by Status</Option>
+                  <Option value="Booked">Booked</Option>
+                  <Option value="Completed">Completed</Option>
+                  <Option value="Cancelled">Cancelled</Option>
+                  <Option value="Checked-In">Checked In</Option>
+                </Select>
               </div>
 
-              {/* Date From */}
-              <div className="relative">
+              {/* Date From - Aapka Pehla Wala Custom Code */}
+              <div className="relative w-full">
+                <img
+                  src={tablecalender}
+                  alt="calendar"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
+                />
                 <input
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
-                  className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none"
+                  className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
                 />
               </div>
 
-              {/* Date To */}
-              <div className="relative">
+              {/* Date To - Fixed handleFilterChange Key */}
+              <div className="relative w-full">
+                <img
+                  src={tablecalender}
+                  alt="calendar"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
+                />
                 <input
                   type="date"
                   value={filters.dateTo}
-                  onChange={(e) => handleFilterChange("dateTo", e.target.value)}
-                  className="w-full bg-[#F9FAFC] border border-gray-200 rounded-xl px-4 py-3 text-gray-700 font-medium focus:outline-none"
+                  onChange={(e) => handleFilterChange("dateTo", e.target.value)} // Fixed key to dateTo
+                  className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
                 />
               </div>
 
@@ -498,16 +516,21 @@ const filteredData = useMemo(() => {
         <table className="w-full border-collapse">
           <thead className="">
             <tr>
-              <th className="w-10 border-b border-t border-r  border-dashed">
-                <input
-                  type="checkbox"
-                  checked={
-                    selectedIds.length === data.length && data.length > 0
-                  }
-                  onChange={toggleAll}
-                  className="checked:accent-blue"
-                />
-              </th>
+
+              {checkbox && (
+                <th className="w-10 border-b border-t border-r  border-dashed">
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedIds.length === data.length && data.length > 0
+                    }
+                    onChange={toggleAll}
+                    className="checked:accent-blue"
+                  />
+                </th>
+
+              )}
+
 
               {columns.map((col) => (
                 <th
@@ -551,6 +574,16 @@ const filteredData = useMemo(() => {
     hover:bg-blue-50 transition-colors
   `}
                   >
+                    {checkbox && (
+                         <td className="border-b border-t border-r border-dashed">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => toggleRow(row.id)}
+                        className="checked:accent-blue"
+                      />
+                    </td>
+                    )}
                     <td className="border-b border-t border-r border-dashed">
                       <input
                         type="checkbox"

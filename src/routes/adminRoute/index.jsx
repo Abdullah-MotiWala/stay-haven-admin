@@ -32,7 +32,7 @@ export const AdminRoute = [
           
            { path: "rooms/addnext", element: <AddRooms /> },
             {path:"rooms" , element:<Room/>},
-            {path:"booking" , element:<Booking/>},
+            {path:"bookings" , element:<Booking/>},
             {path:"booking/view/:id" , element:<BookingView/>},
             {path:"booking/add" , element:<AddBooking/>},
 

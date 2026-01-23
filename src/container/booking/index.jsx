@@ -10,13 +10,11 @@ import { getRecentBooking , getAllBooking } from "../../services/booking";
 import { useState, useEffect , useMemo} from "react";
 import { openNotification } from "../../network/notification";
 const Booking = ()=>{
-   const [activeType, setActiveType] = useState("All Booking");
+   const [activeType, setActiveType] = useState("Room Bookings");
     const [recentBookings, setRecentBookings] = useState([]);
   const roomTypes = [
-   "All Booking",
-   "Active Booking",
-   "Completed Bookings",
-   "Cancelled Bookings"
+   "Room Bookings",
+   "Apartment Bookings",
  ];
   const columns = [
     { key: "bookingId", label: "Booking ID", type: "text" },
@@ -80,7 +78,7 @@ const Booking = ()=>{
 
 
           const filteredBookings = useMemo(() => {
-    if (activeType === "All Booking") return recentBookings;
+    if (activeType === "Room Bookings") return recentBookings;
     
     return recentBookings.filter((booking) => {
       // API status values check karein (Booked, Completed, Cancelled)
@@ -128,6 +126,7 @@ const Booking = ()=>{
                     path={`/admin/booking/view`}
                     inp={true}
                     onlyFilter={true}
+                    checkbox={false}
                   />
                 </div>
     </>)

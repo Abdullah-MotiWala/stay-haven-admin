@@ -8,6 +8,10 @@ import { createBooking } from "../../services/booking";
 import { getAllRooms } from "../../services/rooms"
 import { openNotification } from "../../network/notification";
 import { updateStats } from "../../services/booking";
+import tablecalender from "../../assets/icons/calendarIcon.png"
+import { Select } from 'antd';
+import SuccessModal from "../../components/shared/successModal";
+
 
 const BookingAddComp = () => {
     const { id } = useParams();
@@ -15,7 +19,10 @@ const BookingAddComp = () => {
     const isEditMode = Boolean(id);
     const [loading, setLoading] = useState(false);
     const [rooms, setRooms] = useState([]);
-    const [ids,setids] = useState();
+    const [ids, setids] = useState();
+    const { Option } = Select;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [formData, setFormData] = useState({
         guestName: "",
         phone: "",
@@ -36,24 +43,24 @@ const BookingAddComp = () => {
         paymentMethod: "Bank",
         status: "Checked-In"
     });
-    const handleStatusUpdate = async (newStatus) => {
-        setLoading(true);
-        try {
-            // ids yahan parent se aa rahi hai jo booking ki mongoDB id hai
-            const res = await updateStats(ids, { status: newStatus });
+    // const handleStatusUpdate = async (newStatus) => {
+    //     setLoading(true);
+    //     try {
+    //         // ids yahan parent se aa rahi hai jo booking ki mongoDB id hai
+    //         const res = await updateStats(ids, { status: newStatus });
 
-            if (res.status === 200 || res.status === 201) {
-                openNotification("success", `Booking status updated to ${newStatus}`);
-                // Status update hone ke baad page refresh ya navigate kar sakte hain
-                window.location.reload();
-            }
-        } catch (err) {
-            console.error("Failed to update status:", err);
-            openNotification("error", "Failed to update booking status");
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         if (res.status === 200 || res.status === 201) {
+    //             openNotification("success", `Booking status updated to ${newStatus}`);
+    //             // Status update hone ke baad page refresh ya navigate kar sakte hain
+    //             window.location.reload();
+    //         }
+    //     } catch (err) {
+    //         console.error("Failed to update status:", err);
+    //         openNotification("error", "Failed to update booking status");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     useEffect(() => {
         const fetchRooms = async () => {
             try {
@@ -79,7 +86,7 @@ const BookingAddComp = () => {
                 hotelName: value,
                 hotelId: selectedRoomObj?.hotel?.id || ""
             }));
-            setids(selectedRoomObj?.hotel?.id)
+
         } else if (name === "roomNumber") {
             // Room select hote hi uski ID aur Price dhoondo
             const selectedRoomObj = rooms.find(r => r.roomNumber === value);
@@ -103,12 +110,12 @@ const BookingAddComp = () => {
             const res = await createBooking(formData);
             if (res.status === 200 || res.status === 201) {
                 openNotification("success", "Booking saved successfully!");
-                navigate("/admin/booking");
+                // navigate("/admin/bookings");
             }
-
-            if (typeof handleStatusUpdate === "function") {
-                await handleStatusUpdate(formData.status);
-            }
+            setIsModalOpen(true)
+            // if (typeof handleStatusUpdate === "function") {
+            //     await handleStatusUpdate(formData.status);
+            // }
         } catch (err) {
             openNotification("error", "Error saving booking");
         } finally {
@@ -116,7 +123,7 @@ const BookingAddComp = () => {
         }
     };
 
-    return (
+    return (<>
         <form onSubmit={handleSubmit}>
             <div className='flex gap-1 border-solid border-b border-gray-300 mb-2 pb-4 items-center gap-4'>
                 <img src={leftangle} alt="" className="cursor-pointer" onClick={() => navigate(-1)} />
@@ -156,75 +163,86 @@ const BookingAddComp = () => {
                         <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
                             <h3 className="text-dark font-bold text-lg mb-6 pb-2 border-b border-gray-100">Room Selection</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                {/* Hotel Name Dropdown */}
                                 <div className="flex flex-col">
                                     <label className="text-lightSeconday text-13 font-bold ml-1">Hotel Name</label>
-                                    <div className="relative">
-                                        <select name="hotelName" value={formData.hotelName} onChange={handleChange} required className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none cursor-pointer m-0">
-                                            <option value="">Select Hotel</option>
-                                            {[...new Set(rooms.map(r => r.hotel?.name || "Ocean View Resort"))].map((hotel, i) => (
-                                                <option key={i} value={hotel}>{hotel}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
+                                    <Select
+                                        className="w-full h-[52px] custom-antd-select"
+                                        placeholder="Select Hotel"
+                                        value={formData.hotelName || undefined}
+                                        onChange={(val) => handleChange({ target: { name: 'hotelName', value: val } })}
+                                        suffixIcon={<ChevronDown size={18} className="text-gray-400" />}
+                                    >
+                                        {[...new Set(rooms.map(r => r.hotel?.name || "Ocean View Resort"))].map((hotel, i) => (
+                                            <Option key={i} value={hotel}>{hotel}</Option>
+                                        ))}
+                                    </Select>
                                 </div>
 
+                                {/* Select Room Type Dropdown */}
                                 <div className="flex flex-col">
                                     <label className="text-lightSeconday text-13 font-bold ml-1">Select Room Type</label>
-                                    <div className="relative">
-                                        <select name="roomType" value={formData.roomType} onChange={handleChange} required className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none cursor-pointer m-0">
-                                            <option value="">Select Type</option>
-                                            {[...new Set(rooms.map(r => r.type))].map((type, i) => (
-                                                <option key={i} value={type}>{type === "false" ? "Standard" : type}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
+                                    <Select
+                                        className="w-full h-[52px] custom-antd-select"
+                                        placeholder="Select Type"
+                                        value={formData.roomType || undefined}
+                                        onChange={(val) => handleChange({ target: { name: 'roomType', value: val } })}
+                                        suffixIcon={<ChevronDown size={18} className="text-dark" />}
+                                    >
+                                        {[...new Set(rooms.map(r => r.type))].map((type, i) => (
+                                            <Option key={i} value={type}>{type === "false" ? "Standard" : type}</Option>
+                                        ))}
+                                    </Select>
                                 </div>
 
+                                {/* Room Number Dropdown */}
                                 <div className="flex flex-col">
                                     <label className="text-lightSeconday text-13 font-bold ml-1">Room Number</label>
-                                    <div className="relative">
-                                        <select name="roomNumber" value={formData.roomNumber} onChange={handleChange} required className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none cursor-pointer m-0">
-                                            <option value="">Select Room No</option>
-                                            {rooms.filter(r => !formData.roomType || r.type === formData.roomType).map((room, i) => (
-                                                <option key={i} value={room.roomNumber}>Room No {room.roomNumber}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
+                                    <Select
+                                        className="w-full h-[52px] custom-antd-select"
+                                        placeholder="Select Room No"
+                                        value={formData.roomNumber || undefined}
+                                        onChange={(val) => handleChange({ target: { name: 'roomNumber', value: val } })}
+                                        suffixIcon={<ChevronDown size={18} className="text-dark" />}
+                                    >
+                                        {rooms.filter(r => !formData.roomType || r.type === formData.roomType).map((room, i) => (
+                                            <Option key={i} value={room.roomNumber}>Room No {room.roomNumber}</Option>
+                                        ))}
+                                    </Select>
                                 </div>
 
+                                {/* Number of Guests Dropdown */}
                                 <div className="flex flex-col">
                                     <label className="text-lightSeconday text-13 font-bold ml-1">Number of Guests</label>
-                                    <div className="relative">
-                                        <select name="numGuests" value={formData.numGuests} onChange={handleChange} className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none cursor-pointer m-0">
-                                            <option value="01 Adult">01 Adult</option>
-                                            <option value="02 Adults">02 Adults</option>
-                                        </select>
-                                        <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
+                                    <Select
+                                        className="w-full h-[52px] custom-antd-select"
+                                        value={formData.numGuests || "01 Adult"}
+                                        onChange={(val) => handleChange({ target: { name: 'numGuests', value: val } })}
+                                        suffixIcon={<ChevronDown size={18} className="text-dark" />}
+                                    >
+                                        <Option value="01 Adult">01 Adult</Option>
+                                        <Option value="02 Adults">02 Adults</Option>
+                                    </Select>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Section 3: Stay Details (Fixed Calendar) */}
+                        {/* Section 3: Stay Details */}
                         <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
                             <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">Stay Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                 <div className="flex flex-col w-full">
                                     <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">Checked in Date</label>
-                                    <div className="relative group">
-                                        {/* Removed appearance-none and pointer-events-none from indicator to allow click */}
+                                    <div className="relative w-full">
+                                        <img src={tablecalender} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20" />
                                         <input type="date" name="checkIn" value={formData.checkIn} onChange={handleChange} required className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
-                                        {/* <img src={calenderIcon} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" /> */}
                                     </div>
                                 </div>
                                 <div className="flex flex-col w-full">
                                     <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">Checked out Date</label>
-                                    <div className="relative group">
+                                    <div className="relative w-full">
+                                        <img src={tablecalender} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20" />
                                         <input type="date" name="checkOut" value={formData.checkOut} onChange={handleChange} required className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
-                                        {/* <img src={calenderIcon} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" /> */}
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
@@ -252,60 +270,44 @@ const BookingAddComp = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <label className="text-lightSeconday text-13 font-bold ml-1">Payment Method</label>
-                                    <div className="relative">
-                                        <select name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none cursor-pointer m-0">
-                                            <option value="Bank">Bank</option>
-                                            <option value="Cash">Cash</option>
-                                            <option value="Card">Card</option>
-                                        </select>
-                                        <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
+                                    <Select
+                                        className="w-full h-[58px] custom-antd-select"
+                                        value={formData.paymentMethod || "Card"}
+                                        onChange={(val) => handleChange({ target: { name: 'paymentMethod', value: val } })}
+                                        suffixIcon={<ChevronDown size={18} className="text-dark bg-white" />}
+                                    >
+                                        <Option value="Card">Credit Card</Option>
+                                        <Option value="Bank">Bank</Option>
+                                        <Option value="Cash">Cash</Option>
+
+                                    </Select>
                                 </div>
                             </div>
                         </div>
 
-                      <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm mt-6">
-    <h3 className="text-dark font-semibold text-lg mb-6 pb-1 border-b-2 border-gray-100">Booking Status</h3>
-    <div className="flex flex-wrap items-center gap-12 py-2">
-        <span className="text-dark font-semibold text-15">Set Booking Status</span>
-        <div className="flex items-center gap-8">
-            
-            {/* Checked-In Option */}
-            <label className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                    <input 
-                        type="radio" 
-                        name="status" 
-                        value="Checked-In" 
-                        checked={formData.status === "Checked-In"} 
-                        onChange={handleChange} // Sirf form state update hogi
-                        className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" 
-                    />
-                    <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
-                </div>
-                <span className="text-dark font-medium text-15">Checked in</span>
-            </label>
-
-            {/* Reserved Option */}
-            <label className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                    <input 
-                        type="radio" 
-                        name="status" 
-                        value="Reserved" 
-                        checked={formData.status === "Reserved"} 
-                        onChange={handleChange} 
-                        className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" 
-                    />
-                    <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
-                </div>
-                <span className="text-dark font-medium text-15">Reserved</span>
-            </label>
-
-        </div>
-    </div>
-</div>
-
+                        {/* Booking Status Section remains the same as it uses Radio buttons */}
+                        <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm mt-6">
+                            <h3 className="text-dark font-semibold text-lg mb-6 pb-1 border-b-2 border-gray-100">Booking Status</h3>
+                            <div className="flex flex-wrap items-center gap-12 py-2">
+                                <span className="text-dark font-semibold text-15">Set Booking Status</span>
+                                <div className="flex items-center gap-8">
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className="relative flex items-center justify-center">
+                                            <input type="radio" name="status" value="Checked-In" checked={formData.status === "Checked-In"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                            <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                                        </div>
+                                        <span className="text-dark font-medium text-15">Checked in</span>
+                                    </label>
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className="relative flex items-center justify-center">
+                                            <input type="radio" name="status" value="Reserved" checked={formData.status === "Reserved"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                            <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                                        </div>
+                                        <span className="text-dark font-medium text-15">Reserved</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* RIGHT SIDE: Summary */}
@@ -380,13 +382,48 @@ const BookingAddComp = () => {
                 </div>
             </div>
 
+
             <div className="flex justify-end gap-4 mt-6">
-                <button type="button" onClick={() => navigate(-1)} className="border-2 border-lightSeconday bg-white px-10 py-2 rounded-md font-medium text-lightSeconday">Back</button>
-                <button type="submit" disabled={loading} className="px-10 py-2 bg-blue text-white rounded-md shadow-lg font-medium hover:bg-blue-600 transition-all">
-                    {loading ? "Saving..." : "Save Booking"}
+                <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className=" border-2 border-lightSeconday bg-myWhite px-10 text-lightSeconday rounded-md py-2 font-medium hover:bg-gray-50 transition-all"
+                >
+                    Back
+                </button>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-10 py-2 bg-blue text-white rounded-md"
+                >
+                    {loading ? "Adding..." : "Save Booking"}
                 </button>
             </div>
         </form>
+        {isModalOpen && (
+            <>
+                <SuccessModal
+                    open={true}
+                    // onClose={() => setIsModalOpen(false)}
+                    onClose={() => navigate("/admin/bookings")}
+                    title={
+                        !isEditMode
+                            ? "Booking Save Successfully!"
+                            : "Booking Save Successfully!"
+                    }
+                    description={
+                        !isEditMode
+                            ? "The booking has been saved successfully."
+                            : "The booking has been saved successfully."
+                    }
+                    showButton
+                    buttonText="View Bookings"
+                    onButtonClick={() => navigate("/admin/bookings")}
+                />
+            </>
+        )}
+    </>
     )
 }
 export default BookingAddComp;

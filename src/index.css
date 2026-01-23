@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 * {
-    margin: 0;
-    padding: 0;
-    font-family: 'Lufga', sans-serif !important;
+  margin: 0;
+  padding: 0;
+  font-family: 'Lufga', sans-serif !important;
 }
 
 body,
@@ -15,62 +15,71 @@ body,
   min-height: 100%;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
-body{
+body {
   margin: 0;
   background-image: url('./assets/images/background.png');
-  background-size: cover;        /* image full screen */
-  background-position: top right;   /* center se show */
-  background-repeat: no-repeat;  /* repeat band */
-  background-attachment: fixed;  /* scroll par fixed */
+  background-size: cover;
+  /* image full screen */
+  background-position: top right;
+  /* center se show */
+  background-repeat: no-repeat;
+  /* repeat band */
+  background-attachment: fixed;
+  /* scroll par fixed */
 }
 
 
 /* Agar koi div green hai to usay bhi force dain */
 div[class*="bg-green"],
 div[style*="background: green"] {
-    background-color: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Sidebar aur Cards ko white rehne dain */
 .ant-layout-sider,
 .ant-card,
 .bg-white {
-    background-color: #ffffff !important;
-    border-radius: 20px !important;
-    margin: 12px;
+  background-color: #ffffff !important;
+  border-radius: 20px !important;
+  margin: 12px;
 }
 
 /* Sidebar Active Item Styling */
 .sidebar-menu .ant-menu-item-selected {
-    background-color: #0A5BE2 !important;
-    color: white !important;
-    /* Figma Blue */
-    font-weight: 700;
-    border-radius: 15px !important;
+  background-color: #0A5BE2 !important;
+  color: white !important;
+  /* Figma Blue */
+  font-weight: 700;
+  border-radius: 15px !important;
 }
 
 .sidebar-menu .ant-menu-item {
-    margin-bottom: 8px !important;
-    border-radius: 20px !important;
-    text-decoration-line: none !important;
+  margin-bottom: 8px !important;
+  border-radius: 20px !important;
+  text-decoration-line: none !important;
 }
 
 .logout-btn {
-    border: 1px solid;
-    border-color: #8A8A8F;
+  border: 1px solid;
+  border-color: #8A8A8F;
 }
-a{
-    text-decoration-line: none !important;
-    text-decoration: none !important;
+
+a {
+  text-decoration-line: none !important;
+  text-decoration: none !important;
 }
-a :hover{
-    text-decoration-line: none !important;
-    text-decoration: none !important;
+
+a :hover {
+  text-decoration-line: none !important;
+  text-decoration: none !important;
 }
+
 /* Jo page active ho, uska text white kar do */
 .ant-pagination-item-active a {
   color: white !important;
@@ -79,4 +88,25 @@ a :hover{
 /* Hover karne par bhi white hi rahe */
 .ant-pagination-item-active:hover a {
   color: white !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-antd-select .ant-select-selection-placeholder {
+  color: #111827 !important;
+  /* text-gray-900 jaisa dark color */
+  opacity: 1 !important;
+  font-weight: 500 !important;
+  /* Agar font weight barhana ho */
+}
+
+.ant-select-selector {
+  background-color: white;
+  border: 2px;
+  border-radius: 8px;
+  border-color:rgb(229 231 235 / 1) ↳ #e5e7eb (229 231 235 / var(--tw-border-opacity, 1));
+  ;
 }
