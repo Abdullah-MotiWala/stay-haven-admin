@@ -1,29 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  createHotel,
-  getHotelById,
-  getHotelNamesList,
-  lastHotelId,
-  updateHotel,
-} from "../../../services/hotel";
+import { getHotelNamesList } from "../../../services/hotel";
 import { DEFAULT_IMAGE, STETPS_FIELDS } from "../../../shared/constant";
-import { CloudUpload, FileText, Eye, Trash2 } from "lucide-react";
 
 import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
-import { Form, Input, Select, Checkbox, Steps, Button } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Checkbox,
+  Steps,
+  Button,
+  Avatar,
+  Upload,
+} from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
-import eye from "../../../assets/icons/eye.png";
-import { createRoom, getById, updateRoom } from "../../../services/rooms";
-const AddNewRoom = () => {
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
+import editIcon from "../../../assets/icons/editIcon.svg";
+
+// import { createRoom, getById, updateRoom } from "../../../services/rooms";
+import {
+  createAppartment,
+  getById,
+  updateAppartment,
+} from "../../../services/appartments";
+const AddNewAppartment = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const [form] = Form.useForm();
-  const { Step } = Steps;
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -58,31 +66,31 @@ const AddNewRoom = () => {
   useEffect(() => {
     if (!isEditMode) return;
 
-    const fetchRoomById = async () => {
+    const fetchAppartmentById = async () => {
       setFetching(true);
       try {
-        const res = await getById(id); 
-        const room = res.data;
-        console.log(room,"roomroomroom223423")
+        const res = await getById(id);
+        const appartment = res.data.data;
+        console.log(appartment, "appartmentappartment");
 
         form.setFieldsValue({
-          name: room.roomName || "",
-          roomNumber: room.roomNumber || "",
-          type: room.type || "",
-          bedType: room.bedType || "",
-          roomSize: room.roomSize || "",
-          maxAdults: room.maxAdults || 1,
-          maxChildren: room.maxChildren || 0,
-          pricePerNight: room.pricePerNight || 0.0,
-          status: room.status || "available", 
-          description: room.description || "",
-          mainImage: room.mainImage || "",
-          galleryImages: room.galleryImages || [], 
-          hotel: room.hotel?.id,
-          // featureIds: room.featureIds || [],
-          facility: room.features?.map((a) => a.id) || [],
-          amenities: room.features?.map((r) => r.id) || [],
-          features: room.features?.map((r) => r.id) || [],
+          name: appartment.apartmentName || "",
+          appartmentNumber: appartment.apartmentNumber || "",
+          type: appartment.type || "",
+          bedType: appartment.bedType || "",
+          roomSize: appartment.appartmentSize || "",
+          maxAdults: appartment.maxAdults || 1,
+          maxChildren: appartment.maxChildren || 0,
+          pricePerNight: appartment.pricePerNight || 0.0,
+          status: appartment.status || "available",
+          description: appartment.description || "",
+          mainImage: appartment.mainImage || "",
+          galleryImages: appartment.galleryImages || [],
+          hotel: appartment.hotel?.id,
+          // featureIds: appartment.featureIds || [],
+          facility: appartment.features?.map((a) => a.id) || [],
+          amenities: appartment.features?.map((r) => r.id) || [],
+          features: appartment.features?.map((r) => r.id) || [],
         });
       } catch (err) {
         openNotification("error", "Failed to load hotel");
@@ -91,7 +99,7 @@ const AddNewRoom = () => {
       }
     };
 
-    fetchRoomById();
+    fetchAppartmentById();
   }, [id, isEditMode, form]);
 
   useEffect(() => {
@@ -126,36 +134,59 @@ const AddNewRoom = () => {
   const onBack = () => {
     setCurrentStep(currentStep - 1);
   };
+
   const handleSubmit = async (values) => {
     setLoading(true);
 
     const payload = {
-      roomName: values.name,
-      roomNumber: values.roomNumber,
+      apartmentName: values.name,
+      apartmentNumber: values.appartmentNumber,
       hotelId: values.hotel,
       type: values.type,
       bedType: values.bedType,
-      roomSize: values.roomSize,
+      apartmentSize: values.appartmentSize,
       maxAdults: values.guests,
       maxChildren: values.childrens,
       description: values.description,
       pricePerNight: Number(values.pricePerNight),
       status: values.status,
       featureIds: [...values.features, ...values.amenities, ...values.facility],
+      hostName: values.hostname,
+      hostEmail: values.email,
+      hostPhone: values.phoneNumber,
+      hostImage: "https://ui-avatars.com/api/?name=Abdullah+Khan",
     };
 
-
     try {
+      let res;
+
       if (isEditMode) {
-        await updateRoom(id, payload);
-        openNotification("success", "Room updated successfully");
+        res = await updateAppartment(id, payload);
       } else {
-        await createRoom(payload);
-        openNotification("success", "Room created successfully");
+        res = await createAppartment(payload);
       }
-      // setIsModalOpen(true);
+
+      if (res?.status !== 200 && res?.status !== 201) {
+        throw new Error("API failed");
+      }
+
+      openNotification(
+        "success",
+        isEditMode
+          ? "Appartment updated successfully"
+          : "Appartment created successfully",
+      );
+
+      setIsModalOpen(true);
     } catch (err) {
-      openNotification("error", "Internal Server Error");
+      console.error(err);
+
+      openNotification(
+        "error",
+        err?.response?.data?.message || "Internal Server Error",
+      );
+
+      return;
     } finally {
       setLoading(false);
     }
@@ -163,7 +194,7 @@ const AddNewRoom = () => {
 
   const steps = [
     {
-      title: "Room Details",
+      title: "Appartment Details",
       content: (
         <>
           <div>
@@ -183,19 +214,19 @@ const AddNewRoom = () => {
 
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditMode ? "Edit Room" : "Add New Room"}
+              {isEditMode ? "Edit Appartment" : "Add New Appartment"}
             </h1>
             <p className="text-lg text-darkGray font-medium">
               {isEditMode
-                ? "Fill in the details below to edit a  room to your hotel inventory."
-                : "Fill in the details below to add a new room to your hotel inventory."}
+                ? "Fill in the details below to edit a  appartment to your hotel inventory."
+                : "Fill in the details below to add a new appartment to your hotel inventory."}
             </p>
           </div>
 
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 ">
             <div className="px-6 py-4 mb-6 ">
               <h2 className="text-lg font-semibold text-black  ">
-                Room Details
+                Appartment Details
               </h2>
               <hr />
             </div>
@@ -203,14 +234,17 @@ const AddNewRoom = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">
-                    Room Name
+                    Appartment Name
                   </label>
                   <Form.Item
                     preserve={true}
                     name="name"
                     label=""
                     rules={[
-                      { required: true, message: "Room Name is required" },
+                      {
+                        required: true,
+                        message: "appartment Name is required",
+                      },
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
@@ -228,19 +262,22 @@ const AddNewRoom = () => {
 
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">
-                    Room Number
+                    Appartment Number
                   </label>
 
                   <Form.Item
                     preserve={true}
-                    name="roomNumber"
+                    name="appartmentNumber"
                     rules={[
-                      { required: true, message: "Room Number  is required" },
+                      {
+                        required: true,
+                        message: "Appartment Number  is required",
+                      },
                     ]}
                   >
                     <Input
                       className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                      placeholder="Enter room number"
+                      placeholder="Enter appartment number"
                     />
                   </Form.Item>
                 </div>
@@ -255,7 +292,10 @@ const AddNewRoom = () => {
                     name="hotel"
                     label=""
                     rules={[
-                      { required: true, message: "Room Name is required" },
+                      {
+                        required: true,
+                        message: "Appartment Name is required",
+                      },
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
@@ -270,7 +310,7 @@ const AddNewRoom = () => {
 
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">
-                    Room Type
+                    Appartment Type
                   </label>
 
                   <Form.Item
@@ -278,14 +318,26 @@ const AddNewRoom = () => {
                     name="type"
                     label=""
                     rules={[
-                      { required: true, message: "Room Type is required" },
+                      {
+                        required: true,
+                        message: "Appartment Type is required",
+                      },
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {[
-                        { label: "Single Bed Room", value: "one bed room" },
-                        { label: "Double Bed Room", value: "two bed room" },
-                        { label: "Three Bed Room", value: "three bed room" },
+                        {
+                          label: "Single Bed Appartment",
+                          value: "single room",
+                        },
+                        {
+                          label: "Double Bed Appartment",
+                          value: "Two Bed Rooms",
+                        },
+                        {
+                          label: "Three Bed Appartment",
+                          value: "three bed appartment",
+                        },
                         { label: "Luxury Suits", value: "luxury suits" },
                       ].map((item) => (
                         <Option key={item.value} value={item.value}>
@@ -324,14 +376,17 @@ const AddNewRoom = () => {
                 </div>
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">
-                    Room Size
+                    Appartment Size
                   </label>
                   <Form.Item
                     preserve={true}
-                    name="roomSize"
+                    name="appartmentSize"
                     label=""
                     rules={[
-                      { required: true, message: "Room Size is required" },
+                      {
+                        required: true,
+                        message: "Appartment Size is required",
+                      },
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
@@ -356,9 +411,7 @@ const AddNewRoom = () => {
                     preserve={true}
                     name="guests"
                     label=""
-                    rules={[
-                      { required: true, message: "Room Size is required" },
-                    ]}
+                    rules={[{ required: true, message: "guest is required" }]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {[
@@ -388,7 +441,7 @@ const AddNewRoom = () => {
                     name="childrens"
                     label=""
                     rules={[
-                      { required: true, message: "Room Size is required" },
+                      { required: true, message: "childern is required" },
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
@@ -414,7 +467,7 @@ const AddNewRoom = () => {
               <div>
                 <div className="w-full ">
                   <label className="text-base text-lightSeconday font-medium">
-                    Room Description
+                    Appartment Description
                   </label>
 
                   <Form.Item
@@ -423,7 +476,7 @@ const AddNewRoom = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Room Description is required",
+                        message: "Appartment Description is required",
                       },
                     ]}
                   >
@@ -490,7 +543,7 @@ const AddNewRoom = () => {
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 font-sans overflow-hidden">
             <div className="px-6 py-3 border-b border-gray-100">
               <h2 className="text-[18px] mb-0 font-semibold text-gray-900">
-                Room Images
+                Appartment Images
               </h2>
             </div>
 
@@ -499,7 +552,7 @@ const AddNewRoom = () => {
                 {/* LEFT: Main Image Section */}
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-gray-900">
-                    Upload Room (Main) image
+                    Upload Appartment (Main) image
                   </label>
                   <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
                     <div className="flex justify-center mt-4">
@@ -637,7 +690,7 @@ const AddNewRoom = () => {
             </button>
 
             <button
-              // type="submit"
+              type="button"
               onClick={onNext}
               // disabled={loading}
               className="px-10 py-2 bg-blue text-white rounded-md"
@@ -670,12 +723,12 @@ const AddNewRoom = () => {
 
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditMode ? "Edit Room" : "Add New Room"}
+              {isEditMode ? "Edit Appartment" : "Add New Appartment"}
             </h1>
             <p className="text-lg text-darkGray font-medium">
               {isEditMode
-                ? "Fill in the details below to edit a  room to your hotel inventory."
-                : "Fill in the details below to add a new room to your hotel inventory."}
+                ? "Fill in the details below to edit a  appartment to your hotel inventory."
+                : "Fill in the details below to add a new appartment to your hotel inventory."}
             </p>
           </div>
 
@@ -683,12 +736,14 @@ const AddNewRoom = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
               <div className="px-6 py-4  ">
                 <h2 className="text-lg font-semibold text-black  ">
-                  Room Features
+                  Appartment Features
                 </h2>
                 <hr />
               </div>
               <div className="p-6 px-36 pb-14">
-                <h3 className="font-semibold mb-4">Select Room Features</h3>
+                <h3 className="font-semibold mb-4">
+                  Select Appartment Features
+                </h3>
                 <Form.Item
                   preserve={true}
                   name="features"
@@ -773,12 +828,14 @@ const AddNewRoom = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
               <div className="px-6 py-4  ">
                 <h2 className="text-lg font-semibold text-black  ">
-                  Room Facilities
+                  Appartment Facilities
                 </h2>
                 <hr />
               </div>
               <div className="p-6 px-36 pb-14">
-                <h3 className="font-semibold mb-4">Select Room Facilities</h3>
+                <h3 className="font-semibold mb-4">
+                  Select Appartment Facilities
+                </h3>
                 <Form.Item
                   preserve={true}
                   name="facility"
@@ -815,6 +872,133 @@ const AddNewRoom = () => {
                 </Form.Item>
               </div>
             </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
+              <div className="px-6 py-4  ">
+                <h2 className="text-lg font-semibold text-black  ">
+                  Host Details
+                </h2>
+                <hr />
+              </div>
+              <div className="max-w-4xl mx-auto bg-white  rounded-lg">
+                {/* <div className="flex items-center gap-4 mb-8">
+                  <div className="relative">
+                    <Avatar
+                      size={64}
+                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                    />
+                    <Upload showUploadList={false}>
+                      <div className="absolute bottom-0 right-0 bg-blue-600 w-5 h-5 rounded-full flex items-center justify-center cursor-pointer">
+                        <EditOutlined className="text-white text-xs" />
+                      </div>
+                    </Upload>
+                  </div>
+
+                  <div>
+                    <p className="text-blue-600 font-medium cursor-pointer">
+                      Upload Profile image
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Make sure face is clear
+                    </p>
+                  </div>
+                </div> */}
+                <div className="flex items-center gap-10 mb-14 ">
+                  <div className="relative">
+                    <Avatar
+                      size={120}
+                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                    />
+                    <Upload showUploadList={false}>
+                      <div className="absolute bottom-3 right-2 bg-blue-600  rounded-full flex items-center justify-center cursor-pointer p-1 bg-blue">
+                        {/* <EditOutlined className="text-white text-xs" /> */}
+                        <img
+                          src={editIcon}
+                          alt="Edit Icon"
+                          className="editIconImg"
+                        />
+                      </div>
+                    </Upload>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-blue line-clamp-0">
+                      Upload Profile image
+                    </h2>
+                    <p className="text-lightSeconday">
+                      Make sure face is clear
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="w-full ">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Host Name
+                    </label>
+
+                    <Form.Item
+                      preserve={true}
+                      name="hostname"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Host Name is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                        placeholder="Enter host name"
+                      />
+                    </Form.Item>
+                  </div>
+
+                  <div className="w-full ">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Email
+                    </label>
+
+                    <Form.Item
+                      preserve={true}
+                      name="email"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Email is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                        placeholder="Enter email"
+                      />
+                    </Form.Item>
+                  </div>
+
+                  <div className="w-full ">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Phone Number
+                    </label>
+
+                    <Form.Item
+                      preserve={true}
+                      name="phoneNumber"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Phone Number is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                        placeholder="Enter phone number"
+                        // addonBefore="+92"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -828,13 +1012,14 @@ const AddNewRoom = () => {
 
             <button
               htmlType="submit"
-              // onClick={onNext}
-              // disabled={loading}
+              disabled={loading}
               className="px-10 py-2 bg-blue text-white rounded-md"
             >
-              {/* {loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Room"} */}
-              {/* Next */}
-              saving
+              {loading
+                ? "Saving..."
+                : isEditMode
+                  ? "Save Changes"
+                  : "Add Apartment"}
             </button>
           </div>
         </>
@@ -857,9 +1042,9 @@ const AddNewRoom = () => {
         layout="vertical"
         initialValues={{
           name: "Deluxe",
-          type: "Single Bed Room",
+          type: "single room",
           bedType: "Single Bed",
-          roomSize: "e.g. 25 m²",
+          appartmentSize: "e.g. 25 m²",
           guests: "1",
           childrens: "1",
           status: "available",
@@ -886,21 +1071,20 @@ const AddNewRoom = () => {
         <>
           <SuccessModal
             open={true}
-            // onClose={() => setIsModalOpen(false)}
-            onClose={() => navigate("/admin/rooms")}
+            onClose={() => navigate("/admin/appartments")}
             title={
               !isEditMode
-                ? "Room Added Successfully!"
-                : "Room Updated Successfully!"
+                ? "Appartment Added Successfully!"
+                : "Appartment Updated Successfully!"
             }
             description={
               !isEditMode
-                ? "The Room has been added successfully."
-                : "The Room has been updated successfully."
+                ? "The Appartment has been added successfully."
+                : "The Appartment has been updated successfully."
             }
             showButton
-            buttonText="View Rooms"
-            onButtonClick={() => navigate("/admin/rooms")}
+            buttonText="View Appartment"
+            onButtonClick={() => navigate("/admin/appartments")}
           />
         </>
       )}
@@ -908,4 +1092,4 @@ const AddNewRoom = () => {
   );
 };
 
-export default AddNewRoom;
+export default AddNewAppartment;

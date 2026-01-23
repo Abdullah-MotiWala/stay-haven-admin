@@ -8,14 +8,15 @@ import calendarIcon from "../../assets/icons/Calendar.png";
 import headPhone from "../../assets/icons/headPhone.png";
 import search from "../../assets/icons/search.svg";
 
-import { DEFAULT_IMAGE } from "../../shared/constant";
+import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
 import { Input } from "antd";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isRoomPage = location.pathname === "/admin/rooms";
+
+  const currentConfig = PAGE_CONFIG[location.pathname];
 
   return (
     <header className="w-full px-3 ">
@@ -23,24 +24,31 @@ const Navbar = () => {
         className="flex items-center justify-between
         bg-transparent  py-3"
       >
-      
-          <div className="w-96">
-            <Input
-              placeholder="Search"
-              prefix={<img src={search} className="w-4 h-4" />}
-              className="searchInput w-full p-2 border border-lightSeconday rounded-xl font-medium"
-            />
-          </div>
+        <div className="w-96">
+          <Input
+            placeholder="Search"
+            prefix={<img src={search} className="w-4 h-4" />}
+            className="searchInput w-full p-2 border border-lightSeconday rounded-xl font-medium"
+          />
+        </div>
 
         <div className="flex items-center   ">
-          <button
+          {/* <button
             onClick={() =>
               navigate(isRoomPage ? "/admin/rooms/add" : "/admin/hotel/add")
             }
             className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
           >
             {isRoomPage ? "Add New Room" : "Add New Hotel"}
-          </button>
+          </button> */}
+          {currentConfig && (
+            <button
+              onClick={() => navigate(currentConfig.navigateTo)}
+              className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
+            >
+              {currentConfig.buttonText}
+            </button>
+          )}
 
           <div className="hidden md:flex items-center gap-2 bg-white px-4 py-2.5 rounded-full text-sm text-lightDark font-medium shadow-sm border border-white/50">
             <img src={calendarIcon ?? DEFAULT_IMAGE} alt="themeIcon" />

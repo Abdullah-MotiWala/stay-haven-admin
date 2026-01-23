@@ -66,6 +66,9 @@ div[style*="background: green"] {
 .sidebar-menu .ant-menu-item-selected img {
   filter: brightness(0) invert(1);
 }
+.editIconImg {
+  filter: brightness(0) invert(1)
+}
 
 .logout-btn {
   border: 1px solid;
@@ -83,6 +86,7 @@ a :hover {
 .ant-checkbox-checked .ant-checkbox-inner {
   color: #000000;
   background-color: #8b0002;
+  border-color: #8b0002;
 }
 .ant-checkbox-checked .ant-checkbox-inner:hover {
   color: #000000;

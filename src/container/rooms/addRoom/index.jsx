@@ -61,9 +61,9 @@ const AddNewRoom = () => {
     const fetchRoomById = async () => {
       setFetching(true);
       try {
-        const res = await getById(id); 
+        const res = await getById(id);
         const room = res.data;
-        console.log(room,"roomroomroom223423")
+        console.log(room, "roomroomroom223423");
 
         form.setFieldsValue({
           name: room.roomName || "",
@@ -74,10 +74,10 @@ const AddNewRoom = () => {
           maxAdults: room.maxAdults || 1,
           maxChildren: room.maxChildren || 0,
           pricePerNight: room.pricePerNight || 0.0,
-          status: room.status || "available", 
+          status: room.status || "available",
           description: room.description || "",
           mainImage: room.mainImage || "",
-          galleryImages: room.galleryImages || [], 
+          galleryImages: room.galleryImages || [],
           hotel: room.hotel?.id,
           // featureIds: room.featureIds || [],
           facility: room.features?.map((a) => a.id) || [],
@@ -145,16 +145,33 @@ const AddNewRoom = () => {
     };
 
     try {
+      let res;
+
       if (isEditMode) {
-        await updateRoom(id, payload);
-        openNotification("success", "Room updated successfully");
+        res = await updateRoom(id, payload);
       } else {
-        await createRoom(payload);
-        openNotification("success", "Room created successfully");
+        res = await createRoom(payload);
       }
-      // setIsModalOpen(true);
+
+      if (![200, 201].includes(res?.status)) {
+        throw new Error("API failed");
+      }
+
+      openNotification(
+        "success",
+        isEditMode ? "Room updated successfully" : "Room created successfully",
+      );
+
+      setIsModalOpen(true);
     } catch (err) {
-      openNotification("error", "Internal Server Error");
+      console.error(err);
+
+      openNotification(
+        "error",
+        err?.response?.data?.message || "Internal Server Error",
+      );
+
+      return;
     } finally {
       setLoading(false);
     }
@@ -828,12 +845,12 @@ const AddNewRoom = () => {
             <button
               htmlType="submit"
               // onClick={onNext}
-              // disabled={loading}
+              disabled={loading}
               className="px-10 py-2 bg-blue text-white rounded-md"
             >
-              {/* {loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Room"} */}
+              {loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Room"}
               {/* Next */}
-              saving
+              {/* saving */}
             </button>
           </div>
         </>

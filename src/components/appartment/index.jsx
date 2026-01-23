@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { roomTypes } from "../../container/data/rooms";
-import RoomCard from "../RoomCard";
-import RoomDetail from "../roomDetail";
+import ApparmentCard from "./appartmentCard";
+import AppartmentDetail from "./appartmentDetail";
 import filter from "../../assets/icons/filter.png";
 import MatrixCard from "../MatrixCard";
 import home from "../../assets/icons/home.png";
@@ -9,22 +8,29 @@ import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getAllRooms, getStats, deleteRoom } from "../../services/rooms";
+import {
+  getAllApartments,
+  getStats,
+  deleteAppartment,
+} from "../../services/appartments";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
-import { ENTIRES_PER_PAGE_OPTION, ROOM_TYPES } from "../../shared/constant";
+import {
+  APPARTMENT_TYPES,
+  ENTIRES_PER_PAGE_OPTION,
+} from "../../shared/constant";
 
-export default function Rooms() {
-  const [activeType, setActiveType] = useState("All Rooms");
-  const [selectedRoom, setSelectedRoom] = useState(null);
+export default function Appartments() {
+  const [activeType, setActiveType] = useState("All Apartments");
+  const [selectedAppartment, setSelectedAppartment] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
-  const [roomsdata, setRooms] = useState([]);
+  const [appartmentData, setAppartmentsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(true);
   const [stats, setStats] = useState(null);
@@ -38,16 +44,16 @@ export default function Rooms() {
 
   const fetchData = async () => {
     try {
-      const res = await getAllRooms(
+      const res = await getAllApartments(
         currentPage,
         itemsPerPage,
         status,
         search,
         sort,
-        activeType,
+        activeType === "All Apartments" ? "All" : activeType
       );
       console.log(res?.data, "res?.data");
-      setRooms(res?.data, "rooms data");
+      setAppartmentsData(res?.data);
       setRefresh(false);
       setLoading(true);
     } catch (err) {
@@ -55,16 +61,14 @@ export default function Rooms() {
     }
   };
   useEffect(() => {
-    console.log("UseEffect Run Times");
-
     fetchData();
-  }, [currentPage, itemsPerPage, search, activeType]);
+  }, [currentPage, itemsPerPage, search,activeType]);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await getStats();
-        console.log(res.data, "Rooms===");
-        setStats(res.data);
+        setStats(res?.data?.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -77,8 +81,10 @@ export default function Rooms() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
       try {
-        await deleteRoom(id);
-        setRooms(roomsdata?.data.filter((room) => room.id !== id));
+        await deleteAppartment(id);
+        setAppartmentsData(
+          appartmentData?.data.filter((appart) => appart.id !== id),
+        );
         openNotification("success", "Hotel deleted successfully");
       } catch (err) {
         console.error("Any Problem in deleteing", err);
@@ -87,10 +93,12 @@ export default function Rooms() {
     }
   };
 
+  console.log(stats, "stats1231");
+
   const cardsData = [
     {
-      title: "Total Rooms",
-      value: stats?.totalRooms,
+      title: "Total appartments",
+      value: stats?.totalApartments,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
@@ -100,21 +108,21 @@ export default function Rooms() {
     },
     {
       title: "Available",
-      value: stats?.availableRooms,
+      value: stats?.availableApartments,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: home2,
     },
     {
       title: "Occupied",
-      value: stats?.occupiedRooms,
+      value: stats?.rentedApartments,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: home3,
     },
     {
       title: "Maintenance",
-      value: stats?.maintenanceRooms,
+      value: stats?.maintenanceApartments,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: home4,
@@ -125,14 +133,12 @@ export default function Rooms() {
     setCurrentPage(page);
     setItemsPerPage(pageSize);
   };
-
-  console.log(activeType, "activeTypeactiveType");
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} />
 
       <div className="p-0 ml-3 gap-[2px] inline-flex   overflow-hidden rounded-lg">
-        {ROOM_TYPES.map((type, index) => (
+        {APPARTMENT_TYPES.map((type, index) => (
           <button
             key={type}
             onClick={() => setActiveType(type)}
@@ -146,7 +152,7 @@ export default function Rooms() {
             : "bg-white text-extradark hover:bg-gray-50"
         }
         ${index === 0 ? "" : ""}
-        ${index === ROOM_TYPES.length - 1 ? "" : ""}
+        ${index === APPARTMENT_TYPES.length - 1 ? "" : ""}
       `}
           >
             {type}
@@ -158,7 +164,7 @@ export default function Rooms() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <h2 className="font-semibold text-[#000000] text-lg">
-              All Rooms ({roomsdata?.data?.length})
+              All Appartments ({appartmentData?.data?.length})
             </h2>
             <div className="flex justify-between items-center bg-white ">
               <div className="max-w-96">
@@ -222,55 +228,53 @@ export default function Rooms() {
             )}
 
             <div>
-              {roomsdata?.data?.length > 0 ? (
-                <>
-                  <div className="space-y-4">
-                    {roomsdata.data.map((room) => (
-                      <RoomCard
-                        key={room.id}
-                        room={room}
-                        active={selectedRoom?.id === room.id}
-                        onClick={() => setSelectedRoom(room)}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="mt-4 flex justify-between">
-                    <div>
-                      <Select
-                        defaultValue={10}
-                        className="text-black"
-                        onChange={(value) => setItemsPerPage(value)}
-                        options={ENTIRES_PER_PAGE_OPTION.map((option) => ({
-                          label: option,
-                          value: option,
-                        }))}
-                      />
-                      <span className="text-lightSeconday ml-4">
-                        Entries per page
-                      </span>
-                    </div>
-
-                    <Pagination
-                      current={currentPage}
-                      total={roomsdata?.meta?.totalItems || 0}
-                      pageSize={itemsPerPage}
-                      onChange={onPageChange}
-                      className="flex justify-end"
+              <div className="space-y-4">
+                {appartmentData?.data?.length > 0 ? (
+                  appartmentData.data.map((appart) => (
+                    <ApparmentCard
+                      key={appart.id}
+                      data={appart}
+                      active={selectedAppartment?.id === appart.id}
+                      onClick={() => setSelectedAppartment(appart)}
                     />
+                  ))
+                ) : (
+                  <div className="text-center text-gray-400 py-10">
+                    No data found
                   </div>
-                </>
-              ) : (
-                <div className="py-16 text-center text-gray-400 font-medium">
-                  No data found
+                )}
+              </div>
+
+              <div className="mt-4 flex justify-between">
+                <div>
+                  <Select
+                    defaultValue={10}
+                    className="text-black"
+                    onChange={(value) => setItemsPerPage(value)}
+                    options={ENTIRES_PER_PAGE_OPTION.map((option) => ({
+                      label: option,
+                      value: option,
+                    }))}
+                  />
+                  <span className="text-lightSeconday ml-4">
+                    Entries per page
+                  </span>
                 </div>
-              )}
+
+                <Pagination
+                  current={currentPage}
+                  total={appartmentData?.meta?.totalItems || 0}
+                  pageSize={itemsPerPage}
+                  onChange={onPageChange}
+                  className="flex justify-end"
+                />
+              </div>
             </div>
           </div>
 
           <div className="lg:sticky lg:top-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
-              {!selectedRoom ? (
+              {!selectedAppartment ? (
                 <div className="flex flex-col items-center justify-center h-[500px] p-6 text-center">
                   <div className="bg-gray-50 p-4 rounded-full mb-4">
                     <svg
@@ -288,14 +292,14 @@ export default function Rooms() {
                     </svg>
                   </div>
                   <p className="text-gray-500 font-medium">
-                    Select a room to see details
+                    Select a appartment to see details
                   </p>
                   <p className="text-gray-400 text-sm mt-1">
                     Click on any card from the list
                   </p>
                 </div>
               ) : (
-                <RoomDetail room={selectedRoom} />
+                <AppartmentDetail data={selectedAppartment} />
               )}
             </div>
           </div>

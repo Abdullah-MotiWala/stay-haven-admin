@@ -1,6 +1,34 @@
 export const DEFAULT_IMAGE = "https://placehold.net/default.png";
 export const BASE_HOTEL_CODE = 301;
-export const ENTIRES_PER_PAGE_OPTION  = [10, 20, 30, 40];
+export const ENTIRES_PER_PAGE_OPTION = [10, 20, 30, 40];
+export const APPARTMENT_TYPES = [
+  "All Apartments",
+  "Single Bed",
+  "Double Bed",
+  "Three Bed",
+  "Luxury Suites",
+];
+export const ROOM_TYPES = [
+  "All Rooms",
+  "one Bed Room",
+  "two Bed Room",
+  "Three Bed Room",
+  "Luxury Suites",
+];
+export const PAGE_CONFIG = {
+  "/admin/rooms": {
+    buttonText: "Add New Room",
+    navigateTo: "/admin/rooms/add",
+  },
+  "/admin/appartments": {
+    buttonText: "Add New Appartment",
+    navigateTo: "/admin/appartments/add",
+  },
+  "/admin/hotels": {
+    buttonText: "Add New Hotel",
+    navigateTo: "/admin/hotel/add",
+  },
+};
 
 export const STETPS_FIELDS = {
   0: [
@@ -19,10 +47,9 @@ export const STETPS_FIELDS = {
   1: ["features", "amenities", "facility"],
 };
 
-
 export const ENVIRONMENTS = {
   DEVELOPMENT: "development",
-  PRODUCTION: "production"
+  PRODUCTION: "production",
 };
 export const DISPUTE_TYPES = [
   { label: "General", value: "general" },
@@ -59,5 +86,4 @@ export const SideBarMenuList = [
     langLabel: "users",
     icon: "Test",
   },
-
 ];

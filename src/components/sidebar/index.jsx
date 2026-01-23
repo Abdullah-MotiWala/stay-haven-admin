@@ -42,7 +42,7 @@ const menuItems = [
   {
     key: "/admin/appartments",
     icon: <img src={appartmentIcon} className={iconStyle} alt="appartments" />,
-    label: <Link to="/admin/apparments">Appartments</Link>,
+    label: <Link to="/admin/appartments">Appartments</Link>,
   },
   {
     key: "/admin/bookings",

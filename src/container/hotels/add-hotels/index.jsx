@@ -24,13 +24,12 @@ const HotelForm = () => {
   const [amenitiesList, setAmenitiesList] = useState([]);
   const [roomsList, setRoomsList] = useState([]);
   const [hotel, setHotel] = useState([]);
-
   const [lastId, setLastId] = useState(null);
-
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
 
   const { Option } = Select;
+  const isDisabled = true;
 
   useEffect(() => {
     const fetchLastId = async () => {
@@ -54,6 +53,7 @@ const HotelForm = () => {
       try {
         const res = await getHotelById(id);
         const hotel = res.data;
+        console.log(hotel.status,"hotel.statushotel.status")
         setHotel(hotel);
         form.setFieldsValue({
           name: hotel.name,
@@ -61,7 +61,7 @@ const HotelForm = () => {
           address: hotel.address,
           email: hotel.email,
           cancellation_policy: hotel.cancellation_policy,
-          status: hotel.status,
+          isActive: hotel.status,
           amenities: hotel.amenities?.map((a) => a.id) || [],
           rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
         });
@@ -75,7 +75,7 @@ const HotelForm = () => {
     fetchHotel();
   }, [id, isEditMode, form]);
 
-  console.log(hotel.hotelId,"hotelhotel")
+  console.log(hotel.hotelId, "hotelhotel");
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -197,8 +197,18 @@ const HotelForm = () => {
                     Hotel ID
                   </span>
                 </div>
-                <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
-                  <span className="py-2">{isEditMode ? hotel.hotelId : lastId?.nextNumericId}</span>
+                <div
+                  className={`w-24 text-center border py-2 rounded-md
+    ${
+      isDisabled
+        ? "bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none"
+        : "border-havengray text-black"
+    }
+  `}
+                >
+                  <span className="select-none">
+                    {isEditMode ? hotel.hotelId : lastId?.nextNumericId}
+                  </span>
                 </div>
               </div>
             </div>

@@ -11,6 +11,8 @@ import Booking from "../../container/booking";
 import BookingView from "../../container/booking/bookingView";
 import AddBooking from "../../container/booking/addBooking";
 import AddNewRoom from "../../container/rooms/addRoom";
+import Appartments from "../../container/appartment";
+import AddNewAppartment from "../../container/appartment/addAppartment";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -19,22 +21,23 @@ export const AdminRoute = [
       {
         element: <AdminLayout />,
         children: [
-          // { path: "hotels", element: <hotels /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
           { path: "hotel/edit/:id", element: <AddHotel /> },
           { path: "hotel/view/:id", element: <HotelView /> },
-          { path: "rooms/edit/:id", element: <AddNewRoom /> },
-          { path: "rooms/add", element: <AddNewRoom /> },
-
-          { path: "rooms/addnext", element: <AddRooms /> },
+          
           { path: "rooms", element: <Room /> },
+          { path: "rooms/add", element: <AddNewRoom /> },
+          { path: "rooms/edit/:id", element: <AddNewRoom /> },
+          
+          { path: "appartments", element: <Appartments /> },
+          { path: "appartments/add", element: <AddNewAppartment /> },
+          { path: "appartment/edit/:id", element: <AddNewAppartment /> },
+
           { path: "booking", element: <Booking /> },
           { path: "booking/view/:id", element: <BookingView /> },
           { path: "booking/add", element: <AddBooking /> },
 
-          // {path:"tickets" , element:<Ticket/>},
-          // {path:"ticket/view" ,element:<TicketView/>}
         ],
       },
     ],
