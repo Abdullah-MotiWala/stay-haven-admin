@@ -24,6 +24,7 @@ const HotelDirectory = ({
   onlyFilter,
   path,
   checkbox,
+  activeType,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -32,7 +33,7 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
-
+  
 
   // Filter State
   const [filters, setFilters] = useState({
@@ -406,7 +407,7 @@ const HotelDirectory = ({
               {/* Select Room - Ant Design */}
               <div className="relative ant-select-custom">
                 <Select
-                  placeholder="Select Room"
+                  placeholder={activeType === "Apartment Bookings" ? "Select Apartment" : "Select Room"}
                   value={filters.roomType || undefined}
                   onChange={(val) => handleFilterChange("roomType", val)}
                   className="w-full h-[50px] custom-antd-select"
@@ -575,23 +576,16 @@ const HotelDirectory = ({
   `}
                   >
                     {checkbox && (
-                         <td className="border-b border-t border-r border-dashed">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(row.id)}
-                        onChange={() => toggleRow(row.id)}
-                        className="checked:accent-blue"
-                      />
-                    </td>
+                      <td className="border-b border-t border-r border-dashed">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(row.id)}
+                          onChange={() => toggleRow(row.id)}
+                          className="checked:accent-blue"
+                        />
+                      </td>
                     )}
-                    <td className="border-b border-t border-r border-dashed">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(row.id)}
-                        onChange={() => toggleRow(row.id)}
-                        className="checked:accent-blue"
-                      />
-                    </td>
+
 
                     {columns.map((col) => (
                       <td
