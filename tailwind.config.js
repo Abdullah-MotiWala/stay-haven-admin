@@ -5,7 +5,6 @@ module.exports = {
       colors: {
         primary: "#1677ff",
         mainPrimary: "#8B0002",
-        
         secondary: "#6366f1",
         accent: "#f59e0b",
         dark: "#1f2937",
@@ -33,9 +32,22 @@ module.exports = {
         red: "#E21C26",
         lightDark: "#172025",
         lightWhite:"#F1F3F57A",
-        havenLight:"#E9E9E9"
+        havenLight:"#E9E9E9",
+        inpgray: "#F9F9F9",
+        inpgraysecondary: "#F9FAFC",
+        darkgrayline: "#BBBBBB"
+
+      },
+      fontSize: {
+        '18': '18px',
+        '14': "14px",
+        '13': '13px',
+        '15': '15px',
+        "24": "24px",
+        "90": "90px",
+        "52p": "52px"
       },
     },
-  },
-  plugins: [],
-};
+    plugins: [],
+  }
+}

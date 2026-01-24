@@ -1,6 +1,7 @@
 export const DEFAULT_IMAGE = "https://placehold.net/default.png";
 export const BASE_HOTEL_CODE = 301;
 export const ENTIRES_PER_PAGE_OPTION = [10, 20, 30, 40];
+
 export const APPARTMENT_TYPES = [
   "All Apartments",
   "Single Bed",
@@ -8,6 +9,7 @@ export const APPARTMENT_TYPES = [
   "Three Bed",
   "Luxury Suites",
 ];
+
 export const ROOM_TYPES = [
   "All Rooms",
   "one Bed Room",
@@ -15,6 +17,7 @@ export const ROOM_TYPES = [
   "Three Bed Room",
   "Luxury Suites",
 ];
+
 export const PAGE_CONFIG = {
   "/admin/rooms": {
     buttonText: "Add New Room",
@@ -27,6 +30,10 @@ export const PAGE_CONFIG = {
   "/admin/hotels": {
     buttonText: "Add New Hotel",
     navigateTo: "/admin/hotel/add",
+  },
+  "/admin/bookings": {
+    buttonText: "Add New Booking",
+    navigateTo: "/admin/booking/add",
   },
 };
 

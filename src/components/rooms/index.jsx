@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { roomTypes } from "../../container/data/rooms";
+// import { roomTypes } from "../../container/data/rooms";
 import RoomCard from "../RoomCard";
 import RoomDetail from "../roomDetail";
 import filter from "../../assets/icons/filter.png";

@@ -34,9 +34,10 @@ export const AdminRoute = [
           { path: "appartments/add", element: <AddNewAppartment /> },
           { path: "appartment/edit/:id", element: <AddNewAppartment /> },
 
-          { path: "booking", element: <Booking /> },
+          { path: "bookings", element: <Booking /> },
           { path: "booking/view/:id", element: <BookingView /> },
           { path: "booking/add", element: <AddBooking /> },
+          { path: "booking/edit/:id", element: <AddBooking /> },
 
         ],
       },

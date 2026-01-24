@@ -70,6 +70,20 @@ div[style*="background: green"] {
   filter: brightness(0) invert(1)
 }
 
+.sidebar-menu .ant-menu-item-selected {
+  background-color: #8b0002 !important;
+  color: white !important;
+  /* Figma Blue */
+  font-weight: 700;
+  /* border-radius: 15px !important; */
+}
+
+.sidebar-menu .ant-menu-item {
+  margin-bottom: 8px !important;
+  border-radius: 12px !important;
+  text-decoration-line: none !important;
+}
+
 .logout-btn {
   border: 1px solid;
   border-color: #8a8a8f;
@@ -97,12 +111,17 @@ a :hover {
   color: #000000;
 }
 
-:where(.css-dev-only-do-not-override-qghzx5).ant-pagination
-  .ant-pagination-item-active {
+:where(.css-dev-only-do-not-override-qghzx5).ant-pagination .ant-pagination-item-active {
   border-color: #8b0002 !important;
   background-color: #8b0002 !important;
   color: white !important;
 }
+
+a :hover {
+  text-decoration-line: none !important;
+  text-decoration: none !important;
+}
+
 /* Jo page active ho, uska text white kar do */
 .ant-pagination-item-active a {
   color: white !important;
@@ -113,8 +132,23 @@ a :hover {
   color: white !important;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
 
+.custom-antd-select .ant-select-selection-placeholder {
+  color: #111827 !important;
+  /* text-gray-900 jaisa dark color */
+  opacity: 1 !important;
+  font-weight: 500 !important;
+  /* Agar font weight barhana ho */
+}
 
-.searchInput .ant-input::placeholder {
-  color: #6C7293 !important;
+.ant-select-selector {
+  background-color: white;
+  border: 2px;
+  border-radius: 8px;
+  border-color:rgb(229 231 235 / 1) ↳ #e5e7eb (229 231 235 / var(--tw-border-opacity, 1));
+  ;
 }
