@@ -10,7 +10,7 @@ module.exports = {
         dark: "#1f2937",
         extradark: "#212121",
         light: "#f3f4f6",
-        // blue: "#0A5BE2",
+        darkBlue: "#0A5BE2",
         blue: "#8B0002",
         lightBrown: "#E3E3E3",
         lightSeconday: "#6C7293",
@@ -27,6 +27,7 @@ module.exports = {
         myWhite: "#ffffff",
         darkGray: "#545454",
         lightBlue: "#DBE9FF",
+        statusBlue:"#CFE1FF",
         darkGreen: "#107326",
         lightRed: "#FFDCDE",
         red: "#E21C26",
@@ -45,8 +46,12 @@ module.exports = {
         '15': '15px',
         "24": "24px",
         "90": "90px",
-        "52p": "52px"
+        "52p": "52px",
+        "1":"1px"
       },
+    },
+     borderWidth: {
+      '1': '1px',
     },
     plugins: [],
   }

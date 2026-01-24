@@ -8,7 +8,7 @@ import { createBooking } from "../../services/booking";
 import { getAllRooms } from "../../services/rooms"
 import { openNotification } from "../../network/notification";
 import { updateStats } from "../../services/booking";
-import tablecalender from "../../assets/icons/calendarIcon.png"
+import tablecalender from "../../assets/icons/calendar-lines.svg"
 import { Select } from 'antd';
 import SuccessModal from "../../components/shared/successModal";
 import { Phone, Mail } from 'lucide-react';
@@ -54,7 +54,9 @@ const BookingAddComp = () => {
         taxes: 10, // Hardcoded Tax
         discount: 5, // Hardcoded Discount
         paymentMethod: "Bank",
-        status: "Checked-In"
+        status: "Checked-In",
+        isApartment:false
+
     });
 
     const [hostData,setHostData] = useState({
@@ -99,6 +101,7 @@ const BookingAddComp = () => {
                 const res = await getAllRooms();
                 const data = Array.isArray(res.data) ? res.data : (res.data?.data || []);
                 setRooms(data);
+                console.log(res.data , "Rooms Data")
             } catch (err) {
                 console.error("Error fetching rooms:", err);
                 openNotification("error", "Failed to load rooms");
@@ -107,7 +110,7 @@ const BookingAddComp = () => {
         fetchRooms();
     }, []);
     useEffect(() => {
-        const fetchRooms = async () => {
+        const fetchApartment = async () => {
             try {
                 const res = await getAllApartment();
                 const data = Array.isArray(res.data) ? res.data : (res.data?.data || []);
@@ -118,8 +121,9 @@ const BookingAddComp = () => {
                 openNotification("error", "Failed to load rooms");
             }
         };
-        fetchRooms();
+        fetchApartment();
     }, []);
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -165,6 +169,7 @@ const BookingAddComp = () => {
                     hotelId: selectedObj?.hotelId || selectedObj?.hotel?._id || "",
                     roomType: selectedObj?.type || "",
                     pricePerNight: selectedObj?.price || selectedObj?.pricePerNight || 0,
+                    isApartment:true
                 }));
                 return;
             }
@@ -256,7 +261,7 @@ const BookingAddComp = () => {
                 <h3 className="font-semibold pb-2 px-3 text-lg"> {isEditMode ? "Edit Booking" : "Add New Booking"}</h3>
 
 
-                <div className="bg-white w-full border border-gray-100 rounded-[24px] p-6 shadow-sm mt-6 m-0 mb-2">
+                <div className="bg-white w-full border border-havenLight rounded-3xl p-6 shadow-sm mt-6 m-0 mb-2">
                     <div className="flex flex-wrap items-center gap-12 py-2">
                         <span className="text-dark font-semibold text-15">Select Booking Type</span>
                         <div className="flex items-center gap-8">
@@ -266,7 +271,7 @@ const BookingAddComp = () => {
                                         name="bookingType" // Same Name
                                         value="Room"
                                         checked={formData.bookingType === "Room"}
-                                        onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Room' } })} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                        onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Room' } })} className="peer appearance-none w-5 h-5 border-1 border-gray-300 rounded-full checked:border-blue transition-all" />
                                     <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
                                 </div>
                                 <span className="text-dark font-medium text-15">Room Booking</span>
@@ -277,7 +282,7 @@ const BookingAddComp = () => {
                                         name="bookingType" // Same Name
                                         value="Apartment"
                                         checked={formData.bookingType === "Apartment"}
-                                        onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Apartment' } })} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                        onChange={(e) => handleChange({ target: { name: 'bookingType', value: 'Apartment' } })} className="peer appearance-none w-5 h-5 border-1 border-gray-300 rounded-full checked:border-blue transition-all" />
                                     <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
                                 </div>
                                 <span className="text-dark font-medium text-15">Appartment Booking</span>
@@ -292,31 +297,31 @@ const BookingAddComp = () => {
 
                         <div className="lg:col-span-8 space-y-6">
                             {/* Section 1: Guest Information */}
-                            <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">Guest Information</h3>
+                            <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm">
+                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-havenLight">Guest Information</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Guest Full Name</label>
-                                        <input type="text" name="guestName" value={formData.guestName} onChange={handleChange} required placeholder="Enter full Name" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="text" name="guestName" value={formData.guestName} onChange={handleChange} required placeholder="Enter full Name" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Phone Number</label>
-                                        <input type="text" name="phone" value={formData.phone} onChange={handleChange} required placeholder="Enter Number" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="text" name="phone" value={formData.phone} onChange={handleChange} required placeholder="Enter Number" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Email</label>
-                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">CNIC</label>
-                                        <input type="text" name="cnic" value={formData.cnic} onChange={handleChange} required placeholder="Enter CNIC" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="text" name="cnic" value={formData.cnic} onChange={handleChange} required placeholder="Enter CNIC" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Section 2: Room Selection */}
-                            <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                                <h3 className="text-dark font-bold text-lg mb-6 pb-2 border-b border-gray-100">{formData.bookingType === "Apartment" ? "Apartment Selection" : "Room Selection"}</h3>
+                            <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm">
+                                <h3 className="text-dark font-bold text-lg mb-6 pb-2 border-b border-havenLight">{formData.bookingType === "Apartment" ? "Apartment Selection" : "Room Selection"}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                     {/* Hotel Name Dropdown */}
                                     <div className="flex flex-col">
@@ -385,45 +390,45 @@ const BookingAddComp = () => {
                             </div>
 
                             {/* Section 3: Stay Details */}
-                            <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
-                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">Stay Details</h3>
+                            <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm">
+                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-havenLight">Stay Details</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                     <div className="flex flex-col w-full">
                                         <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">Checked in Date</label>
                                         <div className="relative w-full">
                                             <img src={tablecalender} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20" />
-                                            <input type="date" name="checkIn" value={formData.checkIn} onChange={handleChange} required className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
+                                            <input type="date" name="checkIn" value={formData.checkIn} onChange={handleChange} required className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col w-full">
                                         <label className="text-lightSeconday text-13 font-bold ml-1 mb-1">Checked out Date</label>
                                         <div className="relative w-full">
                                             <img src={tablecalender} alt="calendar" className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20" />
-                                            <input type="date" name="checkOut" value={formData.checkOut} onChange={handleChange} required className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
+                                            <input type="date" name="checkOut" value={formData.checkOut} onChange={handleChange} required className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 cursor-pointer" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Total Night</label>
-                                        <input type="number" name="duration" value={formData.duration} onChange={handleChange} required placeholder="Enter Nights" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="number" name="duration" value={formData.duration} onChange={handleChange} required placeholder="Enter Nights" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Section 4: Pricing & Payment */}
-                            <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
-                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-gray-100">Pricing & Payment</h3>
+                            <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm">
+                                <h3 className="text-dark font-bold text-18 mb-6 pb-2 border-b border-havenLight">Pricing & Payment</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Price per Night</label>
-                                        <input type="number" readOnly name="pricePerNight" value={formData.pricePerNight} onChange={handleChange} required placeholder="Enter Price" className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 " />
+                                        <input type="number" readOnly name="pricePerNight" value={formData.pricePerNight} onChange={handleChange} required placeholder="Enter Price" className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0 " />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Taxes & Fee</label>
-                                        <input type="number" name="taxes" value={formData.taxes} onChange={handleChange} className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="number" name="taxes" value={formData.taxes} onChange={handleChange} className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Discount</label>
-                                        <input type="number" name="discount" value={formData.discount} onChange={handleChange} className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
+                                        <input type="number" name="discount" value={formData.discount} onChange={handleChange} className="w-full bg-white border-1 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-lightSeconday text-13 font-bold ml-1">Payment Method</label>
@@ -443,21 +448,21 @@ const BookingAddComp = () => {
                             </div>
 
                             {/* Booking Status Section remains the same as it uses Radio buttons */}
-                            <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm mt-6">
-                                <h3 className="text-dark font-semibold text-lg mb-6 pb-1 border-b-2 border-gray-100">Booking Status</h3>
+                            <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm mt-6">
+                                <h3 className="text-dark font-semibold text-lg mb-6 pb-1 border-b-2 border-havenLight">Booking Status</h3>
                                 <div className="flex flex-wrap items-center gap-12 py-2">
                                     <span className="text-dark font-semibold text-15">Set Booking Status</span>
                                     <div className="flex items-center gap-8">
                                         <label className="flex items-center gap-3 cursor-pointer group">
                                             <div className="relative flex items-center justify-center">
-                                                <input type="radio" name="status" value="Checked-In" checked={formData.status === "Checked-In"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                                <input type="radio" name="status" value="Checked-In" checked={formData.status === "Checked-In"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-1 border-gray-300 rounded-full checked:border-blue transition-all" />
                                                 <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
                                             </div>
                                             <span className="text-dark font-medium text-15">Checked in</span>
                                         </label>
                                         <label className="flex items-center gap-3 cursor-pointer group">
                                             <div className="relative flex items-center justify-center">
-                                                <input type="radio" name="status" value="Reserved" checked={formData.status === "Reserved"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-blue transition-all" />
+                                                <input type="radio" name="status" value="Reserved" checked={formData.status === "Reserved"} onChange={handleChange} className="peer appearance-none w-5 h-5 border-1 border-gray-300 rounded-full checked:border-blue transition-all" />
                                                 <div className="absolute w-2.5 h-2.5 rounded-full bg-blue scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
                                             </div>
                                             <span className="text-dark font-medium text-15">Reserved</span>
@@ -469,7 +474,7 @@ const BookingAddComp = () => {
 
                         {/* RIGHT SIDE: Summary */}
                         <div className="lg:col-span-4 space-y-6">
-                            <div className="bg-[#EDFDF2] border-2 border-[#107326] rounded-[24px] p-6 top-8">
+                            <div className="bg-[#EDFDF2] border-1 border-[#107326] rounded-3xl p-6 top-8">
                                 <h3 className="text-[#107326] font-semibold text-lg mb-5 border-b-2 border-darkgrayline pb-2">Booking Summary</h3>
 
                                 <div className="space-y-5">
@@ -549,14 +554,14 @@ const BookingAddComp = () => {
                                     </h3>
 
                                     {/* Main Card Container */}
-                                    <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all hover:shadow-md">
+                                    <div className="bg-white border border-havenLight rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-5 transition-all hover:shadow-md">
 
                                         {/* Profile Image */}
                                         <div className="relative">
                                             <img
                                                 src={hostData.profileImg}
                                                 alt={hostData.name}
-                                                className="w-[85px] h-[85px] rounded-full object-cover border-2 border-gray-50 shadow-sm"
+                                                className="w-[85px] h-[85px] rounded-full object-cover border-1 border-gray-50 shadow-sm"
                                             />
                                         </div>
 
@@ -615,7 +620,7 @@ const BookingAddComp = () => {
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className=" border-2 border-lightSeconday bg-myWhite px-10 text-lightSeconday rounded-md py-2 font-medium hover:bg-gray-50 transition-all"
+                        className=" border-1 border-lightSeconday bg-myWhite px-10 text-lightSeconday rounded-md py-2 font-medium hover:bg-gray-50 transition-all"
                     >
                         Back
                     </button>

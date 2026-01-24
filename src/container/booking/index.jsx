@@ -6,10 +6,11 @@ import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import HotelDirectory from "../../components/Table";
-import { getRecentBooking, getAllBooking } from "../../services/booking";
+import { getRecentBooking, getAllBooking , deleteBooking} from "../../services/booking";
 import { getAllApartment } from "../../services/apartment"
 import { useState, useEffect, useMemo } from "react";
 import { openNotification } from "../../network/notification";
+import {} from "../../services/booking"
 const Booking = () => {
   const [activeType, setActiveType] = useState("Room Bookings");
   const [recentBookings, setRecentBookings] = useState([]);
@@ -74,7 +75,18 @@ const Booking = () => {
       iconBg: "#CBCEE7",
       image: home4,
     }]
-
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you want to delete this hotel?")) {
+      try {
+        await deleteBooking(id);
+        setRecentBookings(recentBookings.filter((hotel) => hotel.id !== id));
+        openNotification("success", "Booking deleted successfully");
+      } catch (err) {
+        console.error("Any Problem in deleteing", err);
+        openNotification("error", "Internal Server Error");
+      }
+    }
+  };
   useEffect(() => {
     const fetchRecentBookings = async () => {
       try {
@@ -159,6 +171,7 @@ const Booking = () => {
         onlyFilter={true}
         checkbox={false}
         activeType={activeType}
+        onDelete={handleDelete}
       />
     </div>
   </>)

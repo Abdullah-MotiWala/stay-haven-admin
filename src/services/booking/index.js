@@ -22,5 +22,7 @@ export const updateStats = async (id,data) => {
 export const getRecentBooking = async (data) => {
     return Api.get("/bookings/recent", data);
 };
-
+export const deleteBooking = async (id) => {
+    return Api.delete(`bookings/${id}`);
+};
 

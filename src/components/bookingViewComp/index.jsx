@@ -4,9 +4,9 @@ import BookingContainer from "../bookingCoantainer";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {updateStats} from "../../services/booking";
+import { updateStats } from "../../services/booking";
 import { useEffect } from "react"
-import { openNotification } from "../../network/notification";  
+import { openNotification } from "../../network/notification";
 const BookingComp = (props) => {
     const navigate = useNavigate();
     const { guestInfo, stayDetails, paymentSummary, status, bookingId, ids } = props;
@@ -33,6 +33,29 @@ const BookingComp = (props) => {
             setLoading(false);
         }
     };
+    const getStatusClasses = (status) => {
+        switch (status?.toLowerCase()) {
+            case "checked-in":
+            case "checkin":
+                return "bg-lightYellow text-dark";
+
+            case "completed":
+            case "complete":
+            case "checked-out":
+                return "bg-shadeGreen text-darkGreen";
+
+            case "reserved":
+                return "bg-statusBlue text-darkBlue";
+
+            case "cancelled":
+            case "canceled":
+                return "bg-lightRed text-red";
+
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    };
+
     // const info = [
     //     { label: "Name", value: "Muhammad Akbar Ali" },
     //     { label: "Phone Number", value: "+92 331 5637647" },
@@ -66,9 +89,16 @@ const BookingComp = (props) => {
         <div className="flex justify-between items-center mb-3 px-4">
             <div className="flex gap-4">
                 <p className="font-semibold text-24 ">Booking Details <span>- {bookingId}</span></p>
-                <div className="bg-green-400 w-23 h-full rounded-lg">
-                    <p className="text-[#107326] bg-green-400 p-1.5 px-3 rounded-full font-medium">{status}</p>
+                <div className="w-23 h-full rounded-lg">
+                    <p
+                        className={`p-1.5 px-3 rounded-full font-semibold capitalize ${getStatusClasses(
+                            status
+                        )}`}
+                    >
+                        {status}
+                    </p>
                 </div>
+
             </div>
             <button className="border border-2 p-2 w-90 items-center flex gap-2 font-medium rounded-full bg-slate-100">
                 <span><img src={edit} alt="" onClick={() => navigate(`/admin/booking/edit/${ids}`)} /></span>Edit

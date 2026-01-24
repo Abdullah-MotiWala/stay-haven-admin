@@ -41,15 +41,48 @@ const BoookingView = () => {
     ];
 
     // 2. Stay Details Mapping
-    const Stay_Details = [
-        { label: "Room", value: bookingData.stayDetails?.roomName || "-" },
-        { label: "Room Number", value: bookingData.stayDetails?.roomNumber || "-" },
-        { label: "Total Members", value: bookingData.stayDetails?.totalMembers || "-" },
-        { label: "Hotel Name", value: bookingData.stayDetails?.hotelName || "-" },
-        { label: "Check-in Date", value: bookingData.stayDetails?.checkIn || "-" },
-        { label: "Check-out Date", value: bookingData.stayDetails?.checkOut || "-" },
-        { label: "Total Nights", value: bookingData.stayDetails?.totalNights || "-" },
-    ];
+   const isApartment = bookingData?.stayDetails?.isApartment;
+
+const Stay_Details = [
+  {
+    label: isApartment ? "Apartment" : "Room",
+    value: bookingData.stayDetails?.roomName || "-",
+  },
+  {
+    label: isApartment ? "Apartment Number" : "Room Number",
+    value: bookingData.stayDetails?.roomNumber || "-",
+  },
+  
+  {
+    label: "Total Members",
+    value: bookingData.stayDetails?.totalMembers || "-",
+  },
+  {
+    label: "Hotel Name",
+    value: bookingData.stayDetails?.hotelName || "-",
+  },
+  ...(isApartment
+    ? [
+        {
+          label: "Apartment Type",
+          value: bookingData?.bedType || "-",
+        },
+      ]
+    : []),
+  {
+    label: "Check-in Date",
+    value: bookingData.stayDetails?.checkIn || "-",
+  },
+  {
+    label: "Check-out Date",
+    value: bookingData.stayDetails?.checkOut || "-",
+  },
+  {
+    label: "Total Nights",
+    value: bookingData.stayDetails?.totalNights || "-",
+  },
+];
+
 
     // 3. Payment Summary Mapping
     // Note: NaN values ko handle karne ke liye check lagaya hai
