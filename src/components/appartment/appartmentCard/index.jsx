@@ -12,7 +12,6 @@ function AppartmentCard({  data, active, onClick }) {
     const handleEditClick = () => {
     navigate(`/admin/appartment/edit/${id}`);
   };
-
   return (
     <div
       onClick={onClick}
@@ -101,7 +100,7 @@ function AppartmentCard({  data, active, onClick }) {
 
         <div className="flex justify-between items-end mt-0">
           <div className="text-[#7C8DB5] font-medium text-[14px]">
-            Guest: <span className="text-[#7C8DB5]">N/A</span>
+            Guest: <span className="text-[#7C8DB5]">{data?.host?.name ?? "N/A"}</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[24px] font-bold text-gray-900">

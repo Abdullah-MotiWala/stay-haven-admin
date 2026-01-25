@@ -163,6 +163,7 @@ const HotelsListing = () => {
             columns={columns}
             setRefresh={setRefresh}
             lastId={lastId?.nextNumericId}
+            path={`/admin/hotel/view`}
           />
         )}
 
@@ -181,11 +182,11 @@ const HotelsListing = () => {
             <span className="text-lightSeconday ml-4">Entries per page</span>
           </div>
           <Pagination
-            current={currentPage} 
+            current={currentPage}
             total={stats?.totalHotels || 0}
-            pageSize={itemsPerPage} 
-            onChange={onPageChange} 
-            // showSizeChanger={false} 
+            pageSize={itemsPerPage}
+            onChange={onPageChange}
+            // showSizeChanger={false}
             className="flex justify-end "
             // style={{ paddingTop: "20px", paddingBottom: "20px" }} // Adds padding for better spacing
           />

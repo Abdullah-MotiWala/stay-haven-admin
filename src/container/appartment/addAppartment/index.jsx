@@ -87,6 +87,9 @@ const AddNewAppartment = () => {
           mainImage: appartment.mainImage || "",
           galleryImages: appartment.galleryImages || [],
           hotel: appartment.hotel?.id,
+          hostname: appartment.host?.name,
+          email: appartment.host?.email,
+          phoneNumber: appartment.host?.phone,
           // featureIds: appartment.featureIds || [],
           facility: appartment.features?.map((a) => a.id) || [],
           amenities: appartment.features?.map((r) => r.id) || [],
@@ -328,7 +331,7 @@ const AddNewAppartment = () => {
                       {[
                         {
                           label: "Single Bed Appartment",
-                          value: "single room",
+                          value: "one bed room",
                         },
                         {
                           label: "Double Bed Appartment",

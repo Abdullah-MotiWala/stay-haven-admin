@@ -19,6 +19,7 @@ const BookingComp = (props) => {
         setLoading(true);
         try {
             // ids yahan parent se aa rahi hai jo booking ki mongoDB id hai
+            
             const res = await updateStats(ids, { status: newStatus });
 
             if (res.status === 200 || res.status === 201) {

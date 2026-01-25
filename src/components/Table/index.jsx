@@ -462,7 +462,7 @@ const HotelDirectory = ({
                   suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
                 >
                   <Option value="">Sort by Status</Option>
-                  <Option value="Booked">Booked</Option>
+                  <Option value="Booked  ">Booked</Option>
                   <Option value="Completed">Completed</Option>
                   <Option value="Cancelled">Cancelled</Option>
                   <Option value="Checked-In">Checked In</Option>

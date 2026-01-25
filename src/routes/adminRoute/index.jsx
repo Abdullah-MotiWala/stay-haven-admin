@@ -13,6 +13,7 @@ import AddBooking from "../../container/booking/addBooking";
 import AddNewRoom from "../../container/rooms/addRoom";
 import Appartments from "../../container/appartment";
 import AddNewAppartment from "../../container/appartment/addAppartment";
+import SettingParent from "../../container/settings";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -38,6 +39,10 @@ export const AdminRoute = [
           { path: "booking/view/:id", element: <BookingView /> },
           { path: "booking/add", element: <AddBooking /> },
           { path: "booking/edit/:id", element: <AddBooking /> },
+          
+          { path: "settings", element: <SettingParent /> },
+          
+
 
         ],
       },
