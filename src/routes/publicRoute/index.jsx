@@ -3,14 +3,14 @@ import { PublicGuard } from "../guards";
 import Signup from "../../container/auth/signUp";
 export const PublicRoutes = [
   {
-    path: "/",
-    element: <PublicGuard />, // Security layer
+    path: "/auth",
+    element: <PublicGuard />, 
     children: [
       {
-        path: "/login",
+        path: "/auth/login",
         element: <Login />,
       },
-      { path: "/signup", element: <Signup /> },
+      { path: "/auth/signup", element: <Signup /> },
     ],
   },
 ];

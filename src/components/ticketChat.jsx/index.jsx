@@ -3,16 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom';
 import socket from '../../services/socket.js'; 
 import arrowImg from "../../assets/icons/arrow.png";
 import { Paperclip, Send, ChevronDown } from 'lucide-react';
-import { createMessages, getAdminId, getMessages, getTicket } from '../../services/chat/index.js';
+import { createMessages, getAdminId, getMessages, getTicket, getLoggedInUser } from '../../services/chat/index.js';
+import { updateTicketStatus } from '../../services/chat/index.js';
+import { openNotification } from "../../network/notification";
 
 const ChatWindow = () => {
     const navigate = useNavigate();
     const { ticketId } = useParams(); 
     const [message, setMessage] = useState("");
     const [chatHistory, setChatHistory] = useState([]);
-    const [ticketData, setTicketData] = useState(null); // Dynamic data state
+    const [ticketData, setTicketData] = useState(null); 
     const scrollRef = useRef(null); 
     const adminId = getAdminId();
+
+    const currentUser = getLoggedInUser();
+    const currentUserId = currentUser?.id;
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -56,23 +61,39 @@ const ChatWindow = () => {
     }, [ticketId]);
 
     const sendMessage = async () => {
-        if (!message.trim() || !adminId) return;
+        if (!message.trim() || !currentUserId) return;
         try {
             const payload = {
                 ticketId: ticketId,
-                senderId: adminId, 
+                senderId: currentUserId, 
                 content: message,
-                isAdminMessage: true
+                isAdminMessage: currentUser?.userType === 'admin'
             };
             const res = await createMessages(payload);
             if (res.data.success) {
-                setChatHistory((prev) => [...prev, res.data.data]);
+                // setChatHistory((prev) => [...prev, res.data.data]);
                 setMessage(""); 
             }
         } catch (error) {
             alert("Can't send message");
-        }
+        }        
     };
+
+    const handleResolve = async () => {
+    try {
+        const res = await updateTicketStatus(ticketId, "Closed");
+        if (res.data.success) {
+            setTicketData(prev => ({ ...prev, status: "Closed" }));
+            
+            openNotification("success", "Resolved", "Ticket has been closed successfully!");
+            
+            socket.emit("ticket_status_changed", { ticketId, status: "Closed" });
+        }
+            } catch (err) {
+                console.error("Failed to resolve ticket:", err);
+                alert("Could not update status");
+            }
+        };
 
     return (
         <div className="min-h-screen p-5 font-sans">
@@ -100,7 +121,10 @@ const ChatWindow = () => {
                             {ticketData?.subject || "Fetching subject..."}
                         </h2>
                     </div>
-                    <button className="px-5 py-2 border-[1.5px] border-blue text-blue font-bold rounded-3xl text-[12px] hover:bg-blue hover:text-white transition-all">
+                    <button
+                        onClick={handleResolve}
+                        disabled={ticketData?.status === "Closed"}
+                        className="px-5 py-2 border-[1.5px] border-blue text-blue font-bold rounded-3xl text-[12px] hover:bg-blue hover:text-white transition-all">
                         Mark as Resolved
                     </button>
                 </div>
@@ -118,31 +142,37 @@ const ChatWindow = () => {
 
                         {/* Chat Messages */}
                         <div className="p-4 h-[400px] overflow-y-auto space-y-4 bg-white custom-scrollbar">
-                            {chatHistory.map((msg, index) => (
-                                <div key={index} className={`flex flex-col text-white ${msg.isAdminMessage ? 'items-end ml-auto' : 'items-start'} max-w-[65%]`}>
-                                    <div className={`px-3 py-2 rounded-[12px] w-fit min-w-[120px] shadow-sm ${
-                                        msg.isAdminMessage 
-                                        ? 'bg-blue text-white rounded-tr-none' 
-                                        : 'bg-[#F8FAFC] text-[#4B5563] rounded-tl-none border border-[#F1F5F9]'
-                                    }`}>
-                                        <p className={`text-[13px] leading-tight font-medium ${
-                                        msg.isAdminMessage ? 'text-white' : 'text-[#4B5563]'
-                                    }`}>
-                                        {msg.content}
-                                    </p>
-                                        <div className={`flex justify-end items-center gap-1 mt-1 text-[8px] font-bold opacity-80 ${msg.isAdminMessage ? 'text-blue-100' : 'text-[#9CA3AF]'}`}>
-                                            <span>
-                                                {new Date(msg.createdAt).toLocaleTimeString('en-US', { 
-                                                    hour: '2-digit', 
-                                                    minute: '2-digit', 
-                                                    hour12: true 
-                                                })}
-                                            </span>
-                                            {msg.isAdminMessage && <span>✓✓</span>}
+                            {chatHistory.map((msg, index) => {
+                             const isMe = msg.senderId === currentUserId || msg.sender?.id === currentUserId;
+                            //  console.log(msg)
+                             console.log("CHECKING_STORAGE:", JSON.parse(localStorage.getItem("persist:root") || "{}"));
+
+                                return (
+                                    <div key={index} className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} max-w-[65%]`}>
+                                        {/* <span className="text-[10px] font-bold mb-1 text-[#7C8DB5] uppercase tracking-wider px-1">
+                                            {isMe ? "You" : (msg.isAdminMessage === true ? "admin" : (ticketData?.customerName || "customer"))}
+                                        </span> */}
+
+                                        <div className={`px-3 py-2 rounded-[12px] w-fit min-w-[120px] shadow-sm ${
+                                            isMe 
+                                            ? 'bg-blue text-white rounded-tr-none' 
+                                            : 'bg-[#F8FAFC] text-[#4B5563] rounded-tl-none border border-[#F1F5F9]'
+                                        }`}>
+                                            <p className={`text-[13px] leading-tight font-medium ${isMe ? 'text-white' : 'text-[#4B5563]'}`}>
+                                                {msg.content}
+                                            </p>
+                                            <div className={`flex justify-end items-center gap-1 mt-1 text-[8px] font-bold opacity-80 ${isMe ? 'text-blue-100' : 'text-[#9CA3AF]'}`}>
+                                                <span>
+                                                    {new Date(msg.createdAt).toLocaleTimeString('en-US', { 
+                                                        hour: '2-digit', minute: '2-digit', hour12: true 
+                                                    })}
+                                                </span>
+                                                {isMe && <span>✓✓</span>}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             <div ref={scrollRef} />
                         </div>
 

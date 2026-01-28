@@ -15,7 +15,10 @@ import Appartments from "../../container/appartment";
 import AddNewAppartment from "../../container/appartment/addAppartment";
 import ChatWindow from "../../components/ticketChat.jsx";
 import TicketsPage from "../../components/TicketPage.jsx";
-import SettingsPage from "../../components/setting/index.jsx";
+
+import SettingParent from "../../container/settings";
+// import Login from "../../container/auth/login/index.jsx";
+// import Signup from "../../container/auth/signUp/index.jsx";
 
 export const AdminRoute = [
   {
@@ -38,14 +41,21 @@ export const AdminRoute = [
           { path: "appartments/add", element: <AddNewAppartment /> },
           { path: "appartment/edit/:id", element: <AddNewAppartment /> },
 
-          { path: "booking", element: <Booking /> },
+          { path: "bookings", element: <Booking /> },
           { path: "booking/view/:id", element: <BookingView /> },
           { path: "booking/add", element: <AddBooking /> },
+          { path: "booking/edit/:id", element: <AddBooking /> },
           
           { path: "tickets", element: <TicketsPage/> },
           { path: "tickets/:ticketId/chat", element: <ChatWindow/>},
 
-          { path: "settings", element: <SettingsPage/> }
+          
+          { path: "settings", element: <SettingParent /> },
+
+          // { path: "login", element: <Login/> }
+          // { path: "signup", element: <Signup/> }
+          
+
 
         ],
       },

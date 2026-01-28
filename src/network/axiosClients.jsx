@@ -24,10 +24,34 @@ const Api = setupCache(axiosInstance, {
   headerInterpreter: () => null,
 });
 
+// Api.interceptors.request.use(
+//   async config => {
+//     await store?.dispatch(TotalRequest());
+//     config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+//     return config;
+//   },
+//   async error => {
+//     await store?.dispatch(FinishLoading());
+//     return Promise.reject(error);
+//   }
+// );
+
 Api.interceptors.request.use(
   async config => {
     await store?.dispatch(TotalRequest());
-    config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+      const persistRoot = JSON.parse(localStorage.getItem("persist:root") || "{}");
+      const userState = JSON.parse(persistRoot.user || "{}");
+      token = userState?.token; 
+    }
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
     return config;
   },
   async error => {
@@ -35,6 +59,7 @@ Api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 
 Api.interceptors.response.use(
   async response => {
