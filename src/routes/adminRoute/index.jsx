@@ -14,6 +14,7 @@ import AddNewRoom from "../../container/rooms/addRoom";
 import Appartments from "../../container/appartment";
 import AddNewAppartment from "../../container/appartment/addAppartment";
 import SettingParent from "../../container/settings";
+import HotelBookingDashboard from "../../container/dashboard";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -22,6 +23,7 @@ export const AdminRoute = [
       {
         element: <AdminLayout />,
         children: [
+          { path: "dashboard", element: <HotelBookingDashboard /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
           { path: "hotel/edit/:id", element: <AddHotel /> },

@@ -1,0 +1,83 @@
+import React from "react";
+import HotelDirectory from "../../Table";
+
+const BookingList = ({recentBookings}) => {
+  const columns = [
+    { key: "bookingId", label: "Booking ID", type: "text" },
+    { key: "guestName", label: "Guest Name", type: "text" },
+    { key: "roomType", label: "Room Type", type: "roomType" },
+    { key: "roomNumber", label: "Room No", type: "text" },
+    { key: "duration", label: "Duration", type: "text" },
+    { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
+    { key: "status", label: "Status", type: "status" },
+  ];
+
+  const bookings = [
+    {
+      bookingId: "#321-02",
+      guestName: "Muhammad Akbar Ali Khan Iqbal",
+      roomType: "Deluxe",
+      roomNumber: "Room 101",
+      duration: "3 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Sara Iqbal",
+      roomType: "Standard",
+      roomNumber: "Room 202",
+      duration: "2 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Alexander James William Robert Smith",
+      roomType: "Deluxe",
+      roomNumber: "Room 300",
+      duration: "1 night",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-Out",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Sophia Grace",
+      roomType: "Deluxe",
+      roomNumber: "Room 119",
+      duration: "3 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-Out",
+    },
+    {
+      bookingId: "#321-02",
+      guestName: "Benjamin Thomas Edward Samuel Brown",
+      roomType: "Standard",
+      roomNumber: "Room 210",
+      duration: "2 nights",
+      checkIn: "Jan 02, 2026",
+      checkOut: "Jan 05, 2026",
+      status: "Checked-In",
+    },
+  ];
+  console.log(recentBookings,"recentBookings===")
+  return (
+    <div>
+      <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
+        <HotelDirectory
+          data={recentBookings}
+          title="Bookings List"
+          columns={columns}
+          filter={false}
+          view={true}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default BookingList;

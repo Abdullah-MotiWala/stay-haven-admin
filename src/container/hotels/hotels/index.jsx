@@ -25,7 +25,7 @@ const HotelsListing = () => {
   const [lastId, setLastId] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(2);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -132,11 +132,10 @@ const HotelsListing = () => {
   ];
 
   const onPageChange = (page, pageSize) => {
-    setCurrentPage(page); // Update current page state
-    setItemsPerPage(pageSize); // Update items per page if needed
+    setCurrentPage(page); 
+    setItemsPerPage(pageSize); 
   };
 
-  console.log(lastId, "hot213123elshotelshotels");
   return (
     <div className="p-0">
       <div className="mt-4 px-3">
