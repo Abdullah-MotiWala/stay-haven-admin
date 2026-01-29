@@ -94,7 +94,7 @@ export default function Rooms() {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: "+12%",
+      trend: `${(stats?.roomsGrowth ?? 0) >= 0 ? '+' : ''}${stats?.roomsGrowth ?? 0}%`,
       trendText: "vs last week",
       showTrend: true,
     },

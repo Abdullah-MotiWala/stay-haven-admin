@@ -81,9 +81,10 @@ const Dashboard = () => {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: "+12%",
+      trend: `${(stats?.bookingGrowth ?? 0) >= 0 ? '+' : ''}${stats?.bookingGrowth ?? 0}%`,
       trendText: "vs last week",
       showTrend: true,
+      trendColor: (stats?.bookingGrowth ?? 0) >= 0 ? "green" : "red",
     },
     {
       title: "Hotels Listed",

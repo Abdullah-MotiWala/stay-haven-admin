@@ -23,8 +23,9 @@ const HotelDirectory = ({
   inp,
   onlyFilter,
   path,
-  checkbox,
+  checkbox = true,
   activeType,
+  roomTypes = []
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -247,12 +248,13 @@ const HotelDirectory = ({
         );
 
       case "roomType":
+        const typeLabel = typeof row.roomType === 'object' ? row.roomType.title : row.roomType;
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center
-      ${getRoomTypeStyle(row.roomType)}`}
+      ${getRoomTypeStyle(typeLabel)}`}
           >
-            {row.roomType ?? "N/A"}
+            {typeLabel ?? "N/A"}
           </span>
         );
 
@@ -425,9 +427,16 @@ const HotelDirectory = ({
                   }
                 >
                   <Option value="">Select Room</Option>
-                  <Option value="One Bed Rooms">One Bed Rooms</Option>
-                  <Option value="Two Bed Rooms">Two Bed Rooms</Option>
-                  <Option value="Three Bed Rooms">Three Bed Rooms</Option>
+                  {roomTypes.length > 0 ? (
+                    roomTypes.map(type => (
+                      <Option key={type.id} value={type.id}>{type.title}</Option>
+                    ))
+                  ) : (
+                    <>
+                      <Option value="one-bed-id">One Bed Room</Option>
+                      <Option value="two-bed-id">Two Bed Room</Option>
+                    </>
+                  )}
                 </Select>
               </div>
 

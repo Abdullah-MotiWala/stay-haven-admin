@@ -93,9 +93,9 @@ const HotelsListing = () => {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: "+12%",
+      trend: `${stats?.growth?.isPositive ? '+' : '-'}${stats?.growth?.percentage ?? 0}%`,
       trendText: "vs last week",
-      showTrend: false,
+      showTrend: true,
     },
     {
       title: "Active Hotels",
