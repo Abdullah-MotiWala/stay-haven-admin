@@ -38,6 +38,7 @@ const AddNewRoom = () => {
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
+  const [roomTypesList, setRoomTypesList] = useState([]);
 
   const { Option } = Select;
 
@@ -68,7 +69,7 @@ const AddNewRoom = () => {
         form.setFieldsValue({
           name: room.roomName || "",
           roomNumber: room.roomNumber || "",
-          type: room.type || "",
+          type: room.roomType?.id || room.roomTypeId,
           bedType: room.bedType || "",
           roomSize: room.roomSize || "",
           maxAdults: room.maxAdults || 1,
@@ -97,15 +98,17 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
+          getAllFeature("ROOM_TYPE"),
         ]);
 
         setAmenitiesList(amenityRes.data);
         setFeaturesList(featuresRes.data);
         setFacilityList(facilityRes.data);
+        setRoomTypesList(roomTypeRes.data);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -133,7 +136,7 @@ const AddNewRoom = () => {
       roomName: values.name,
       roomNumber: values.roomNumber,
       hotelId: values.hotel,
-      type: values.type,
+      roomTypeId: values.type,
       bedType: values.bedType,
       roomSize: values.roomSize,
       maxAdults: values.guests,
@@ -298,14 +301,9 @@ const AddNewRoom = () => {
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                      {[
-                        { label: "Single Bed Room", value: "one bed room" },
-                        { label: "Double Bed Room", value: "two bed room" },
-                        { label: "Three Bed Room", value: "three bed room" },
-                        { label: "Luxury Suits", value: "luxury suits" },
-                      ].map((item) => (
-                        <Option key={item.value} value={item.value}>
-                          {item.label}
+                      {roomTypesList.map((item) => (
+                        <Option key={item.id} value={item.id}> {/* Ab value ID jayegi */}
+                          {item.title}
                         </Option>
                       ))}
                     </Select>

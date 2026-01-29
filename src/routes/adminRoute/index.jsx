@@ -20,6 +20,7 @@ import SettingParent from "../../container/settings";
 // import Login from "../../container/auth/login/index.jsx";
 // import Signup from "../../container/auth/signUp/index.jsx";
 
+import HotelBookingDashboard from "../../container/dashboard";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -28,6 +29,7 @@ export const AdminRoute = [
       {
         element: <AdminLayout />,
         children: [
+          { path: "dashboard", element: <HotelBookingDashboard /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
           { path: "hotel/edit/:id", element: <AddHotel /> },
