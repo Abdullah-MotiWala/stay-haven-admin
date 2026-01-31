@@ -77,16 +77,16 @@ const handleLogin = async (values) => {
             >
               Login
             </Button>
-            <div className="mt-3 text-center">
+            {/* <div className="mt-3 text-center">
               <a href="" className="text-center text-blue pt-2 underline">
                 Forget Password ?
               </a>
-            </div>
+            </div> */}
 
-            <div className="text-center mt-2">
+            {/* <div className="text-center mt-2">
               <p className="mb-0">Don’t have an account yet?</p>
               <a href="/auth/signup">Sign up Now</a>
-            </div>
+            </div> */}
           </Form>
         </Card>
       </div>
