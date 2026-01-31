@@ -15,10 +15,7 @@ import Appartments from "../../container/appartment";
 import AddNewAppartment from "../../container/appartment/addAppartment";
 import ChatWindow from "../../components/ticketChat.jsx";
 import TicketsPage from "../../components/TicketPage.jsx";
-
 import SettingParent from "../../container/settings";
-// import Login from "../../container/auth/login/index.jsx";
-// import Signup from "../../container/auth/signUp/index.jsx";
 
 import HotelBookingDashboard from "../../container/dashboard";
 export const AdminRoute = [

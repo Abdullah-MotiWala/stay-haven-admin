@@ -82,7 +82,7 @@ const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="text-center py-10 text-gray-400 text-lg">
-                      {loading ? "Searching..." : "No tickets found. Check Database."}
+                      {loading ? "Searching..." : "No tickets found."}
                     </td>
                   </tr>
                 )}

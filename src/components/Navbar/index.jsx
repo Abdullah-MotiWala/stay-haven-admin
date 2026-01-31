@@ -9,14 +9,26 @@ import headPhone from "../../assets/icons/headPhone.png";
 import search from "../../assets/icons/search.svg";
 
 import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
-import { Input } from "antd";
+import { Button, Dropdown, Input } from "antd";
+import { LogoutOutlined } from "@ant-design/icons";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-
   const currentConfig = PAGE_CONFIG[location.pathname];
+  const logout = () => {
+    localStorage.clear();
+    navigate("/auth/login", { replace: true });
+  };
+  const userMenuItems = [
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: logout,
+    },
+  ];
 
   return (
     <header className="w-full px-3 ">
@@ -33,14 +45,6 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center   ">
-          {/* <button
-            onClick={() =>
-              navigate(isRoomPage ? "/admin/rooms/add" : "/admin/hotel/add")
-            }
-            className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
-          >
-            {isRoomPage ? "Add New Room" : "Add New Hotel"}
-          </button> */}
           {currentConfig && (
             <button
               onClick={() => navigate(currentConfig.navigateTo)}
@@ -71,11 +75,17 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center border-l border-[#AEB2C9] pl-4 ml-1">
-            <img
-              src={userImg ?? DEFAULT_IMAGE}
-              alt="profile"
-              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer hover:opacity-80 transition"
-            />
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <img
+                src={userImg ?? DEFAULT_IMAGE}
+                alt="profile"
+                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer hover:opacity-80 transition"
+              />
+            </Dropdown>
           </div>
         </div>
       </div>

@@ -7,12 +7,12 @@ import { openNotification } from "../../../network/notification";
 import { Authenticate, SelfUser } from "../../../redux/features/authSlice";
 
 const Login = () => {
-  const navigate = useNavigate();
+const navigate = useNavigate();
   const dispatch = useDispatch();
 
 const handleLogin = async (values) => {
   try {
-    const payload = { ...values, userType: "customer" };
+    const payload = { ...values, userType: "admin" };
     const res = await loginApi(payload);
 
     const userData = res.data; 
@@ -29,7 +29,7 @@ const handleLogin = async (values) => {
 
       openNotification("success", "Welcome back, " + (userData.name || "Admin"));
 
-      navigate("/admin/hotels", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   } catch (err) {
     const errorMsg = err.response?.data?.message || "Invalid email or password";

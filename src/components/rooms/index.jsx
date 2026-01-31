@@ -48,6 +48,10 @@ export default function Rooms() {
       );
       console.log(res?.data, "res?.data");
       setRooms(res?.data, "rooms data");
+      if (res?.data?.data?.length > 0) {
+        setSelectedRoom(res.data.data[0]);
+      }
+
       setRefresh(false);
       setLoading(true);
     } catch (err) {
@@ -94,7 +98,7 @@ export default function Rooms() {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: `${(stats?.roomsGrowth ?? 0) >= 0 ? '+' : ''}${stats?.roomsGrowth ?? 0}%`,
+      trend: `${(stats?.roomsGrowth ?? 0) >= 0 ? "+" : ""}${stats?.roomsGrowth ?? 0}%`,
       trendText: "vs last week",
       showTrend: true,
     },
@@ -232,6 +236,7 @@ export default function Rooms() {
                         active={selectedRoom?.id === room.id}
                         onClick={() => setSelectedRoom(room)}
                       />
+                      
                     ))}
                   </div>
 
