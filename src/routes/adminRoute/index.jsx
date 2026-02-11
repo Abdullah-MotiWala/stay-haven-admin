@@ -13,6 +13,11 @@ import AddBooking from "../../container/booking/addBooking";
 import AddNewRoom from "../../container/rooms/addRoom";
 import Appartments from "../../container/appartment";
 import AddNewAppartment from "../../container/appartment/addAppartment";
+import ChatWindow from "../../components/ticketChat.jsx";
+import TicketsPage from "../../components/TicketPage.jsx";
+import SettingParent from "../../container/settings";
+
+import HotelBookingDashboard from "../../container/dashboard";
 export const AdminRoute = [
   {
     path: "/admin",
@@ -21,6 +26,7 @@ export const AdminRoute = [
       {
         element: <AdminLayout />,
         children: [
+          { path: "dashboard", element: <HotelBookingDashboard /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
           { path: "hotel/edit/:id", element: <AddHotel /> },
@@ -38,6 +44,17 @@ export const AdminRoute = [
           { path: "booking/view/:id", element: <BookingView /> },
           { path: "booking/add", element: <AddBooking /> },
           { path: "booking/edit/:id", element: <AddBooking /> },
+          
+          { path: "tickets", element: <TicketsPage/> },
+          { path: "tickets/:ticketId/chat", element: <ChatWindow/>},
+
+          
+          { path: "settings", element: <SettingParent /> },
+
+          // { path: "login", element: <Login/> }
+          // { path: "signup", element: <Signup/> }
+          
+
 
         ],
       },

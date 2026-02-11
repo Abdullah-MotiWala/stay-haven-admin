@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Layout, Menu, Button, Drawer } from "antd";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Layout, Menu, Button, Drawer, Modal } from "antd";
 
 import {
   AppstoreOutlined,
@@ -11,6 +11,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
   MenuOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 
 import logo from "../../assets/images/logo-haven.svg";
@@ -61,30 +62,53 @@ const menuItems = [
   },
 ];
 
-const SidebarContent = ({ location }) => (
-  <div className="flex flex-col h-full">
-    <div className="p-2 flex justify-center mb-16 mt-10">
-      <img src={logo} alt="STAY HAVEN" className=" object-contain" />
-    </div>
+const SidebarContent = ({ location }) => {
+  const navigate = useNavigate();
 
-    <Menu
-      mode="inline"
-      selectedKeys={[location.pathname]}
-      items={menuItems}
-      className="px-2 sidebar-menu font-medium text-gray-500"
-    />
+  // --- Logout Function ---
+  const handleLogout = () => {
+    Modal.confirm({
+      title: 'Do you want to logout?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'You will need to login again to access the dashboard.',
+      okText: 'Logout',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk() {
+        // 1. LocalStorage se sab saaf kar dein
+        localStorage.clear(); 
+        // 2. Wapas login page par bhej dein
+        navigate("/auth/login", { replace: true });
+      },
+    });
+  };
 
-    <div className="p-2 mt-auto border-t border-gray-100">
-      <Button
-        icon={<LogoutOutlined />}
-        block
-        className="rounded-md h-12 bg-white text-lightSeconday font-medium"
-      >
-        Logout
-      </Button>
+  return (
+    <div className="flex flex-col h-full">
+      <div className="p-2 flex justify-center mb-16 mt-10">
+        <img src={logo} alt="STAY HAVEN" className=" object-contain" />
+      </div>
+
+      <Menu
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        items={menuItems}
+        className="px-2 sidebar-menu font-medium text-gray-500"
+      />
+
+      <div className="p-2 mt-auto border-t border-gray-100">
+        <Button
+          icon={<LogoutOutlined />}
+          block
+          onClick={handleLogout} // Click handler connect kiya
+          className="rounded-md h-12 bg-white text-lightRed font-medium border-lightRed hover:text-red-600"
+        >
+          Logout
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Sidebar = () => {
   const location = useLocation();

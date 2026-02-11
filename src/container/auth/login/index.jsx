@@ -2,36 +2,40 @@ import React from "react";
 import { Form, Input, Button, Card, Checkbox } from "antd";
 import { loginApi } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { openNotification } from "../../../network/notification";
+import { Authenticate, SelfUser } from "../../../redux/features/authSlice";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const handleLogin = async (values) => {
-    try {
-      const payload = {
-        ...values,
-        userType: "admin",
-      };
-      console.log("Login successful:", payload);
-      const res = await loginApi(payload);
-      console.log("Login successful:", res);
-      if(!res.data.token){
-        throw new Error("Login failed");
-      }else{
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("userType", res.userType);
-        localStorage.setItem("fullName", res.fullName);
-        navigate("/admin/hotels", { replace: true });
+const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-      }
+const handleLogin = async (values) => {
+  try {
+    const payload = { ...values, userType: "admin" };
+    const res = await loginApi(payload);
 
+    const userData = res.data; 
 
-    } catch (err) {
-      console.error(err);
-            openNotification("error", "Invalid email or password");
-      
+    if (!userData.token) {
+      throw new Error("Login failed");
+    } else {
+      localStorage.setItem("token", userData.token);
+      localStorage.setItem("userType", userData.userType);
+      localStorage.setItem("fullName", userData.name || userData.fullName);
+
+      dispatch(Authenticate({ token: userData.token })); 
+      dispatch(SelfUser(userData)); 
+
+      openNotification("success", "Welcome back, " + (userData.name || "Admin"));
+
+      navigate("/admin/dashboard", { replace: true });
     }
-  };
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || "Invalid email or password";
+    openNotification("error", errorMsg);
+  }
+};
   return (
     <>
       <div className="flex items-center justify-center p-4 ">
@@ -73,16 +77,16 @@ const Login = () => {
             >
               Login
             </Button>
-            <div className="mt-3 text-center">
+            {/* <div className="mt-3 text-center">
               <a href="" className="text-center text-blue pt-2 underline">
                 Forget Password ?
               </a>
-            </div>
+            </div> */}
 
-            <div className="text-center mt-2">
+            {/* <div className="text-center mt-2">
               <p className="mb-0">Don’t have an account yet?</p>
-              <a href="">Sign up Now</a>
-            </div>
+              <a href="/auth/signup">Sign up Now</a>
+            </div> */}
           </Form>
         </Card>
       </div>

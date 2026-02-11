@@ -9,6 +9,13 @@ export const APPARTMENT_TYPES = [
   "Three Bed",
   "Luxury Suites",
 ];
+export const TABS = [
+  "General Settings",
+  "Amenities",
+  "Booking Features",
+  "Booking Policies",
+  "Pricing & Taxes",
+];
 
 export const ROOM_TYPES = [
   "All Rooms",

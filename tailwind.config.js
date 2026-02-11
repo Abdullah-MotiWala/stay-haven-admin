@@ -10,7 +10,7 @@ module.exports = {
         dark: "#1f2937",
         extradark: "#212121",
         light: "#f3f4f6",
-        darkBlue: "#0A5BE2",
+        mainBlue: "#0A5BE2",
         blue: "#8B0002",
         lightBrown: "#E3E3E3",
         lightSeconday: "#6C7293",
@@ -36,7 +36,10 @@ module.exports = {
         havenLight:"#E9E9E9",
         inpgray: "#F9F9F9",
         inpgraysecondary: "#F9FAFC",
-        darkgrayline: "#BBBBBB"
+        darkgrayline: "#BBBBBB",
+        lightGrays:"#E8E7EC",
+        maxLightRed:"#FFE1E3",
+        maxLightBlue:"#E5EFFF",
 
       },
       fontSize: {

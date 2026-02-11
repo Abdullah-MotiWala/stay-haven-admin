@@ -50,10 +50,13 @@ export default function Appartments() {
         status,
         search,
         sort,
-        activeType === "All Apartments" ? "All" : activeType
+        activeType === "All Apartments" ? "All" : activeType,
       );
       console.log(res?.data, "res?.data");
       setAppartmentsData(res?.data);
+      if (res?.data?.data?.length > 0) {
+        setSelectedAppartment(res.data.data[0]);
+      }
       setRefresh(false);
       setLoading(true);
     } catch (err) {
@@ -62,7 +65,7 @@ export default function Appartments() {
   };
   useEffect(() => {
     fetchData();
-  }, [currentPage, itemsPerPage, search,activeType]);
+  }, [currentPage, itemsPerPage, search, activeType]);
 
   useEffect(() => {
     const fetchStats = async () => {

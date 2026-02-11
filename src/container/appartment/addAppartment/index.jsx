@@ -42,6 +42,7 @@ const AddNewAppartment = () => {
   const [hotel, setHotel] = useState([]);
   const [hotelsList, setHotelsList] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [roomTypesList, setRoomTypesList] = useState([]);
 
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
@@ -76,7 +77,7 @@ const AddNewAppartment = () => {
         form.setFieldsValue({
           name: appartment.apartmentName || "",
           appartmentNumber: appartment.apartmentNumber || "",
-          type: appartment.type || "",
+          type: appartment.roomType?.id || appartment.typeId,
           bedType: appartment.bedType || "",
           roomSize: appartment.appartmentSize || "",
           maxAdults: appartment.maxAdults || 1,
@@ -87,6 +88,9 @@ const AddNewAppartment = () => {
           mainImage: appartment.mainImage || "",
           galleryImages: appartment.galleryImages || [],
           hotel: appartment.hotel?.id,
+          hostname: appartment.host?.name,
+          email: appartment.host?.email,
+          phoneNumber: appartment.host?.phone,
           // featureIds: appartment.featureIds || [],
           facility: appartment.features?.map((a) => a.id) || [],
           amenities: appartment.features?.map((r) => r.id) || [],
@@ -105,15 +109,17 @@ const AddNewAppartment = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
+          getAllFeature("ROOM_TYPE"),
         ]);
 
         setAmenitiesList(amenityRes.data);
         setFeaturesList(featuresRes.data);
         setFacilityList(facilityRes.data);
+        setRoomTypesList(roomTypeRes.data);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -291,6 +297,7 @@ const AddNewAppartment = () => {
                     preserve={true}
                     name="hotel"
                     label=""
+
                     rules={[
                       {
                         required: true,
@@ -325,25 +332,11 @@ const AddNewAppartment = () => {
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                      {[
-                        {
-                          label: "Single Bed Appartment",
-                          value: "single room",
-                        },
-                        {
-                          label: "Double Bed Appartment",
-                          value: "Two Bed Rooms",
-                        },
-                        {
-                          label: "Three Bed Appartment",
-                          value: "three bed appartment",
-                        },
-                        { label: "Luxury Suits", value: "luxury suits" },
-                      ].map((item) => (
-                        <Option key={item.value} value={item.value}>
-                          {item.label}
-                        </Option>
-                      ))}
+                     {roomTypesList?.map((item) => (
+                      <Option key={item.id} value={item.id}>
+                        {item.title}
+                      </Option>
+                    ))}
                     </Select>
                   </Form.Item>
                 </div>

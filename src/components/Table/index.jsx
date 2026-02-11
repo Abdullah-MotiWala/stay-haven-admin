@@ -6,10 +6,10 @@ import { bulkActionApi } from "../../services/hotel";
 import { openNotification } from "../../network/notification";
 import { exportToExcel } from "../../utils/exportExcel";
 import { deriveBookingStatus } from "../../helper";
-import search from "../../assets/icons/search.png"
-import { Calendar, RotateCcw } from "lucide-react"
-import tablecalender from "../../assets/icons/tablecalender.png"
-import { Select } from 'antd';
+import search from "../../assets/icons/search.png";
+import { Calendar, RotateCcw } from "lucide-react";
+import tablecalender from "../../assets/icons/tablecalender.png";
+import { Select } from "antd";
 const HotelDirectory = ({
   data = [],
   columns = [],
@@ -23,8 +23,9 @@ const HotelDirectory = ({
   inp,
   onlyFilter,
   path,
-  checkbox,
+  checkbox = true,
   activeType,
+  roomTypes = []
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -33,9 +34,7 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
-  
 
-  // Filter State
   const [filters, setFilters] = useState({
     roomType: "",
     hotelName: "",
@@ -45,17 +44,22 @@ const HotelDirectory = ({
     dateTo: "",
   });
 
-  // Updated Filter Logic
   const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Basic Filters
-      const matchesSearch = !searchTerm || item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesRoom = !filters.roomType || item.roomType === filters.roomType;
-      const matchesHotel = !filters.hotelName || item.hotelName === filters.hotelName;
-      const itemStatus = item.checkInOut ? deriveBookingStatus(item.checkInOut) : item.status;
-      const matchesStatus = !filters.status || itemStatus?.toLowerCase() === filters.status.toLowerCase();
+    return data?.filter((item) => {
+      const matchesSearch =
+        !searchTerm ||
+        item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRoom =
+        !filters.roomType || item.roomType === filters.roomType;
+      const matchesHotel =
+        !filters.hotelName || item.hotelName === filters.hotelName;
+      const itemStatus = item.checkInOut
+        ? deriveBookingStatus(item.checkInOut)
+        : item.status;
+      const matchesStatus =
+        !filters.status ||
+        itemStatus?.toLowerCase() === filters.status.toLowerCase();
 
-      // 1. Date Logic (Pehle ki tarah split karke)
       let matchesDate = true;
       if (item.checkInOut && (filters.dateFrom || filters.dateTo)) {
         const startDateStr = item.checkInOut.split(" - ")[0];
@@ -74,29 +78,32 @@ const HotelDirectory = ({
         }
       }
 
-      // 2. Duration Logic (Stay ke dino ke hisaab se)
       let matchesDuration = true;
       if (filters.duration && item.duration) {
-        // item.duration se number nikalein (e.g., "4 Nights" -> 4)
         const stayNights = parseInt(item.duration);
 
         if (filters.duration === "24h") {
-          // Sirf 1 raat wala stay
           if (stayNights !== 1) matchesDuration = false;
         } else if (filters.duration === "1w") {
-          // 1 hafte tak ka stay (1 se 7 raatein)
           if (stayNights > 7) matchesDuration = false;
         } else if (filters.duration === "3w") {
-          // 3 hafte tak ka stay (1 se 21 raatein)
           if (stayNights > 21) matchesDuration = false;
         }
       }
 
-      return matchesSearch && matchesRoom && matchesHotel && matchesStatus && matchesDate && matchesDuration;
+      return (
+        matchesSearch &&
+        matchesRoom &&
+        matchesHotel &&
+        matchesStatus &&
+        matchesDate &&
+        matchesDuration
+      );
     });
   }, [searchTerm, data, filters]);
+
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const resetFilters = () => {
@@ -111,11 +118,9 @@ const HotelDirectory = ({
     setSearchTerm("");
   };
 
-  // Extract unique hotels from data for the dropdown
-  const uniqueHotels = [...new Set(data.map(item => item.hotelName))];
+  const uniqueHotels = [...new Set(data?.map((item) => item.hotelName))];
 
   const getStatusStyle = (status) => {
-    console.log(status, "status12sadasd");
     switch (status) {
       case "Booked":
         return "bg-lightYellow text-black";
@@ -135,12 +140,6 @@ const HotelDirectory = ({
         return "bg-lightRed text-red";
       case "Delete":
         return "bg-red-100 text-red-600";
-      case "Draft":
-        return "bg-red-100 text-red-600";
-      case "Checked-In":
-        return "bg-lightYellow text-black";
-      case "Checked-Out":
-        return "bg-shadeGreen text-black";
       default:
         return "bg-gray-100 text-gray-600";
     }
@@ -158,7 +157,6 @@ const HotelDirectory = ({
   };
 
   const getRowStatus = (row) => {
-    console.log(row, "rowrow1234");
     if (row.checkInOut) {
       return deriveBookingStatus(row.checkInOut);
     }
@@ -178,10 +176,10 @@ const HotelDirectory = ({
   };
 
   const toggleAll = () => {
-    if (selectedIds.length === data.length) {
+    if (selectedIds?.length === data?.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(data.map((row) => row.id));
+      setSelectedIds(data?.map((row) => row.id));
     }
   };
 
@@ -193,13 +191,10 @@ const HotelDirectory = ({
 
     const payload = {
       ids: selectedIds,
-      action, // ACTIVATE | DEACTIVATE | DELETE
+      action,
     };
 
-    console.log("Bulk action payload:", payload);
-
     try {
-      console.log("Bulk payload:", payload);
       await bulkActionApi(payload);
       setSelectedIds([]);
       setBulkOpen(false);
@@ -212,7 +207,7 @@ const HotelDirectory = ({
   const handleExportExcel = () => {
     const rowsToExport =
       selectedIds.length > 0
-        ? data.filter((row) => selectedIds.includes(row.id))
+        ? data?.filter((row) => selectedIds.includes(row.id))
         : data;
 
     if (rowsToExport.length === 0) {
@@ -253,12 +248,13 @@ const HotelDirectory = ({
         );
 
       case "roomType":
+        const typeLabel = typeof row.roomType === 'object' ? row.roomType.title : row.roomType;
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center
-      ${getRoomTypeStyle(row.roomType)}`}
+      ${getRoomTypeStyle(typeLabel)}`}
           >
-            {row.roomType ?? "N/A"}
+            {typeLabel ?? "N/A"}
           </span>
         );
 
@@ -322,7 +318,9 @@ const HotelDirectory = ({
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
           {inp && (
-            <div className="relative"> {/* Isko relative rakhein taake icon sahi position ho */}
+            <div className="relative">
+              {" "}
+              {/* Isko relative rakhein taake icon sahi position ho */}
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <img src={search} className="w-4 h-4" alt="search" />
               </span>
@@ -333,9 +331,7 @@ const HotelDirectory = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
           )}
-
         </div>
 
         {/* Right Section: Buttons aur Filters */}
@@ -343,7 +339,10 @@ const HotelDirectory = ({
           {filter && (
             <div className="flex items-center gap-2">
               {/* Ye Filter button hamesha dikhega agar 'filter' prop true hai */}
-              <button className="p-2 border rounded-lg hover:bg-gray-50" onClick={() => setShowFilter(!showFilter)}>
+              <button
+                className="p-2 border rounded-lg hover:bg-gray-50"
+                onClick={() => setShowFilter(!showFilter)}
+              >
                 <Filter size={16} />
               </button>
 
@@ -361,11 +360,19 @@ const HotelDirectory = ({
 
                     {bulkOpen && (
                       <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-                        {["Active Selected", "InActive Selected", "Delete", "Draft", "Maintenance"].map((item) => (
+                        {[
+                          "Active Selected",
+                          "InActive Selected",
+                          "Delete",
+                          "Draft",
+                          "Maintenance",
+                        ].map((item) => (
                           <button
                             key={item}
                             onClick={() => {
-                              handleBulkAction(item.split(" ")[0].toUpperCase());
+                              handleBulkAction(
+                                item.split(" ")[0].toUpperCase(),
+                              );
                               setBulkOpen(!bulkOpen);
                             }}
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
@@ -396,27 +403,40 @@ const HotelDirectory = ({
             </button>
           )}
         </div>
-
       </div>
       {showFilter && (
         <div className="flex justify-end w-full">
           <div className="bg-white border rounded-2xl p-6 shadow-sm w-full mb-6">
-            <h3 className="text-gray-900 font-bold text-lg mb-5">Apply Filters</h3>
+            <h3 className="text-gray-900 font-bold text-lg mb-5">
+              Apply Filters
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
               {/* Select Room - Ant Design */}
               <div className="relative ant-select-custom">
                 <Select
-                  placeholder={activeType === "Apartment Bookings" ? "Select Apartment" : "Select Room"}
+                  placeholder={
+                    activeType === "Apartment Bookings"
+                      ? "Select Apartment"
+                      : "Select Room"
+                  }
                   value={filters.roomType || undefined}
                   onChange={(val) => handleFilterChange("roomType", val)}
                   className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
+                  suffixIcon={
+                    <ChevronDown size={18} className="text-gray-900" />
+                  }
                 >
-                  <Option value="" >Select Room</Option>
-                  <Option value="One Bed Rooms">One Bed Rooms</Option>
-                  <Option value="Two Bed Rooms">Two Bed Rooms</Option>
-                  <Option value="Three Bed Rooms">Three Bed Rooms</Option>
+                  <Option value="">Select Room</Option>
+                  {roomTypes.length > 0 ? (
+                    roomTypes.map(type => (
+                      <Option key={type.id} value={type.id}>{type.title}</Option>
+                    ))
+                  ) : (
+                    <>
+                      <Option value="one-bed-id">One Bed Room</Option>
+                      <Option value="two-bed-id">Two Bed Room</Option>
+                    </>
+                  )}
                 </Select>
               </div>
 
@@ -427,11 +447,15 @@ const HotelDirectory = ({
                   value={filters.hotelName || undefined}
                   onChange={(val) => handleFilterChange("hotelName", val)}
                   className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
+                  suffixIcon={
+                    <ChevronDown size={18} className="text-gray-900" />
+                  }
                 >
                   <Option value="">Select Hotel</Option>
-                  {uniqueHotels.map(hotel => (
-                    <Option key={hotel} value={hotel}>{hotel}</Option>
+                  {uniqueHotels.map((hotel) => (
+                    <Option key={hotel} value={hotel}>
+                      {hotel}
+                    </Option>
                   ))}
                 </Select>
               </div>
@@ -443,7 +467,9 @@ const HotelDirectory = ({
                   value={filters.duration || undefined}
                   onChange={(val) => handleFilterChange("duration", val)}
                   className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
+                  suffixIcon={
+                    <ChevronDown size={18} className="text-gray-900" />
+                  }
                 >
                   <Option value="">Sort by Duration</Option>
                   <Option value="24h">24 Hours</Option>
@@ -459,10 +485,12 @@ const HotelDirectory = ({
                   value={filters.status || undefined}
                   onChange={(val) => handleFilterChange("status", val)}
                   className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={<ChevronDown size={18} className="text-gray-900" />}
+                  suffixIcon={
+                    <ChevronDown size={18} className="text-gray-900" />
+                  }
                 >
                   <Option value="">Sort by Status</Option>
-                  <Option value="Booked">Booked</Option>
+                  <Option value="Booked  ">Booked</Option>
                   <Option value="Completed">Completed</Option>
                   <Option value="Cancelled">Cancelled</Option>
                   <Option value="Checked-In">Checked In</Option>
@@ -479,7 +507,9 @@ const HotelDirectory = ({
                 <input
                   type="date"
                   value={filters.dateFrom}
-                  onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("dateFrom", e.target.value)
+                  }
                   className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
                 />
               </div>
@@ -500,10 +530,16 @@ const HotelDirectory = ({
               </div>
 
               <div className="lg:col-span-2 flex items-center justify-end gap-3">
-                <button onClick={resetFilters} className="flex items-center gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100">
+                <button
+                  onClick={resetFilters}
+                  className="flex items-center gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100"
+                >
                   <RotateCcw size={16} /> Reset All Filters
                 </button>
-                <button onClick={() => setShowFilter(false)} className="px-10 py-3 bg-[#0061F2] text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">
+                <button
+                  onClick={() => setShowFilter(false)}
+                  className="px-10 py-3 bg-[#0061F2] text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all"
+                >
                   Apply
                 </button>
               </div>
@@ -517,21 +553,18 @@ const HotelDirectory = ({
         <table className="w-full border-collapse">
           <thead className="">
             <tr>
-
               {checkbox && (
                 <th className="w-10 border-b border-t border-r  border-dashed">
                   <input
                     type="checkbox"
                     checked={
-                      selectedIds.length === data.length && data.length > 0
+                      selectedIds.length === data?.length && data?.length > 0
                     }
                     onChange={toggleAll}
                     className="checked:accent-blue"
                   />
                 </th>
-
               )}
-
 
               {columns.map((col) => (
                 <th
@@ -550,17 +583,17 @@ const HotelDirectory = ({
           </thead>
 
           <tbody>
-            {data.length === 0 ? (
+            {data?.length === 0 ? (
               <tr>
                 <td
-                  colSpan={columns.length + 1}
+                  colSpan={columns?.length + 1}
                   className="py-12 text-center text-sm text-gray-500"
                 >
                   No data found
                 </td>
               </tr>
             ) : (
-              data.map((row, index) => {
+              data?.map((row, index) => {
                 const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
                   index + 1,
                 ).padStart(2, "0")}`;
@@ -585,7 +618,6 @@ const HotelDirectory = ({
                         />
                       </td>
                     )}
-
 
                     {columns.map((col) => (
                       <td
@@ -645,9 +677,3 @@ const HotelDirectory = ({
 };
 
 export default HotelDirectory;
-
-
-
-
-
-

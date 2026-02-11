@@ -25,7 +25,7 @@ const HotelsListing = () => {
   const [lastId, setLastId] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(2);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -93,9 +93,9 @@ const HotelsListing = () => {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: "+12%",
+      trend: `${stats?.growth?.isPositive ? '+' : '-'}${stats?.growth?.percentage ?? 0}%`,
       trendText: "vs last week",
-      showTrend: false,
+      showTrend: true,
     },
     {
       title: "Active Hotels",
@@ -132,11 +132,10 @@ const HotelsListing = () => {
   ];
 
   const onPageChange = (page, pageSize) => {
-    setCurrentPage(page); // Update current page state
-    setItemsPerPage(pageSize); // Update items per page if needed
+    setCurrentPage(page); 
+    setItemsPerPage(pageSize); 
   };
 
-  console.log(lastId, "hot213123elshotelshotels");
   return (
     <div className="p-0">
       <div className="mt-4 px-3">
@@ -163,6 +162,7 @@ const HotelsListing = () => {
             columns={columns}
             setRefresh={setRefresh}
             lastId={lastId?.nextNumericId}
+            path={`/admin/hotel/view`}
           />
         )}
 
@@ -181,11 +181,11 @@ const HotelsListing = () => {
             <span className="text-lightSeconday ml-4">Entries per page</span>
           </div>
           <Pagination
-            current={currentPage} 
+            current={currentPage}
             total={stats?.totalHotels || 0}
-            pageSize={itemsPerPage} 
-            onChange={onPageChange} 
-            // showSizeChanger={false} 
+            pageSize={itemsPerPage}
+            onChange={onPageChange}
+            // showSizeChanger={false}
             className="flex justify-end "
             // style={{ paddingTop: "20px", paddingBottom: "20px" }} // Adds padding for better spacing
           />
