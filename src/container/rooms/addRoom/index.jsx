@@ -109,7 +109,6 @@ const AddNewRoom = () => {
         setFeaturesList(featuresRes.data);
         setFacilityList(facilityRes.data);
         setRoomTypesList(roomTypeRes.data);
-        console.log(roomTypesRes.data)
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -280,7 +279,7 @@ const AddNewRoom = () => {
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {hotelsList?.map((item) => (
-                        <Option key={item.id} value={item.id}>
+                        <Option key={item.hotel_id} value={item.hotel_id}>
                           {item.name}
                         </Option>
                       ))}

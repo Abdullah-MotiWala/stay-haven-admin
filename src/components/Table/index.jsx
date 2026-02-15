@@ -45,7 +45,9 @@ const HotelDirectory = ({
   });
 
   const filteredData = useMemo(() => {
-    return data?.filter((item) => {
+    if (!Array.isArray(data)) return [];
+
+    return data.filter((item) => {
       const matchesSearch =
         !searchTerm ||
         item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -117,8 +119,18 @@ const HotelDirectory = ({
     });
     setSearchTerm("");
   };
+  
+  // const uniqueHotels = [...new Set(data?.map((item) => item.hotelName))];
 
-  const uniqueHotels = [...new Set(data?.map((item) => item.hotelName))];
+ // Replace your current code with this:
+const bookings = Array.isArray(data) ? data : [data];
+const safeBookings = bookings.filter(item => item && item.hotelName); // Safe filter
+const uniqueHotels = [...new Set(safeBookings.map(item => item.hotelName))];
+
+
+  // const uniqueHotels = [
+  //   ...new Set(Array.isArray(data) ? data.map(item => item.hotelName) : [])
+  // ];
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -583,7 +595,7 @@ const HotelDirectory = ({
           </thead>
 
           <tbody>
-            {data?.length === 0 ? (
+            {!Array.isArray(data) || data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns?.length + 1}

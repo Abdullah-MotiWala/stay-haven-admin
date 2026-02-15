@@ -14,7 +14,7 @@ import SuccessModal from "../../../components/shared/successModal";
 import { Form, Input, Select, Checkbox } from "antd";
 const HotelForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); 
   const isEditMode = Boolean(id);
   const [form] = Form.useForm();
 

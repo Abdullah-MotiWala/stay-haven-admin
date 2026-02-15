@@ -66,7 +66,7 @@ const AddNewAppartment = () => {
 
   useEffect(() => {
     if (!isEditMode) return;
-
+    console.log(hotelsList, "hotellist data");
     const fetchAppartmentById = async () => {
       setFetching(true);
       try {
@@ -292,24 +292,26 @@ const AddNewAppartment = () => {
                   <label className="text-base text-lightSeconday font-medium">
                     Select Hotel
                   </label>
-
                   <Form.Item
                     preserve={true}
                     name="hotel"
-                    label=""
-
                     rules={[
                       {
                         required: true,
-                        message: "Appartment Name is required",
+                        message: "Hotel selection is required",
                       },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select
+                      className="w-full h-12 border border-lightSeconday rounded-md font-medium"
+                      placeholder="Select a hotel"
+                      // OnChange check karne ke liye (Debugging)
+                      onChange={(val) => console.log("Selected Value:", val)}
+                    >
                       {hotelsList?.map((item) => (
-                        <Option key={item.id} value={item.id}>
+                        <Select.Option key={item.hotel_id} value={item.hotel_id}>
                           {item.name}
-                        </Option>
+                        </Select.Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -332,11 +334,11 @@ const AddNewAppartment = () => {
                     ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                     {roomTypesList?.map((item) => (
-                      <Option key={item.id} value={item.id}>
-                        {item.title}
-                      </Option>
-                    ))}
+                      {roomTypesList?.map((item) => (
+                        <Option key={item.id} value={item.id}>
+                          {item.title}
+                        </Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </div>
@@ -759,9 +761,8 @@ const AddNewAppartment = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>
@@ -804,9 +805,8 @@ const AddNewAppartment = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>
@@ -851,9 +851,8 @@ const AddNewAppartment = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>
@@ -985,7 +984,7 @@ const AddNewAppartment = () => {
                       <Input
                         className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
                         placeholder="Enter phone number"
-                        // addonBefore="+92"
+                      // addonBefore="+92"
                       />
                     </Form.Item>
                   </div>
