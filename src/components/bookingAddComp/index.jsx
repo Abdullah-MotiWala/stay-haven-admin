@@ -45,6 +45,9 @@ const BookingAddComp = () => {
     roomType: "",
     roomNumber: "",
 
+    apartmentName: "",
+    apartmentNumber: "",
+
     numGuests: "01 Adult",
     checkIn: "",
     checkOut: "",
@@ -54,6 +57,7 @@ const BookingAddComp = () => {
     discount: 5, // Hardcoded Discount
     paymentMethod: "Bank",
     status: "Checked-In",
+    isApartment: false,
   });
 
   const [hostData, setHostData] = useState({
@@ -100,6 +104,8 @@ const BookingAddComp = () => {
         const res = await getAllRooms();
         const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setRooms(data);
+        console.log(res.data, "Rooms");
+
       } catch (err) {
         console.error("Error fetching rooms:", err);
         openNotification("error", "Failed to load rooms");
@@ -162,11 +168,19 @@ const BookingAddComp = () => {
       }
       setFormData((prev) => ({
         ...prev,
-        hotelName: value,
-        hotelId: selectedObj?.hotelId || selectedObj?.hotel?._id || "",
-        roomType: selectedObj?.type || "",
+        hotelName: !isApartment ? value : "",
+        hotelId: selectedObj?.hotelId || selectedObj?.hotel?._id || selectedObj?.hotel?.id || "",
+        roomType: selectedObj?.type || selectedObj?.roomType.title || "",
         pricePerNight: selectedObj?.price || selectedObj?.pricePerNight || 0,
+        // roomId: selectedObj?.id || "",
+        apartmentId: selectedObj?.id || "",
+        roomNumber: selectedObj?.apartmentNumber || "",
+        apartmentName: !isApartment ? value : "",
+
       }));
+      console.log(selectedObj, "selected Object for Hotel/Apartment");
+      console.log(value, "selected value for Hotel/Apartment");
+
       return;
     }
 
@@ -202,9 +216,9 @@ const BookingAddComp = () => {
 
   const getTypeOptions = () => {
     if (formData.bookingType === "Apartment") {
-      return [...new Set(apartment.map((a) => a.type))];
+      return [...new Set(apartment.map((a) => a.roomType.title))];
     }
-    return [...new Set(rooms.map((r) => r.type))];
+    return [...new Set(rooms.map((r) => r.roomType.title))];
   };
 
   const getNumberOptions = () => {
@@ -217,7 +231,7 @@ const BookingAddComp = () => {
         .map((a) => a.apartmentNumber);
     }
     return rooms
-      .filter((r) => !formData.roomType || r.type === formData.roomType)
+      .filter((r) => !formData.roomType || r.roomType?.title  === formData.roomType)
       .map((r) => r.roomNumber);
   };
 
@@ -226,9 +240,14 @@ const BookingAddComp = () => {
     setLoading(true);
 
     try {
-      console.log("Final Payload:", formData);
+      const finalPayload = {
+        ...formData,
+        isApartment: formData.bookingType === "Apartment",
+      };
 
-      const res = await createBooking(formData);
+      console.log("Final Payload:", finalPayload);
+
+      const res = await createBooking(finalPayload);
 
       if (res.status === 200 || res.status === 201) {
         openNotification("success", "Booking saved successfully!");

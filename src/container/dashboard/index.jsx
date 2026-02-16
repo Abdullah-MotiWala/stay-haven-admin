@@ -17,6 +17,7 @@ import {
   getOpenTickets
 } from "../../services/dashboard/";
 import { openNotification } from "../../network/notification";
+import { getNotificationApi } from "../../services/notification";
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [bookingStatistics, setBookingStatistics] = useState(null);
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const [recentBookings, setRecentBookings] = useState(null);
   const [apartmentAvailability, setApartmentAvailability] = useState([]);
   const [openTickets, setOpenTickets] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     fetchAllDashboardData();
@@ -41,7 +43,8 @@ const Dashboard = () => {
         customersRes,
         recentBookingsRes,
         apartmentRes,
-        openTicketsRes
+        openTicketsRes,
+        notifications
       ] = await Promise.all([
         getStats(),
         getBookingStatistics(),
@@ -50,7 +53,10 @@ const Dashboard = () => {
         getCustomers(),
         getRecentBookings(),
         getApartmentAvailability(),
-        getOpenTickets()
+        getOpenTickets(),
+        getNotificationApi()
+        
+
       ]);
 
       setStats(statsRes?.data?.data);
@@ -61,6 +67,7 @@ const Dashboard = () => {
       setRecentBookings(recentBookingsRes?.data);
       setApartmentAvailability(apartmentRes?.data?.data || []);
       setOpenTickets(openTicketsRes?.data?.data)
+      setNotifications(notifications?.data?.data || []);
 
       console.log("Stats:", statsRes?.data?.data);
       console.log("Booking Statistics:", bookingStatsRes?.data?.data);
@@ -68,6 +75,8 @@ const Dashboard = () => {
       console.log("Booking Status:", bookingStatusRes?.data?.data);
       console.log("Customers:", customersRes?.data?.data);
       console.log("Recent Bookings:", recentBookingsRes?.data);
+      console.log("Notifications:", notifications?.data?.data || []);
+
     } catch (err) {
       console.error("Dashboard API error:", err);
       openNotification("error", "Failed to load dashboard data");
@@ -110,7 +119,7 @@ const Dashboard = () => {
   ];
   return (
     <div>
-      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={recentBookings} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} />
+      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={recentBookings} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} />
     </div>
   );
 };

@@ -7,7 +7,7 @@ import OpenTickets from "./openTickets";
 import AvailabilityProgress from "./roomCharts";
 import RoomAvailability from "./roomCharts";
 
-const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets }) => {
+const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets, notifications }) => {
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} />
@@ -42,7 +42,7 @@ const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatu
         </div>
 
         <div className="lg:col-span-1 m-0">
-          <NotificationsAlerts />
+          <NotificationsAlerts notifications={notifications || []} />
         </div>
       </div>
     </>
