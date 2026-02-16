@@ -175,7 +175,7 @@ const BookingAddComp = () => {
         // roomId: selectedObj?.id || "",
         apartmentId: selectedObj?.id || "",
         roomNumber: selectedObj?.apartmentNumber || "",
-        apartmentName: !isApartment ? value : "",
+        apartmentName: isApartment ? value : "",
 
       }));
       console.log(selectedObj, "selected Object for Hotel/Apartment");
