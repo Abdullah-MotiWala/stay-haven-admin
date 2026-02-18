@@ -12,7 +12,9 @@ import {
   LogoutOutlined,
   MenuOutlined,
   ExclamationCircleOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+
 
 import logo from "../../assets/images/logo-haven.svg";
 import dashboardIcon from "../../assets/images/dashbi.svg";
@@ -56,11 +58,17 @@ const menuItems = [
     label: <Link to="/admin/tickets">Tickets</Link>,
   },
   {
+    key: "/admin/hosts",
+    icon: <UserOutlined className={iconStyle} />,
+    label: <Link to="/admin/hosts">Hosts</Link>,
+  },
+  {
     key: "/admin/settings",
     icon: <img src={settingIcon} className={iconStyle} alt="settings" />,
     label: <Link to="/admin/settings">Settings</Link>,
   },
 ];
+
 
 const SidebarContent = ({ location }) => {
   const navigate = useNavigate();
@@ -76,7 +84,7 @@ const SidebarContent = ({ location }) => {
       cancelText: 'Cancel',
       onOk() {
         // 1. LocalStorage se sab saaf kar dein
-        localStorage.clear(); 
+        localStorage.clear();
         // 2. Wapas login page par bhej dein
         navigate("/auth/login", { replace: true });
       },

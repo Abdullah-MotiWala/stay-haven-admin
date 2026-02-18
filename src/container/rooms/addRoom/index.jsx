@@ -228,9 +228,9 @@ const AddNewRoom = () => {
                     preserve={true}
                     name="name"
                     label=""
-                    rules={[
-                      { required: true, message: "Room Name is required" },
-                    ]}
+                    // rules={[
+                    //   { required: true, message: "Room Name is required" },
+                    // ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {[
@@ -273,9 +273,9 @@ const AddNewRoom = () => {
                     preserve={true}
                     name="hotel"
                     label=""
-                    rules={[
-                      { required: true, message: "Room Name is required" },
-                    ]}
+                    // rules={[
+                    //   { required: true, message: "Room Name is required" },
+                    // ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {hotelsList?.map((item) => (

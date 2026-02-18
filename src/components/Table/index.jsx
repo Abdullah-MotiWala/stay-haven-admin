@@ -25,7 +25,8 @@ const HotelDirectory = ({
   path,
   checkbox = true,
   activeType,
-  roomTypes = []
+  roomTypes = [],
+  onStatusToggle
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -119,13 +120,13 @@ const HotelDirectory = ({
     });
     setSearchTerm("");
   };
-  
+
   // const uniqueHotels = [...new Set(data?.map((item) => item.hotelName))];
 
- // Replace your current code with this:
-const bookings = Array.isArray(data) ? data : [data];
-const safeBookings = bookings.filter(item => item && item.hotelName); // Safe filter
-const uniqueHotels = [...new Set(safeBookings.map(item => item.hotelName))];
+  // Replace your current code with this:
+  const bookings = Array.isArray(data) ? data : [data];
+  const safeBookings = bookings.filter(item => item && item.hotelName); // Safe filter
+  const uniqueHotels = [...new Set(safeBookings.map(item => item.hotelName))];
 
 
   // const uniqueHotels = [
@@ -283,14 +284,35 @@ const uniqueHotels = [...new Set(safeBookings.map(item => item.hotelName))];
           <span className="text-sm text-gray-900">{row.checkInOut ?? "-"}</span>
         );
 
+      // case "status":
+      //   const status = getRowStatus(row);
+      //   console.log(status, "statusstatusstatus");
+      //   return (
+      //     <span
+      //       className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+      //         status,
+      //       )}`}
+      //     >
+      //       {status}
+      //     </span>
+      //   );
       case "status":
         const status = getRowStatus(row);
-        console.log(status, "statusstatusstatus");
+
+        if (onStatusToggle) {
+          return (
+            <button
+              onClick={() => onStatusToggle(row.id)}
+              className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer ${getStatusStyle(status)}`}
+            >
+              {status}
+            </button>
+          );
+        }
+
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-              status,
-            )}`}
+            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(status)}`}
           >
             {status}
           </span>

@@ -42,7 +42,12 @@ export const PAGE_CONFIG = {
     buttonText: "Add New Booking",
     navigateTo: "/admin/booking/add",
   },
+  "/admin/hosts": {
+    buttonText: "Add New Host",
+    navigateTo: "/admin/hosts/add",
+  },
 };
+
 
 export const STETPS_FIELDS = {
   0: [

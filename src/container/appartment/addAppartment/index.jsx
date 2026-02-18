@@ -295,12 +295,12 @@ const AddNewAppartment = () => {
                   <Form.Item
                     preserve={true}
                     name="hotel"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Hotel selection is required",
-                      },
-                    ]}
+                    // rules={[
+                    //   {
+                    //     required: true,
+                    //     message: "Hotel selection is required",
+                    //   },
+                    // ]}
                   >
                     <Select
                       className="w-full h-12 border border-lightSeconday rounded-md font-medium"
