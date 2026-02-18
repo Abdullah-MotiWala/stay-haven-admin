@@ -279,7 +279,7 @@ const AddNewRoom = () => {
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {hotelsList?.map((item) => (
-                        <Option key={item.hotel_id} value={item.hotel_id}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       ))}
@@ -871,7 +871,7 @@ const AddNewRoom = () => {
         layout="vertical"
         initialValues={{
           name: "Deluxe",
-          type: "Single Bed Room",
+          // type: "Single Bed Room",
           bedType: "Single Bed",
           roomSize: "e.g. 25 m²",
           guests: "1",
