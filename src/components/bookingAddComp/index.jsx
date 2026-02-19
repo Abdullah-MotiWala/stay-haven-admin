@@ -104,7 +104,7 @@ const BookingAddComp = () => {
         const res = await getAllRooms();
         const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setRooms(data);
-        console.log(res.data, "Rooms");
+        console.log(data, "Rooms");
 
       } catch (err) {
         console.error("Error fetching rooms:", err);
@@ -211,8 +211,11 @@ const BookingAddComp = () => {
     if (formData.bookingType === "Apartment") {
       return [...new Set(apartment.map((a) => a.apartmentName))];
     }
-    return [...new Set(rooms.map((r) => r.hotel?.name || "Ocean View Resort"))];
+    return [...new Set(rooms.map((r) => r.hotel?.name))];
   };
+  const abc = getHotelOptions()
+  console.log(abc, "this is hotel options");
+
 
   const getTypeOptions = () => {
     if (formData.bookingType === "Apartment") {
@@ -231,7 +234,7 @@ const BookingAddComp = () => {
         .map((a) => a.apartmentNumber);
     }
     return rooms
-      .filter((r) => !formData.roomType || r.roomType?.title  === formData.roomType)
+      .filter((r) => !formData.roomType || r.roomType?.title === formData.roomType)
       .map((r) => r.roomNumber);
   };
 
