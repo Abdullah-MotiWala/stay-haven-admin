@@ -12,7 +12,7 @@ const TicketsPage = () => {
     try {
       setLoading(true);
       // Backend controller 'getAll' query params accept karta hai
-      const response = await axios.get("http://localhost:3000/api/tickets", {
+      const response = await axios.get("http://api.stayhaven.pk/api/tickets", {
         params: { 
           search: searchTerm, 
           status: statusFilter 
