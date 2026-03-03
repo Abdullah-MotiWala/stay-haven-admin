@@ -12,9 +12,12 @@ import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
 import { Form, Input, Select, Checkbox } from "antd";
+import { uploadSingleMedia } from "../../../services/uploads";
+// import { uploadSingleMedia } from "../../../services/upload"; // Import upload service
+
 const HotelForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { id } = useParams();
   const isEditMode = Boolean(id);
   const [form] = Form.useForm();
 
@@ -25,6 +28,10 @@ const HotelForm = () => {
   const [roomsList, setRoomsList] = useState([]);
   const [hotel, setHotel] = useState([]);
   const [lastId, setLastId] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(DEFAULT_IMAGE);
+  const [uploading, setUploading] = useState(false);
+
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
 
@@ -53,8 +60,14 @@ const HotelForm = () => {
       try {
         const res = await getHotelById(id);
         const hotel = res.data;
-        console.log(hotel.status,"hotel.statushotel.status")
+        console.log(hotel.status, "hotel.statushotel.status");
         setHotel(hotel);
+
+        // Set image preview if exists
+        if (hotel.imageUrl) {
+          setImagePreview(hotel.imageUrl);
+        }
+
         form.setFieldsValue({
           name: hotel.name,
           city: hotel.city,
@@ -85,8 +98,8 @@ const HotelForm = () => {
           getAllFeature("ROOM_TYPE"),
         ]);
 
-        setAmenitiesList(amenityRes.data);
-        setRoomsList(roomRes.data);
+        setAmenitiesList(amenityRes.data.data);
+        setRoomsList(roomRes.data.data);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -95,21 +108,168 @@ const HotelForm = () => {
     fetchFeatures();
   }, []);
 
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        openNotification("error", "Image size should be less than 5MB");
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        openNotification("error", "Please select an image file");
+        return;
+      }
+
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Upload image function
+  const uploadImage = async () => {
+    if (!imageFile) return null;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      console.log("formData", formData);
+      formData.append('image', imageFile);
+
+      const response = await uploadSingleMedia(formData);
+      return response.data.data.url; // Adjust this based on your API response structure
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      openNotification("error", "Failed to upload image");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // const handleSubmit = async (values) => {
+  //   setLoading(true);
+
+  //   // Upload image first if selected
+  //   let imageUrl = null;
+  //   if (imageFile) {
+  //     imageUrl = await uploadImage();
+  //     if (!imageUrl) {
+  //       setLoading(false);
+  //       return; // Stop submission if image upload fails
+  //     }
+  //   }
+
+  //   const payload = {
+  //     name: values.name,
+  //     city: values.city,
+  //     address: values.address,
+  //     email: values.email,
+  //     cancellation_policy: values.cancellation_policy,
+  //     // status: values.isActive,
+  //     featureIds: [...values.amenities, ...values.rooms],
+  //   };
+
+  //   // Add imageUrl to payload if uploaded
+  //   if (imageUrl) {
+  //     payload.imageUrl = imageUrl;
+  //   } else if (isEditMode && imagePreview !== DEFAULT_IMAGE) {
+  //     // Keep existing image in edit mode if no new image selected
+  //     payload.imageUrl = imagePreview;
+  //   }
+
+  //   console.log(payload, "payloadpayloadpayload");
+
+  //   try {
+  //     if (isEditMode) {
+  //       await updateHotel(id, payload);
+  //       openNotification("success", "Hotel updated successfully");
+  //     } else {
+  //       await createHotel(payload);
+  //       openNotification("success", "Hotel created successfully");
+  //     }
+
+  //     setIsModalOpen(true);
+  //   } catch (err) {
+  //     openNotification("error", err?.response?.data?.message || "Internal Server Error");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (values) => {
     setLoading(true);
 
-    const payload = {
-      name: values.name,
-      city: values.city,
-      address: values.address,
-      email: values.email,
-      cancellation_policy: values.cancellation_policy,
-      status: values.isActive,
-      featureIds: [...values.amenities, ...values.rooms],
-    };
-
-    console.log(payload, "payloadpayloadpayload");
     try {
+      // let imageUrl = null;
+
+      // // 1️⃣ Upload image only if new file selected
+      // if (imageFile) {
+      //   try {
+      //     imageUrl = await uploadImage();
+      //   } catch (error) {
+      //     openNotification("error", "Image upload failed");
+      //     setLoading(false);
+      //     return;
+      //   }
+      // }
+
+      // // 2️⃣ Build payload
+      // const payload = {
+      //   name: values.name,
+      //   city: values.city,
+      //   address: values.address,
+      //   email: values.email,
+      //   cancellation_policy: values.cancellation_policy,
+      //   status: values.isActive,
+      //   featureIds: [
+      //     ...(values.amenities || []),
+      //     ...(values.rooms || [])
+      //   ],
+      // };
+
+      // // 3️⃣ Add image only if available
+      // if (imageUrl) {
+      //   payload.imageUrl = imageUrl;
+      // } else if (isEditMode && imagePreview) {
+      //   payload.imageUrl = imagePreview;
+      // }
+
+      // console.log(payload, "FINAL PAYLOAD");
+      let imageUrl = null;
+
+      if (imageFile) {
+        console.log("FINAL PAYLOAD ", typeof imageFile);
+        imageUrl = await uploadImage();
+      }
+
+      const payload = {
+        name: values.name,
+        city: values.city,
+        address: values.address,
+        email: values.email,
+        cancellation_policy: values.cancellation_policy,
+        status: values.isActive,
+        featureIds: [
+          ...(values.amenities || []),
+          ...(values.rooms || [])
+        ],
+      };
+
+      console.log("FINAL PAYLOAD 👉", imageUrl);
+      if (imageUrl) {
+        payload.imageUrl = imageUrl; // 👈 EXACT FIELD NAME from entity
+      }
+
+      console.log("FINAL PAYLOAD 👉", payload);
+
+      // 4️⃣ Create or Update
       if (isEditMode) {
         await updateHotel(id, payload);
         openNotification("success", "Hotel updated successfully");
@@ -119,13 +279,19 @@ const HotelForm = () => {
       }
 
       setIsModalOpen(true);
+
     } catch (err) {
-      openNotification("error", "Internal Server Error");
+      console.log(err);
+      openNotification(
+        "error",
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Internal Server Error"
+      );
     } finally {
       setLoading(false);
     }
   };
-
   if (fetching) {
     return (
       <div className="p-20 text-center text-blue font-semibold">
@@ -144,7 +310,7 @@ const HotelForm = () => {
       >
         <div>
           <div
-            className="flex  items-center gap-4 cursor-pointer"
+            className="flex items-center gap-4 cursor-pointer"
             onClick={() => navigate(-1)}
           >
             <div>
@@ -170,24 +336,46 @@ const HotelForm = () => {
 
         <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 ">
           <div className="px-6 py-4 mb-6 ">
-            <h2 className="text-lg font-semibold text-black  ">
+            <h2 className="text-lg font-semibold text-black">
               Hotel Profile
             </h2>
             <hr />
           </div>
           <div className="p-6 px-36 pb-14">
-            <div className="flex   justify-between mb-10">
-              <div className="flex items-center gap-20 ">
-                <img
-                  src={DEFAULT_IMAGE}
-                  className="w-[330px] h-[152px] rounded-[16px] object-cover border"
-                  alt="hotel"
-                />
+            <div className="flex justify-between mb-10">
+              <div className="flex items-center gap-20">
+                {/* Image Upload Section */}
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    className="w-[330px] h-[152px] rounded-[16px] object-cover border"
+                    alt="hotel"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-[16px] opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <span className="text-white text-sm font-medium">
+                      {uploading ? "Uploading..." : "Change Image"}
+                    </span>
+                  </label>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </div>
                 <div>
                   <h2 className="text-xl font-semibold text-blue">
                     Upload Hotel Image
                   </h2>
                   <p className="text-lightSeconday">Make sure image is clear</p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Max size: 5MB | Format: JPG, PNG, GIF
+                  </p>
                 </div>
               </div>
 
@@ -199,11 +387,10 @@ const HotelForm = () => {
                 </div>
                 <div
                   className={`w-24 text-center border py-2 rounded-md
-    ${
-      isDisabled
-        ? "bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none"
-        : "border-havengray text-black"
-    }
+    ${isDisabled
+                      ? "bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none"
+                      : "border-havengray text-black"
+                    }
   `}
                 >
                   <span className="select-none">
@@ -218,14 +405,6 @@ const HotelForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Hotel Name
                 </label>
-                {/* <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter hotel name"
-                /> */}
                 <Form.Item
                   name="name"
                   rules={[
@@ -261,14 +440,6 @@ const HotelForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Hotel Location
                 </label>
-                {/* <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter location"
-                /> */}
                 <Form.Item
                   name="address"
                   rules={[{ required: true, message: "address is required" }]}
@@ -284,14 +455,6 @@ const HotelForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Hotel Email
                 </label>
-                {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
                 <Form.Item
                   name="email"
                   rules={[
@@ -310,14 +473,6 @@ const HotelForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Cancellation Policy
                 </label>
-                {/* <input
-                  type="text"
-                  name="cancellation_policy"
-                  value={formData.cancellation_policy}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter policy"
-                /> */}
                 <Form.Item
                   name="cancellation_policy"
                   rules={[
@@ -360,7 +515,7 @@ const HotelForm = () => {
               ]}
             >
               <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                {amenitiesList.map((a) => {
+                {amenitiesList?.map((a) => {
                   const isChecked = selectedAmenities.includes(a.id);
 
                   return (
@@ -370,9 +525,8 @@ const HotelForm = () => {
                         className="w-full flex items-center"
                       >
                         <span
-                          className={`block w-full text-sm font-medium ${
-                            isChecked ? "text-blue" : "text-lightText"
-                          }`}
+                          className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                            }`}
                         >
                           {a.title}
                         </span>
@@ -382,28 +536,6 @@ const HotelForm = () => {
                 })}
               </Checkbox.Group>
             </Form.Item>
-
-            {/*<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-               {amenitiesList.map((item) => (
-                <label key={item} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.amenities.includes(item.id)}
-                    onChange={() => toggleAmenity(item.id)}
-                    className="w-5 h-5 rounded border-lightGray text-blue checked:accent-blue"
-                  />
-                  <span
-                    className={`text-sm font-medium ${
-                      formData.amenities.includes(item.id)
-                        ? "text-blue"
-                        : "text-lightText"
-                    }`}
-                  >
-                    {item.title}
-                  </span>
-                </label>
-              ))} 
-            </div>*/}
 
             <h3 className="font-semibold mb-4">Rooms Included</h3>
             <Form.Item
@@ -427,9 +559,8 @@ const HotelForm = () => {
                         className="w-full flex items-center"
                       >
                         <span
-                          className={`block w-full text-sm font-medium ${
-                            isChecked ? "text-blue" : "text-lightText"
-                          }`}
+                          className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                            }`}
                         >
                           {r.title}
                         </span>
@@ -453,10 +584,11 @@ const HotelForm = () => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="px-10 py-2 bg-blue text-white rounded-md"
+            disabled={loading || uploading}
+            className={`px-10 py-2 bg-blue text-white rounded-md ${(loading || uploading) ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
-            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save"}
+            {uploading ? "Uploading Image..." : loading ? "Saving..." : isEditMode ? "Save Changes" : "Save"}
           </button>
         </div>
       </Form>
@@ -464,7 +596,6 @@ const HotelForm = () => {
         <>
           <SuccessModal
             open={true}
-            // onClose={() => setIsModalOpen(false)}
             onClose={() => navigate("/admin/hotels")}
             title={
               !isEditMode

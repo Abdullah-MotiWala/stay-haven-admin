@@ -18,7 +18,7 @@ import {
   Upload,
 } from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
-import { EditOutlined, UploadOutlined } from "@ant-design/icons";
+import { DeleteFilled, EditOutlined, UploadOutlined } from "@ant-design/icons";
 import editIcon from "../../../assets/icons/editIcon.svg";
 
 // import { createRoom, getById, updateRoom } from "../../../services/rooms";
@@ -27,6 +27,8 @@ import {
   getById,
   updateAppartment,
 } from "../../../services/appartments";
+import { uploadMultipleMedia, uploadSingleMedia } from "../../../services/uploads";
+import { Delete } from "lucide-react";
 const AddNewAppartment = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -43,7 +45,13 @@ const AddNewAppartment = () => {
   const [hotelsList, setHotelsList] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [roomTypesList, setRoomTypesList] = useState([]);
-
+  const [hostImageFile, setHostImageFile] = useState(null);
+  const [hostImagePreview, setHostImagePreview] = useState(DEFAULT_IMAGE);
+  const [mainImageFile, setMainImageFile] = useState(null);
+  const [mainImagePreview, setMainImagePreview] = useState(DEFAULT_IMAGE);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [galleryPreviews, setGalleryPreviews] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
@@ -73,6 +81,16 @@ const AddNewAppartment = () => {
         const res = await getById(id);
         const appartment = res.data.data;
         console.log(appartment, "appartmentappartment");
+
+        // Set main image preview if exists
+        if (appartment.mainImage) {
+          setMainImagePreview(appartment.mainImage);
+        }
+
+        // Set gallery previews if exist
+        if (appartment.galleryImages && appartment.galleryImages.length > 0) {
+          setGalleryPreviews(appartment.galleryImages);
+        }
 
         form.setFieldsValue({
           name: appartment.apartmentName || "",
@@ -115,11 +133,11 @@ const AddNewAppartment = () => {
           getAllFeature("ROOM_FACILITY"),
           getAllFeature("ROOM_TYPE"),
         ]);
-
-        setAmenitiesList(amenityRes.data);
-        setFeaturesList(featuresRes.data);
-        setFacilityList(facilityRes.data);
-        setRoomTypesList(roomTypeRes.data);
+        console.log(roomTypeRes, "roomTypeResroomTypeRes===");
+        setAmenitiesList(amenityRes.data.data);
+        setFeaturesList(featuresRes.data.data);
+        setFacilityList(facilityRes.data.data);
+        setRoomTypesList(roomTypeRes.data.data);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -127,6 +145,181 @@ const AddNewAppartment = () => {
 
     fetchFeatures();
   }, []);
+
+  const handleHostImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log("Selected host image:", file);
+
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        openNotification("error", "Host image size should be less than 5MB");
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        openNotification("error", "Please select an image file");
+        return;
+      }
+
+      setHostImageFile(file);  // ✅ hostImageFile set karo
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setHostImagePreview(reader.result);  // ✅ hostImagePreview set karo
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMainImageChange = (e) => {
+    const file = e.target.files[0];
+    console.log("Selected main image:", file);
+
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        openNotification("error", "Main image size should be less than 5MB");
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        openNotification("error", "Please select an image file");
+        return;
+      }
+
+      setMainImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMainImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Upload main image
+  const uploadMainImage = async () => {
+    if (!mainImageFile) return null;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', mainImageFile);
+      const response = await uploadSingleMedia(formData);
+      return response.data.data.url;
+    } catch (error) {
+      console.error("Main image upload failed:", error);
+      openNotification("error", "Failed to upload main image");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+  const uploadHostImage = async () => {
+    if (!hostImageFile) return null;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', hostImageFile);
+      const response = await uploadSingleMedia(formData);
+      return response.data.data.url;
+    } catch (error) {
+      console.error("Host image upload failed:", error);
+      openNotification("error", "Failed to upload host image");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+  // Handle multiple gallery images selection
+  // Handle multiple gallery images selection
+  // Handle multiple gallery images selection
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+    console.log("Selected gallery files:", files);
+
+    if (files.length > 0) {
+      // Check total files count (max 10 images)
+      if (galleryFiles.length + files.length > 10) {
+        openNotification("error", "Maximum 10 gallery images allowed");
+        return;
+      }
+
+      // Validate each file
+      const validFiles = files.filter(file => {
+        // Check file size (max 2MB each)
+        if (file.size > 2 * 1024 * 1024) {
+          openNotification("error", `${file.name} size should be less than 2MB`);
+          return false;
+        }
+
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+          openNotification("error", `${file.name} is not an image file`);
+          return false;
+        }
+
+        return true;
+      });
+
+      if (validFiles.length === 0) return;
+
+      // Generate previews for valid files
+      validFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setGalleryPreviews(prev => [...prev, reader.result]);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      setGalleryFiles(prev => [...prev, ...validFiles]);
+
+      // Reset input value so same file can be selected again if needed
+      e.target.value = null;
+    }
+  };
+
+  // Remove single gallery image
+  const removeGalleryImage = (index) => {
+    setGalleryFiles(prev => prev.filter((_, i) => i !== index));
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Upload multiple gallery images - USING uploadMultipleMedia
+  const uploadGalleryImages = async () => {
+    if (galleryFiles.length === 0) return [];
+
+    const uploadedUrls = [];
+    setUploading(true);
+
+    try {
+      // Create FormData with all images
+      const formData = new FormData();
+
+      // Append all gallery files
+      galleryFiles.forEach((file) => {
+        formData.append('images', file); // 'images' field name as per backend
+      });
+
+      // Upload all images at once
+      const response = await uploadMultipleMedia(formData);
+      console.log("Gallery upload response:", response.data.data.data.data);
+
+      // Get URLs from response - adjust according to your API response structure
+      const urls = response?.data?.data?.url || response?.data?.data?.data?.url || [];
+      console.log("urlswkiqowk", response?.data);
+      console.log("urlswkiqowk", response?.data?.data);
+      console.log("urlswkiqowk", response?.data?.data?.url);
+
+      return urls;
+
+    } catch (error) {
+      console.error("Gallery images upload failed:", error);
+      openNotification("error", "Failed to upload gallery images");
+      return [];
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const onNext = async () => {
     try {
@@ -141,8 +334,108 @@ const AddNewAppartment = () => {
     setCurrentStep(currentStep - 1);
   };
 
+  // const handleSubmit = async (values) => {
+  //   setLoading(true);
+
+  //   // Upload main image if selected
+  //   let mainImageUrl = null;
+  //   if (mainImageFile) {
+  //     mainImageUrl = await uploadMainImage();
+  //     if (!mainImageUrl) {
+  //       setLoading(false);
+  //       return;
+  //     }
+  //   }
+
+  //   // Upload gallery images if selected
+  //   let galleryUrls = [];
+  //   if (galleryFiles.length > 0) {
+  //     galleryUrls = await uploadGalleryImages();
+  //   }
+
+
+  //   const payload = {
+  //     apartmentName: values.name,
+  //     apartmentNumber: values.appartmentNumber,
+  //     hotelId: values.hotel,
+  //     type: values.type,
+  //     bedType: values.bedType,
+  //     apartmentSize: values.appartmentSize,
+  //     maxAdults: values.guests,
+  //     maxChildren: values.childrens,
+  //     description: values.description,
+  //     pricePerNight: Number(values.pricePerNight),
+  //     status: values.status,
+  //     featureIds: [...values.features, ...values.amenities, ...values.facility],
+  //     hostName: values.hostname,
+  //     hostEmail: values.email,
+  //     hostPhone: values.phoneNumber,
+  //     hostImage: "https://ui-avatars.com/api/?name=Abdullah+Khan",
+  //   };
+
+  //   try {
+  //     let res;
+
+  //     if (isEditMode) {
+  //       res = await updateAppartment(id, payload);
+  //     } else {
+  //       res = await createAppartment(payload);
+  //     }
+
+  //     if (res?.status !== 200 && res?.status !== 201) {
+  //       throw new Error("API failed");
+  //     }
+
+  //     openNotification(
+  //       "success",
+  //       isEditMode
+  //         ? "Appartment updated successfully"
+  //         : "Appartment created successfully",
+  //     );
+
+  //     setIsModalOpen(true);
+  //   } catch (err) {
+  //     console.error(err);
+
+  //     openNotification(
+  //       "error",
+  //       err?.response?.data?.message || "Internal Server Error",
+  //     );
+
+  //     return;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (values) => {
     setLoading(true);
+
+    // Upload main image if selected
+    let mainImageUrl = null;
+    if (mainImageFile) {
+      mainImageUrl = await uploadMainImage();
+      if (!mainImageUrl) {
+        setLoading(false);
+        return;
+      }
+    }
+
+    let hostImageUrl = null;
+    if (hostImageFile) {
+      hostImageUrl = await uploadHostImage();
+      if (!hostImageUrl) {
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Upload gallery images if selected
+    let galleryUrls = [];
+    if (galleryFiles.length > 0) {
+      galleryUrls = await uploadGalleryImages();
+    }
+    console.log("galleryUrls", galleryUrls);
+
 
     const payload = {
       apartmentName: values.name,
@@ -160,8 +453,33 @@ const AddNewAppartment = () => {
       hostName: values.hostname,
       hostEmail: values.email,
       hostPhone: values.phoneNumber,
-      hostImage: "https://ui-avatars.com/api/?name=Abdullah+Khan",
+      // hostImage: "https://ui-avatars.com/api/?name=Abdullah+Khan",
     };
+
+    // 👇 YEH IMPORTANT LINES HAIN - IMAGES PAYLOAD MEIN ADD KARO 👇
+
+    // Add mainImage to payload
+    if (mainImageUrl) {
+      payload.mainImage = mainImageUrl;  // New uploaded image
+    } else if (isEditMode && mainImagePreview !== DEFAULT_IMAGE) {
+      payload.mainImage = mainImagePreview;  // Existing image from edit mode
+    }
+
+    // Add hostImage to payload
+    if (hostImageUrl) {
+      payload.hostImage = hostImageUrl;  // New uploaded host image
+    } else if (isEditMode && hostImagePreview !== DEFAULT_IMAGE) {
+      payload.hostImage = hostImagePreview;  // Existing host image from edit mode
+    }
+
+    // Add galleryImages to payload
+    if (galleryUrls.length > 0) {
+      payload.galleryImages = galleryUrls;  // New uploaded gallery images
+    } else if (isEditMode && galleryPreviews.length > 0) {
+      payload.galleryImages = galleryPreviews;  // Existing gallery from edit mode
+    }
+
+    console.log("FINAL PAYLOAD WITH IMAGES:", payload); // Check karo images aa rahi hain
 
     try {
       let res;
@@ -179,25 +497,21 @@ const AddNewAppartment = () => {
       openNotification(
         "success",
         isEditMode
-          ? "Appartment updated successfully"
-          : "Appartment created successfully",
+          ? "Apartment updated successfully"
+          : "Apartment created successfully",
       );
 
       setIsModalOpen(true);
     } catch (err) {
       console.error(err);
-
       openNotification(
         "error",
         err?.response?.data?.message || "Internal Server Error",
       );
-
-      return;
     } finally {
       setLoading(false);
     }
   };
-
   const steps = [
     {
       title: "Appartment Details",
@@ -295,12 +609,12 @@ const AddNewAppartment = () => {
                   <Form.Item
                     preserve={true}
                     name="hotel"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Hotel selection is required",
-                    //   },
-                    // ]}
+                  // rules={[
+                  //   {
+                  //     required: true,
+                  //     message: "Hotel selection is required",
+                  //   },
+                  // ]}
                   >
                     <Select
                       className="w-full h-12 border border-lightSeconday rounded-md font-medium"
@@ -309,7 +623,7 @@ const AddNewAppartment = () => {
                       onChange={(val) => console.log("Selected Value:", val)}
                     >
                       {hotelsList?.map((item) => (
-                        <Select.Option key={item.hotel_id} value={item.hotel_id}>
+                        <Select.Option key={item.id} value={item.id}>
                           {item.name}
                         </Select.Option>
                       ))}
@@ -569,7 +883,7 @@ const AddNewAppartment = () => {
                       </p>
                       <input
                         type="file"
-                        // onChange={handleMainImageChange}
+                        onChange={handleMainImageChange}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
                     </div>
@@ -609,67 +923,60 @@ const AddNewAppartment = () => {
                 {/* RIGHT: Gallery Section */}
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-gray-900">
-                    Gallery (Optional)
+                    Gallery (Optional) - Max 10 images
                   </label>
                   <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
                     <div className="flex justify-center mt-4">
-                      {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
                       <img
                         src={cloudimg}
                         alt=""
                         className="w-6 h-6 text-gray-700"
                       />
                       <p className="text-sm text-gray-700 font-medium text-center px-4">
-                        Upload multiple image
+                        Click to upload multiple images
                       </p>
                     </div>
 
                     <div>
                       <p className="text-[11px] text-gray-400">
-                        Only JPG/PNG Files under 2 MB
+                        Only JPG/PNG Files under 2 MB each
                       </p>
                       <input
                         type="file"
-                        // onChange={handleGalleryChange}
+                        multiple  // 👈 YEH IMPORTANT HAI
+                        accept="image/*"
+                        onChange={handleGalleryChange}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
                     </div>
                   </div>
 
-                  {/* Gallery File List (Scrollable if many files) */}
-                  <div className="max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
-                    {/* {gallery.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 "
-                        >
-                          <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-                              <FileText className="w-6 h-6 text-blue" />
-                            </div>
-                            <div className="truncate">
-                              <p className="text-[13px] font-medium text-gray-800 truncate mb-0">
-                                {file.name}
-                              </p>
-                              <p className="text-[11px] text-gray-400">
-                                {file.date}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-2 shrink-0 ml-2">
-                            <button className="p-1.5 bg-[#DBEAFE] text-blue  rounded-md hover:bg-blue-200 transition-colors">
-                              <img src={eye} alt="" />
-                            </button>
-                            <button
-                              // onClick={() => removeGalleryImage(index)}
-                              className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
+                  {/* Gallery Previews with Remove Option */}
+                  {galleryPreviews.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mt-4 max-h-[200px] overflow-y-auto p-2">
+                      {galleryPreviews.map((preview, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={preview}
+                            alt={`Gallery ${index}`}
+                            className="w-full h-20 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(index)}
+                            className="absolute -top-5 -right-2 bg-white text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <DeleteFilled size={12} />
+                          </button>
                         </div>
-                      ))} */}
-                  </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Selected Count */}
+                  <p className="text-xs text-gray-400">
+                    {galleryFiles.length}/10 images selected
+                  </p>
                 </div>
               </div>
             </div>
@@ -795,7 +1102,7 @@ const AddNewAppartment = () => {
                   ]}
                 >
                   <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                    {amenitiesList.map((a) => {
+                    {amenitiesList?.map((a) => {
                       const isChecked = selectedAmenities.includes(a.id);
 
                       return (
@@ -898,18 +1205,29 @@ const AddNewAppartment = () => {
                   <div className="relative">
                     <Avatar
                       size={120}
-                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                      src={hostImagePreview !== DEFAULT_IMAGE ? hostImagePreview : "https://ui-avatars.com/api/?name=Host+Image"}
                     />
-                    <Upload showUploadList={false}>
-                      <div className="absolute bottom-3 right-2 bg-blue-600  rounded-full flex items-center justify-center cursor-pointer p-1 bg-blue">
-                        {/* <EditOutlined className="text-white text-xs" /> */}
-                        <img
-                          src={editIcon}
-                          alt="Edit Icon"
-                          className="editIconImg"
-                        />
-                      </div>
-                    </Upload>
+
+                    {/* ✅ Hidden file input for host image */}
+                    <input
+                      id="host-image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHostImageChange}
+                      className="hidden"
+                    />
+
+                    {/* ✅ Label that triggers file input */}
+                    {/* <label
+                      htmlFor="host-image-upload"
+                      className="absolute bottom-3 right-2 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer p-1 bg-blue hover:bg-blue-700 transition-colors"
+                    >
+                      <img
+                        src={editIcon}
+                        alt="Edit Icon"
+                        className="w-4 h-4"
+                      />
+                    </label> */}
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-blue line-clamp-0">
@@ -918,6 +1236,11 @@ const AddNewAppartment = () => {
                     <p className="text-lightSeconday">
                       Make sure face is clear
                     </p>
+                    {hostImageFile && (
+                      <p className="text-xs text-green-600 mt-1">
+                        ✓ {hostImageFile.name} selected
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1004,14 +1327,10 @@ const AddNewAppartment = () => {
 
             <button
               htmlType="submit"
-              disabled={loading}
-              className="px-10 py-2 bg-blue text-white rounded-md"
+              disabled={loading || uploading}
+              className={`px-10 py-2 bg-blue text-white rounded-md ${(loading || uploading) ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              {loading
-                ? "Saving..."
-                : isEditMode
-                  ? "Save Changes"
-                  : "Add Apartment"}
+              {uploading ? "Uploading Images..." : loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Apartment"}
             </button>
           </div>
         </>
@@ -1034,7 +1353,7 @@ const AddNewAppartment = () => {
         layout="vertical"
         initialValues={{
           name: "Deluxe",
-          type: "single room",
+          type: "",
           bedType: "Single Bed",
           appartmentSize: "e.g. 25 m²",
           guests: "1",

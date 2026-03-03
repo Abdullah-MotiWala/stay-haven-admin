@@ -9,7 +9,6 @@ import {
 } from "../../../services/hotel";
 import { DEFAULT_IMAGE, STETPS_FIELDS } from "../../../shared/constant";
 import { CloudUpload, FileText, Eye, Trash2 } from "lucide-react";
-
 import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
@@ -18,6 +17,7 @@ import { Form, Input, Select, Checkbox, Steps, Button } from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
 import eye from "../../../assets/icons/eye.png";
 import { createRoom, getById, updateRoom } from "../../../services/rooms";
+import { uploadMultipleMedia, uploadSingleMedia } from "../../../services/uploads";
 const AddNewRoom = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -34,6 +34,8 @@ const AddNewRoom = () => {
   const [hotel, setHotel] = useState([]);
   const [hotelsList, setHotelsList] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [mainImage, setMainImage] = useState(null);
+  const [gallery, setGallery] = useState([]);
 
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
@@ -46,8 +48,8 @@ const AddNewRoom = () => {
     const fetchHotelNamesList = async () => {
       try {
         const res = await getHotelNamesList();
-        console.log(res?.data?.data, "lastID2wq===");
-        setHotelsList(res?.data.data);
+        // console.log(res?.data?.data, "lastID2wq===");
+        setHotelsList(res?.data.data || res.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -63,7 +65,7 @@ const AddNewRoom = () => {
       setFetching(true);
       try {
         const res = await getById(id);
-        const room = res.data;
+        const room = res.data.data || res.data;
         console.log(room, "roomroomroom223423");
 
         form.setFieldsValue({
@@ -81,9 +83,9 @@ const AddNewRoom = () => {
           galleryImages: room.galleryImages || [],
           hotel: room.hotel?.id,
           // featureIds: room.featureIds || [],
-          facility: room.features?.map((a) => a.id) || [],
-          amenities: room.features?.map((r) => r.id) || [],
-          features: room.features?.map((r) => r.id) || [],
+          // facility: room.features?.map((a) => a.id) || [],
+          // amenities: room.features?.map((r) => r.id) || [],
+          // features: room.features?.map((r) => r.id) || [],
         });
       } catch (err) {
         openNotification("error", "Failed to load hotel");
@@ -104,11 +106,11 @@ const AddNewRoom = () => {
           getAllFeature("ROOM_FACILITY"),
           getAllFeature("ROOM_TYPE"),
         ]);
-
-        setAmenitiesList(amenityRes.data);
-        setFeaturesList(featuresRes.data);
-        setFacilityList(facilityRes.data);
-        setRoomTypesList(roomTypeRes.data);
+        // console.log(roomTypeRes.data.data, "roomTypeResroomTypeRes===");
+        setAmenitiesList(amenityRes.data.data || []);
+        setFeaturesList(featuresRes.data.data || []);
+        setFacilityList(facilityRes.data.data || []);
+        setRoomTypesList(roomTypeRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -116,6 +118,22 @@ const AddNewRoom = () => {
 
     fetchFeatures();
   }, []);
+
+  const handleMainImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMainImage(file);
+    }
+  };
+
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length) {
+      setGallery(files);
+    }
+  };
+
+
 
   const onNext = async () => {
     try {
@@ -129,25 +147,110 @@ const AddNewRoom = () => {
   const onBack = () => {
     setCurrentStep(currentStep - 1);
   };
+  // const handleSubmit = async (values) => {
+  //   setLoading(true);
+
+  //   const payload = {
+  //     roomName: values.name,
+  //     roomNumber: values.roomNumber,
+  //     hotelId: values.hotel,
+  //     roomTypeId: values.type,
+  //     bedType: values.bedType,
+  //     roomSize: values.roomSize,
+  //     maxAdults: values.guests,
+  //     maxChildren: values.childrens,
+  //     description: values.description,
+  //     pricePerNight: Number(values.pricePerNight),
+  //     status: values.status,
+  //     featureIds: [...values.features, ...values.amenities, ...values.facility],
+  //   };
+
+  //   try {
+  //     let res;
+
+  //     if (isEditMode) {
+  //       res = await updateRoom(id, payload);
+  //     } else {
+  //       res = await createRoom(payload);
+  //     }
+
+  //     if (![200, 201].includes(res?.status)) {
+  //       throw new Error("API failed");
+  //     }
+
+  //     openNotification(
+  //       "success",
+  //       isEditMode ? "Room updated successfully" : "Room created successfully",
+  //     );
+
+  //     setIsModalOpen(true);
+  //   } catch (err) {
+  //     console.error(err);
+
+  //     openNotification(
+  //       "error",
+  //       err?.response?.data?.message || "Internal Server Error",
+  //     );
+
+  //     return;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (values) => {
     setLoading(true);
 
-    const payload = {
-      roomName: values.name,
-      roomNumber: values.roomNumber,
-      hotelId: values.hotel,
-      roomTypeId: values.type,
-      bedType: values.bedType,
-      roomSize: values.roomSize,
-      maxAdults: values.guests,
-      maxChildren: values.childrens,
-      description: values.description,
-      pricePerNight: Number(values.pricePerNight),
-      status: values.status,
-      featureIds: [...values.features, ...values.amenities, ...values.facility],
-    };
-
     try {
+      let mainImageUrl = null;
+      let galleryUrls = [];
+
+      // Upload main image
+      if (mainImage) {
+        const formData = new FormData();
+        formData.append("image", mainImage);
+
+        const uploadRes = await uploadSingleMedia(formData);
+        mainImageUrl = uploadRes?.data?.data?.url;
+      }
+
+      // Upload multiple images
+      if (gallery.length > 0) {
+        const formData = new FormData();
+
+        gallery.forEach((file) => {
+          formData.append("images", file);
+        });
+
+        const uploadRes = await uploadMultipleMedia(formData);
+        galleryUrls =
+          uploadRes?.data?.data?.map((item) => item.url) || [];
+      }
+
+      const payload = {
+        roomName: values.name,
+        roomNumber: values.roomNumber,
+        hotelId: values.hotel,
+        roomTypeId: values.type,
+        bedType: values.bedType,
+        roomSize: values.roomSize,
+        maxAdults: Number(values.guests), // ✅ FIXED
+        maxChildren: Number(values.childrens), // ✅ FIXED
+        description: values.description,
+        pricePerNight: Number(values.pricePerNight),
+        status: values.status,
+        featureIds: [
+          ...new Set([
+            ...values.features,
+            ...values.amenities,
+            ...values.facility,
+          ]),
+        ],
+
+        // 👇 IMPORTANT
+        ...(mainImageUrl && { mainImage: mainImageUrl }),
+        ...(galleryUrls.length > 0 && { galleryImages: galleryUrls }),
+      };
+
       let res;
 
       if (isEditMode) {
@@ -162,24 +265,22 @@ const AddNewRoom = () => {
 
       openNotification(
         "success",
-        isEditMode ? "Room updated successfully" : "Room created successfully",
+        isEditMode
+          ? "Room updated successfully"
+          : "Room created successfully"
       );
 
       setIsModalOpen(true);
     } catch (err) {
       console.error(err);
-
       openNotification(
         "error",
-        err?.response?.data?.message || "Internal Server Error",
+        err?.response?.data?.message || "Internal Server Error"
       );
-
-      return;
     } finally {
       setLoading(false);
     }
   };
-
   const steps = [
     {
       title: "Room Details",
@@ -228,9 +329,9 @@ const AddNewRoom = () => {
                     preserve={true}
                     name="name"
                     label=""
-                    // rules={[
-                    //   { required: true, message: "Room Name is required" },
-                    // ]}
+                  // rules={[
+                  //   { required: true, message: "Room Name is required" },
+                  // ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {[
@@ -273,9 +374,9 @@ const AddNewRoom = () => {
                     preserve={true}
                     name="hotel"
                     label=""
-                    // rules={[
-                    //   { required: true, message: "Room Name is required" },
-                    // ]}
+                  // rules={[
+                  //   { required: true, message: "Room Name is required" },
+                  // ]}
                   >
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
                       {hotelsList?.map((item) => (
@@ -535,7 +636,7 @@ const AddNewRoom = () => {
                       </p>
                       <input
                         type="file"
-                        // onChange={handleMainImageChange}
+                        onChange={handleMainImageChange}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
                     </div>
@@ -596,7 +697,9 @@ const AddNewRoom = () => {
                       </p>
                       <input
                         type="file"
-                        // onChange={handleGalleryChange}
+                        multiple  // 👈 YEH IMPORTANT HAI
+                        accept="image/*"
+                        onChange={handleGalleryChange}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
                     </div>
@@ -725,9 +828,8 @@ const AddNewRoom = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>
@@ -760,7 +862,7 @@ const AddNewRoom = () => {
                   ]}
                 >
                   <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                    {amenitiesList.map((a) => {
+                    {amenitiesList?.map((a) => {
                       const isChecked = selectedAmenities.includes(a.id);
 
                       return (
@@ -770,9 +872,8 @@ const AddNewRoom = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>
@@ -815,9 +916,8 @@ const AddNewRoom = () => {
                             className="w-full flex items-center"
                           >
                             <span
-                              className={`block w-full text-sm font-medium ${
-                                isChecked ? "text-blue" : "text-lightText"
-                              }`}
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
                             >
                               {a.title}
                             </span>

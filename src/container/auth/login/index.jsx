@@ -15,7 +15,7 @@ const handleLogin = async (values) => {
     const payload = { ...values, userType: "admin" };
     const res = await loginApi(payload);
 
-    const userData = res.data; 
+    const userData = res.data.data; 
 
     if (!userData.token) {
       throw new Error("Login failed");
