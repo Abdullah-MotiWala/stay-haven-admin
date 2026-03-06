@@ -9,7 +9,7 @@ export const AdminGuard = () => {
 };
 export const PublicGuard = () => {
   if (isLoggedIn()) {
-    return <Navigate to="/admin/dsshboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   // if (!isAdmin()) {

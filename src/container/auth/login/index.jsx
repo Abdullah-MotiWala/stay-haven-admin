@@ -16,7 +16,7 @@ const handleLogin = async (values) => {
     const res = await loginApi(payload);
 
     const userData = res.data.data; 
-
+    console.log("User Data:", userData);
     if (!userData.token) {
       throw new Error("Login failed");
     } else {
@@ -73,7 +73,7 @@ const handleLogin = async (values) => {
                 htmlType="submit"
 
               block
-              className="bg-blue text-white h-14 rounded-xl text-lg font-bold mt-4 shadow-blue-200 shadow-lg"
+              className="w-full bg-mainPrimary hover:!bg-mainPrimary text-white text-sm text-white h-14 rounded-xl text-lg font-bold mt-4  shadow-lg"
             >
               Login
             </Button>
