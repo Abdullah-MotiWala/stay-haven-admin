@@ -29,6 +29,7 @@ const AddNewRoom = () => {
   const [fetching, setFetching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amenitiesList, setAmenitiesList] = useState([]);
+  const [policyList, setPolicyList] = useState([]);
   const [featuresList, setFeaturesList] = useState([]);
   const [facilityList, setFacilityList] = useState([]);
   const [hotel, setHotel] = useState([]);
@@ -40,6 +41,7 @@ const AddNewRoom = () => {
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
+  const selectedPolicy = Form.useWatch("policy", form) || [];
   const [roomTypesList, setRoomTypesList] = useState([]);
 
   const { Option } = Select;
@@ -100,16 +102,18 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes,policyTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
           getAllFeature("ROOM_TYPE"),
+          getAllFeature("POLICY"),
         ]);
         // console.log(roomTypeRes.data.data, "roomTypeResroomTypeRes===");
         setAmenitiesList(amenityRes.data.data || []);
         setFeaturesList(featuresRes.data.data || []);
         setFacilityList(facilityRes.data.data || []);
+        setPolicyList(policyTypeRes.data.data || []);
         setRoomTypesList(roomTypeRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
@@ -243,6 +247,7 @@ const AddNewRoom = () => {
             ...values.features,
             ...values.amenities,
             ...values.facility,
+            ...values.policy,
           ]),
         ],
 
@@ -864,6 +869,50 @@ const AddNewRoom = () => {
                   <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
                     {amenitiesList?.map((a) => {
                       const isChecked = selectedAmenities.includes(a.id);
+
+                      return (
+                        <div key={a.id} className="w-full">
+                          <Checkbox
+                            value={a.id}
+                            className="w-full flex items-center"
+                          >
+                            <span
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
+                            >
+                              {a.title}
+                            </span>
+                          </Checkbox>
+                        </div>
+                      );
+                    })}
+                  </Checkbox.Group>
+                </Form.Item>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
+              <div className="px-6 py-4  ">
+                <h2 className="text-lg font-semibold text-black  ">
+                  Policy
+                </h2>
+                <hr />
+              </div>
+              <div className="p-6 px-36 pb-14">
+                <h3 className="font-semibold mb-4">Select Policy</h3>
+                <Form.Item
+                  preserve={true}
+                  name="policy"
+                  className="w-full"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select at least one Policy",
+                    },
+                  ]}
+                >
+                  <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
+                    {policyList?.map((a) => {
+                      const isChecked = selectedPolicy.includes(a.id);
 
                       return (
                         <div key={a.id} className="w-full">
