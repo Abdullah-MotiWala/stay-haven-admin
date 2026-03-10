@@ -239,6 +239,7 @@ const AddNewRoom = () => {
         galleryUrls =
           uploadRes?.data?.data?.map((item) => item.url) || [];
       }
+      console.log(test)
 
       const payload = {
         roomName: values.name,
