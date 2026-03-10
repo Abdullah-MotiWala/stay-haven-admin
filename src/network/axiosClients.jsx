@@ -104,9 +104,10 @@ Api.interceptors.response.use(
     res.data = { ...res.data, success: false };
 
     if (res?.status === 401 && !window.location.href.includes("auth")) {
-      window.location.href = "/auth";
+      localStorage.clear();
+      window.location.href = "/auth/login";
     } else if (res?.status === 410) {
-      window.location.href = "/dashboard";
+      window.location.href = "/admin/dashboard";
     }
 
     return res;

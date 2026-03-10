@@ -12,6 +12,7 @@ import Amenities from "./forms/amenities";
 import BookingFeatures from "./forms/bookingFeatures";
 import BookingPolicies from "./forms/bookingPolicies";
 import PricingAndTaxes from "./forms/pricingAndTaxes";
+import RoomRules from "./forms/roomRules";
 
 const Setting = () => {
   const [activeType, setActiveType] = useState("General Settings");
@@ -36,7 +37,7 @@ const Setting = () => {
           form.setFieldsValue({
             ...data,
             currencyId: data.currency?.id, 
-            timezone: data.timezone?.id, 
+            timezoneId: data.timezone?.id, 
             currentSymbol: initialSymbol,
             selectedFeatures: data.selectedFeatures?.map(f => f.id) ,
             checkInTime: data.checkInTime ? dayjs(data.checkInTime, ["h:mm A", "HH:mm:ss", "HH:mm"]) : null,
@@ -58,6 +59,7 @@ const Setting = () => {
       case "Amenities": return <Amenities />;
       case "Booking Features": return <BookingFeatures />;
       case "Booking Policies": return <BookingPolicies />;
+      case "Room Rules": return <RoomRules />;
       case "Pricing & Taxes": return <PricingAndTaxes symbol={currentSymbol}   />;
       default: return null;
     }
@@ -69,7 +71,7 @@ const Setting = () => {
       const payload = {
         ...values,
         currencyId: values.currencyId,
-        timezoneId: values.timezone,
+        timezoneId: values.timezoneId,
         featureIds: values.selectedFeatures,
         checkInTime: values.checkInTime?.format("h:mm A"),
         checkOutTime: values.checkOutTime?.format("h:mm A"),

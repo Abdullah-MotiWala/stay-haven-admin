@@ -17,10 +17,10 @@ const GeneralSettings = ({ onCurrenciesFetched, setGlobalSymbol }) => {
           getFeaturesByTypeApi("TIMEZONE"),
         ]);
 
-        const currData = currRes.data.map(item => ({ label: item.title, value: item.id }));
+        const currData = currRes.data.data.map(item => ({ label: item.title, value: item.id }));
         setCurrencies(currData);
         onCurrenciesFetched(currData); 
-        setTimezones(tzRes.data.map(item => ({ label: item.title, value: item.id })));
+        setTimezones(tzRes.data.data.map(item => ({ label: item.title, value: item.id })));
       } catch (err) {
         console.error("Failed to fetch features:", err);
       } finally {

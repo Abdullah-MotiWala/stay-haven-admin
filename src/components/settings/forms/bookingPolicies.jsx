@@ -1,8 +1,51 @@
-import React from "react";
-import { Form, TimePicker, Input } from "antd";
-import dayjs from "dayjs"; 
+import React, { useState, useEffect } from "react";
+import { Form, TimePicker, Input, Divider, Spin } from "antd";
+import dayjs from "dayjs";
+import deleteIcon from "../../../assets/icons/deleteIcon.svg";
+import { getFeaturesByTypeApi, createFeatureApi, deleteFeatureApi } from "../../../services/setting";
+import { openNotification } from "../../../network/notification";
 
 const BookingPolicies = () => {
+  const [rulesPolicies, setRulesPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [rulePolicyInput, setRulePolicyInput] = useState("");
+
+  const fetchRulesPolicies = async () => {
+    try {
+      const res = await getFeaturesByTypeApi("POLICY");
+      setRulesPolicies(res?.data?.data || res.data || []);
+    } catch (err) {
+      console.error("Failed to load rules & policies", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRulesPolicies();
+  }, []);
+
+  const handleAdd = async (title) => {
+    if (!title.trim()) return;
+    try {
+      await createFeatureApi({ title, type: "POLICY" });
+      setRulePolicyInput("");
+      await fetchRulesPolicies();
+      openNotification("success", "Rule/Policy added", `${title} added successfully`);
+    } catch (err) {
+      openNotification("error", "Error", "Failed to add rule/policy");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteFeatureApi(id);
+      await fetchRulesPolicies();
+      openNotification("success", "Rule/Policy removed", "Item removed successfully");
+    } catch (err) {
+      openNotification("error", "Error", "Failed to delete");
+    }
+  };
   
   return (
     <div className="space-y-6">
@@ -73,6 +116,40 @@ const BookingPolicies = () => {
           </Form.Item>
         </div>
         </div>
+
+        <Divider />
+
+        {/* Rules & Policies Section */}
+        <section>
+          <h3 className="text-lg font-semibold mb-8">Add Room Rules & Policies</h3>
+          {loading ? (
+            <Spin className="flex justify-center my-10" />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
+                
+              </div>
+              
+              <div className="mt-14">
+                <h3 className="text-lg text-extradark font-semibold">Add Custom Rules & Policies</h3>
+                <p className="text-lightText text-base font-normal">Add any additional rules or policies not listed above</p>
+                <Input 
+                  className="w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" 
+                  placeholder="Enter Custom rule/policy"
+                  value={rulePolicyInput}
+                  onChange={(e) => setRulePolicyInput(e.target.value)}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => handleAdd(rulePolicyInput)} 
+                  className="px-8 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
+                >
+                  Add in the above list
+                </button>
+              </div>
+            </>
+          )}
+        </section>
       </div>
     </div>
   );
