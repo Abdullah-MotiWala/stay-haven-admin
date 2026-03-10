@@ -31,6 +31,7 @@ const AddNewRoom = () => {
   const [amenitiesList, setAmenitiesList] = useState([]);
   const [featuresList, setFeaturesList] = useState([]);
   const [facilityList, setFacilityList] = useState([]);
+  const [rulesPoliciesList, setRulesPoliciesList] = useState([]);
   const [hotel, setHotel] = useState([]);
   const [hotelsList, setHotelsList] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +41,7 @@ const AddNewRoom = () => {
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
+  const selectedRulesPolicies = Form.useWatch("rulesPolicies", form) || [];
   const [roomTypesList, setRoomTypesList] = useState([]);
 
   const { Option } = Select;
@@ -100,17 +102,19 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes, rulesPoliciesRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
           getAllFeature("ROOM_TYPE"),
+          getAllFeature("POLICY"),
         ]);
         // console.log(roomTypeRes.data.data, "roomTypeResroomTypeRes===");
         setAmenitiesList(amenityRes.data.data || []);
         setFeaturesList(featuresRes.data.data || []);
         setFacilityList(facilityRes.data.data || []);
         setRoomTypesList(roomTypeRes.data.data || []);
+        setRulesPoliciesList(rulesPoliciesRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -243,6 +247,7 @@ const AddNewRoom = () => {
             ...values.features,
             ...values.amenities,
             ...values.facility,
+            ...(values.rulesPolicies || []),
           ]),
         ],
 
@@ -929,6 +934,44 @@ const AddNewRoom = () => {
                 </Form.Item>
               </div>
             </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
+              <div className="px-6 py-4  ">
+                <h2 className="text-lg font-semibold text-black  ">
+                  Rules & Policies
+                </h2>
+                <hr />
+              </div>
+              <div className="p-6 px-36 pb-14">
+                <h3 className="font-semibold mb-4">Select Rules & Policies</h3>
+                <Form.Item
+                  preserve={true}
+                  name="rulesPolicies"
+                  className="w-full"
+                >
+                  <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
+                    {(rulesPoliciesList || []).map((a) => {
+                      const isChecked = selectedRulesPolicies.includes(a.id);
+
+                      return (
+                        <div key={a.id} className="w-full">
+                          <Checkbox
+                            value={a.id}
+                            className="w-full flex items-center"
+                          >
+                            <span
+                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
+                                }`}
+                            >
+                              {a.title}
+                            </span>
+                          </Checkbox>
+                        </div>
+                      );
+                    })}
+                  </Checkbox.Group>
+                </Form.Item>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -980,6 +1023,7 @@ const AddNewRoom = () => {
           features: [],
           amenities: [],
           facility: [],
+          rulesPolicies: [],
         }}
         onFinish={handleSubmit}
         className="min-h-screen w-full md:p-8 font-sans"

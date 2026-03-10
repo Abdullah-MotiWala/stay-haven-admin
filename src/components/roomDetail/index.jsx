@@ -251,6 +251,34 @@ const [mainImage, setMainImage] = useState(null);
             )}
           </div>
         </div>
+
+        <div className="">
+          <h3 className="text-lg md:text-xl font-semibold  text-extradark">
+            Rules & Policies
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-x-8 gap-y-4">
+            {room?.features?.filter((item) => item.type === "POLICY")
+              .length > 0 ? (
+              room.features
+                .filter((item) => item.type === "POLICY")
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 text-sm md:text-sm font-medium text-extradark"
+                  >
+                    <img
+                      src={tick}
+                      alt=""
+                      className="h-5 w-5 bg-lightGreenOne p-1 rounded-full"
+                    />
+                    {item.title}
+                  </div>
+                ))
+            ) : (
+              <p className="text-sm text-seconday font-medium">N/A</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

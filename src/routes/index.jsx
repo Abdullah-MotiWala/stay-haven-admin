@@ -1,15 +1,23 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import {  PublicRoutes } from "./publicRoute";
 import { AdminRoute } from "./adminRoute";
-import { Navigate } from "react-router-dom";
+import { isLoggedIn } from "../utils/auth";
 
-
-const RootRedirect = {
-  path: "/",
-  element: <Navigate to="/admin/dashboard" replace />,
+const RootRedirect = () => {
+  if (isLoggedIn()) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <Navigate to="/auth/login" replace />;
 };
 
-const routes = [RootRedirect,...PublicRoutes,  ...AdminRoute];
+const routes = [
+  {
+    path: "/",
+    element: <RootRedirect />,
+  },
+  ...PublicRoutes,
+  ...AdminRoute
+];
 
 const appRoutes = createBrowserRouter(routes);
 

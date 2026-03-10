@@ -14,6 +14,7 @@ export const TABS = [
   "Amenities",
   "Booking Features",
   "Booking Policies",
+  "Room Rules",
   "Pricing & Taxes",
 ];
 
