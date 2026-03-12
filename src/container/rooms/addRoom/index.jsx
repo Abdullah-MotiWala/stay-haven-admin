@@ -42,11 +42,7 @@ const AddNewRoom = () => {
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
-<<<<<<< HEAD
   const selectedPolicy = Form.useWatch("policy", form) || [];
-=======
-  const selectedRulesPolicies = Form.useWatch("rulesPolicies", form) || [];
->>>>>>> f58b466fc3def223ea630ba0c6c551a638d0354b
   const [roomTypesList, setRoomTypesList] = useState([]);
 
   const { Option } = Select;
@@ -107,11 +103,7 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-<<<<<<< HEAD
         const [amenityRes, featuresRes, facilityRes, roomTypeRes,policyTypeRes] = await Promise.all([
-=======
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes, rulesPoliciesRes] = await Promise.all([
->>>>>>> f58b466fc3def223ea630ba0c6c551a638d0354b
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
@@ -124,7 +116,7 @@ const AddNewRoom = () => {
         setFacilityList(facilityRes.data.data || []);
         setPolicyList(policyTypeRes.data.data || []);
         setRoomTypesList(roomTypeRes.data.data || []);
-        setRulesPoliciesList(rulesPoliciesRes.data.data || []);
+        // setRulesPoliciesList(rulesPoliciesRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -989,44 +981,7 @@ const AddNewRoom = () => {
                 </Form.Item>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
-              <div className="px-6 py-4  ">
-                <h2 className="text-lg font-semibold text-black  ">
-                  Rules & Policies
-                </h2>
-                <hr />
-              </div>
-              <div className="p-6 px-36 pb-14">
-                <h3 className="font-semibold mb-4">Select Rules & Policies</h3>
-                <Form.Item
-                  preserve={true}
-                  name="rulesPolicies"
-                  className="w-full"
-                >
-                  <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                    {(rulesPoliciesList || []).map((a) => {
-                      const isChecked = selectedRulesPolicies.includes(a.id);
-
-                      return (
-                        <div key={a.id} className="w-full">
-                          <Checkbox
-                            value={a.id}
-                            className="w-full flex items-center"
-                          >
-                            <span
-                              className={`block w-full text-sm font-medium ${isChecked ? "text-blue" : "text-lightText"
-                                }`}
-                            >
-                              {a.title}
-                            </span>
-                          </Checkbox>
-                        </div>
-                      );
-                    })}
-                  </Checkbox.Group>
-                </Form.Item>
-              </div>
-            </div>
+          
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
