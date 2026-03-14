@@ -12,6 +12,7 @@ import {
   getAllApartments,
   getStats,
   deleteAppartment,
+  getBedType
 } from "../../services/appartments";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
@@ -24,8 +25,7 @@ import {
 } from "../../shared/constant";
 
 export default function Appartments() {
-  const [activeType, setActiveType] = useState("All Apartments");
-  const [selectedAppartment, setSelectedAppartment] = useState(null);
+const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]);  const [selectedAppartment, setSelectedAppartment] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -43,26 +43,33 @@ export default function Appartments() {
   const { Option } = Select;
 
   const fetchData = async () => {
-    try {
-      const res = await getAllApartments(
+  try {
+    let res;
+
+    if (activeType.typeId === null) {
+      // All apartments
+      res = await getAllApartments(
         currentPage,
         itemsPerPage,
         status,
         search,
-        sort,
-        activeType === "All Apartments" ? "All" : activeType,
+        sort
       );
-      console.log(res?.data, "res?.data");
-      setAppartmentsData(res?.data);
-      if (res?.data?.data?.length > 0) {
-        setSelectedAppartment(res.data.data[0]);
-      }
-      setRefresh(false);
-      setLoading(true);
-    } catch (err) {
-      console.error("Data fetch error", err);
+    } else {
+      // Filter by type
+      res = await getBedType(activeType.typeId);
     }
-  };
+
+    setAppartmentsData(res?.data);
+
+    if (res?.data?.data?.length > 0) {
+      setSelectedAppartment(res.data.data[0]);
+    }
+console.log(res.data, "Apartment Data===");
+  } catch (err) {
+    console.error("Data fetch error", err);
+  }
+};
   useEffect(() => {
     fetchData();
   }, [currentPage, itemsPerPage, search, activeType]);
@@ -72,6 +79,7 @@ export default function Appartments() {
       try {
         const res = await getStats();
         setStats(res?.data?.data);
+        console.log(res.data, "Stats===");
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -105,7 +113,7 @@ export default function Appartments() {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: "+12%",
+      trend: `${stats?.occupancyRate ?? 0}`,
       trendText: "vs last week",
       showTrend: true,
     },
@@ -140,10 +148,10 @@ export default function Appartments() {
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} />
 
-      <div className="p-0 ml-3 gap-[2px] inline-flex   overflow-hidden rounded-lg">
+      <div className="p-0 ml-3 gap-[2px] flex flex-wrap  item-center rounded-lg">
         {APPARTMENT_TYPES.map((type, index) => (
           <button
-            key={type}
+            key={type.label}
             onClick={() => setActiveType(type)}
             className={`
         px-2 py-2 text-sm font-medium whitespace-nowrap
@@ -158,7 +166,7 @@ export default function Appartments() {
         ${index === APPARTMENT_TYPES.length - 1 ? "" : ""}
       `}
           >
-            {type}
+            {type.label}
           </button>
         ))}
       </div>

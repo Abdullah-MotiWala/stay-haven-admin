@@ -103,7 +103,7 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes,policyTypeRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes, policyTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
@@ -231,7 +231,6 @@ const AddNewRoom = () => {
         galleryUrls =
           uploadRes?.data?.data?.map((item) => item.url) || [];
       }
-      console.log(test)
 
       const payload = {
         roomName: values.name,
@@ -247,12 +246,12 @@ const AddNewRoom = () => {
         status: values.status,
         featureIds: [
           ...new Set([
-            ...values.features,
-            ...values.amenities,
-            ...values.facility,
-            ...values.policy,
+            ...(values.features || []),
+            ...(values.amenities || []),
+            ...(values.facility || []),
+            ...(values.policy || []),
           ]),
-        ],
+        ],  
 
         // 👇 IMPORTANT
         ...(mainImageUrl && { mainImage: mainImageUrl }),
@@ -280,7 +279,7 @@ const AddNewRoom = () => {
 
       setIsModalOpen(true);
     } catch (err) {
-      console.error(err);
+      console.log(err);
       openNotification(
         "error",
         err?.response?.data?.message || "Internal Server Error"
@@ -981,7 +980,7 @@ const AddNewRoom = () => {
                 </Form.Item>
               </div>
             </div>
-          
+
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
@@ -995,7 +994,7 @@ const AddNewRoom = () => {
 
             <button
               htmlType="submit"
-              // onClick={onNext}
+              // onClick={handleSubmit}
               disabled={loading}
               className="px-10 py-2 bg-blue text-white rounded-md"
             >

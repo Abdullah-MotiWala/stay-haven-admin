@@ -16,6 +16,7 @@ import {
   getApartmentAvailability,
   getOpenTickets
 } from "../../services/dashboard/";
+import {getAllBooking} from "../../services/booking"
 import { openNotification } from "../../network/notification";
 import { getNotificationApi } from "../../services/notification";
 const Dashboard = () => {
@@ -28,6 +29,8 @@ const Dashboard = () => {
   const [apartmentAvailability, setApartmentAvailability] = useState([]);
   const [openTickets, setOpenTickets] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [allBooking, setAllBookings] = useState([]);
+
 
   useEffect(() => {
     fetchAllDashboardData();
@@ -41,20 +44,22 @@ const Dashboard = () => {
         roomsAvailabilityRes,
         bookingStatusRes,
         customersRes,
-        recentBookingsRes,
+        // recentBookingsRes,
         apartmentRes,
         openTicketsRes,
-        notifications
+        notifications,
+        AllBooking
       ] = await Promise.all([
         getStats(),
         getBookingStatistics(),
         getRoomsAvailability(),
         getBookingStatus(),
         getCustomers(),
-        getRecentBookings(),
+        // getRecentBookings(),
         getApartmentAvailability(),
         getOpenTickets(),
-        getNotificationApi()
+        getNotificationApi(),
+        getAllBooking()
         
 
       ]);
@@ -64,18 +69,20 @@ const Dashboard = () => {
       setRoomsAvailability(roomsAvailabilityRes?.data?.data);
       setBookingStatus(bookingStatusRes?.data?.data);
       setCustomers(customersRes?.data?.data);
-      setRecentBookings(recentBookingsRes?.data);
+      // setRecentBookings(recentBookingsRes?.data);
       setApartmentAvailability(apartmentRes?.data?.data || []);
       setOpenTickets(openTicketsRes?.data?.data)
       setNotifications(notifications?.data?.data || []);
+      setAllBookings(AllBooking?.data?.data || []);
 
       console.log("Stats:", statsRes?.data?.data);
       console.log("Booking Statistics:", bookingStatsRes?.data?.data);
       console.log("Rooms Availability:", roomsAvailabilityRes?.data?.data);
       console.log("Booking Status:", bookingStatusRes?.data?.data);
       console.log("Customers:", customersRes?.data?.data);
-      console.log("Recent Bookings:", recentBookingsRes?.data);
+      // console.log("Recent Bookings:", recentBookingsRes?.data);
       console.log("Notifications:", notifications?.data?.data || []);
+      console.log("All Bookings:", AllBooking?.data?.data || []);
 
     } catch (err) {
       console.error("Dashboard API error:", err);
@@ -119,7 +126,7 @@ const Dashboard = () => {
   ];
   return (
     <div>
-      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={recentBookings} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} />
+      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={allBooking} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} />
     </div>
   );
 };

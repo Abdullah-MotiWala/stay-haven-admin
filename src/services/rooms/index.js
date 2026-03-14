@@ -22,6 +22,9 @@ export const updateRoom = async (id, data) => {
 export const getById = async (id, data) => {
   return Api.get(`rooms/${id}`, data);
 };
+export const getBedtypeId = async (id) => {
+  return Api.get(`rooms/by-type/${id}`);
+};
 export const deleteRoom = async (id, data) => {
   return Api.delete(`rooms/${id}`, data);
 };

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import { roomTypes } from "../../container/data/rooms";
 import RoomCard from "../RoomCard";
 import RoomDetail from "../roomDetail";
 import filter from "../../assets/icons/filter.png";
@@ -9,7 +8,7 @@ import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getAllRooms, getStats, deleteRoom } from "../../services/rooms";
+import { getAllRooms, getStats, deleteRoom ,getBedtypeId } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
@@ -18,7 +17,7 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION, ROOM_TYPES } from "../../shared/constant";
 
 export default function Rooms() {
-  const [activeType, setActiveType] = useState("All Rooms");
+const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
@@ -36,39 +35,48 @@ export default function Rooms() {
 
   const { Option } = Select;
 
-  const fetchData = async () => {
-    try {
-      const res = await getAllRooms(
+ const fetchData = async () => {
+  try {
+    let res;
+
+    if (activeType.typeId === null) {
+      // ALL ROOMS
+      res = await getAllRooms(
         currentPage,
         itemsPerPage,
         status,
         search,
-        sort,
-        activeType,
+        sort
       );
-      console.log(res?.data, "res?.data");
-      setRooms(res?.data, "rooms data");
-      if (res?.data?.data?.length > 0) {
-        setSelectedRoom(res.data.data[0]);
-      }
-
-      setRefresh(false);
-      setLoading(true);
-    } catch (err) {
-      console.error("Data fetch error", err);
+    } else {
+      // FILTERED ROOMS
+      res = await getBedtypeId(activeType.typeId);
     }
-  };
+
+    console.log(res?.data);
+
+    setRooms(res?.data);
+
+    if (res?.data?.data?.length > 0) {
+      setSelectedRoom(res.data.data[0]);
+    }
+
+  } catch (err) {
+    console.error("Data fetch error", err);
+  }
+};
   useEffect(() => {
     console.log("UseEffect Run Times");
 
     fetchData();
   }, [currentPage, itemsPerPage, search, activeType]);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await getStats();
         console.log(res.data, "Rooms===");
-        setStats(res.data);
+        setStats(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -98,7 +106,7 @@ export default function Rooms() {
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: home1,
-      trend: `${(stats?.roomsGrowth ?? 0) >= 0 ? "+" : ""}${stats?.roomsGrowth ?? 0}%`,
+      trend: `${stats?.growth?.isPositive ? '+' : '-'}${stats?.growth?.percentage ?? 0}%`,
       trendText: "vs last week",
       showTrend: true,
     },
@@ -135,28 +143,29 @@ export default function Rooms() {
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} />
 
-      <div className="p-0 ml-3 gap-[2px] inline-flex   overflow-hidden rounded-lg">
+      <div className="p-1 ml-3 gap-[2px] flex flex-wrap items-center rounded-lg">
         {ROOM_TYPES.map((type, index) => (
           <button
-            key={type}
+            key={type.label}
             onClick={() => setActiveType(type)}
             className={`
         px-2 py-2 text-sm font-medium whitespace-nowrap
-        transition-colors duration-200 rounded-0 m-0 
-        
-        ${
-          activeType === type
-            ? "bg-blue text-white"
-            : "bg-white text-extradark hover:bg-gray-50"
-        }
+        transition-colors duration-200 rounded-0 m-0
+        ${activeType === type
+                ? "bg-blue text-white"
+                : "bg-white text-extradark hover:bg-gray-50"
+              }
         ${index === 0 ? "" : ""}
         ${index === ROOM_TYPES.length - 1 ? "" : ""}
       `}
           >
-            {type}
+            {type.label}
           </button>
         ))}
       </div>
+
+
+
 
       <div className="p-4 md:p-6 bg-white min-h-screen">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -236,7 +245,7 @@ export default function Rooms() {
                         active={selectedRoom?.id === room.id}
                         onClick={() => setSelectedRoom(room)}
                       />
-                      
+
                     ))}
                   </div>
 

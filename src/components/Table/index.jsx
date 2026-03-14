@@ -47,7 +47,7 @@ const HotelDirectory = ({
 
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
-
+console.log("Filtering data ", data);
     return data.filter((item) => {
       const matchesSearch =
         !searchTerm ||
@@ -55,7 +55,7 @@ const HotelDirectory = ({
       const matchesRoom =
         !filters.roomType || item.roomType === filters.roomType;
       const matchesHotel =
-        !filters.hotelName || item.hotelName === filters.hotelName;
+        !filters.hotelName || item.hotelName === filters.hotelName || item.hotel?.name === filters.hotelName || item.name === filters.hotelName;
       const itemStatus = item.checkInOut
         ? deriveBookingStatus(item.checkInOut)
         : item.status;
@@ -82,8 +82,8 @@ const HotelDirectory = ({
       }
 
       let matchesDuration = true;
-      if (filters.duration && item.duration) {
-        const stayNights = parseInt(item.duration);
+      if (filters.duration && (item.duration || item.updatedAt)) {
+        const stayNights = parseInt(item.duration || item.updatedAt) || 0;
 
         if (filters.duration === "24h") {
           if (stayNights !== 1) matchesDuration = false;
@@ -103,6 +103,8 @@ const HotelDirectory = ({
         matchesDuration
       );
     });
+
+  
   }, [searchTerm, data, filters]);
 
   const handleFilterChange = (key, value) => {
@@ -125,8 +127,9 @@ const HotelDirectory = ({
 
   // Replace your current code with this:
   const bookings = Array.isArray(data) ? data : [data];
-  const safeBookings = bookings.filter(item => item && item.hotelName); // Safe filter
-  const uniqueHotels = [...new Set(safeBookings.map(item => item.hotelName))];
+  console.log(bookings, "bookingsbookings");
+  const safeBookings = bookings.filter(item => item && (item.hotelName || item.name)); // Safe filter
+  const uniqueHotels = [...new Set(safeBookings.map(item => (item.hotelName || item.hotel?.name || item.name)))];
 
 
   // const uniqueHotels = [
@@ -261,7 +264,7 @@ const HotelDirectory = ({
         );
 
       case "roomType":
-        const typeLabel = typeof row.roomType === 'object' ? row.roomType.title : row.roomType;
+        const typeLabel = typeof row.roomType === 'object' ? row.roomType?.title : row.roomType;
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center
@@ -467,8 +470,8 @@ const HotelDirectory = ({
                     ))
                   ) : (
                     <>
-                      <Option value="one-bed-id">One Bed Room</Option>
-                      <Option value="two-bed-id">Two Bed Room</Option>
+                      <Option value="One Bed Room">One Bed Room</Option>
+                      <Option value="Two Bed Room">Two Bed Room</Option>
                     </>
                   )}
                 </Select>
@@ -572,7 +575,7 @@ const HotelDirectory = ({
                 </button>
                 <button
                   onClick={() => setShowFilter(false)}
-                  className="px-10 py-3 bg-[#0061F2] text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all"
+                  className="px-10 py-3 bg-blue text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all"
                 >
                   Apply
                 </button>
@@ -617,7 +620,7 @@ const HotelDirectory = ({
           </thead>
 
           <tbody>
-            {!Array.isArray(data) || data.length === 0 ? (
+            {!Array.isArray(filteredData) || filteredData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns?.length + 1}
@@ -627,7 +630,7 @@ const HotelDirectory = ({
                 </td>
               </tr>
             ) : (
-              data?.map((row, index) => {
+              filteredData?.map((row, index) => {
                 const uiHotelId = `#${BASE_HOTEL_CODE}-${String(
                   index + 1,
                 ).padStart(2, "0")}`;
@@ -656,7 +659,7 @@ const HotelDirectory = ({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={`p-4 text-sm border-b border-t  border-l border-dashed
+                        className={`px-2 py-4  text-sm border-b border-t  border-l border-dashed
                         ${col.type === "status" ? "text-center" : ""}
                         ${col.type === "actions" ? "text-right relative" : ""}
                       `}

@@ -93,7 +93,7 @@ const Setting = () => {
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="p-0 my-4 gap-1 inline-flex   overflow-hidden rounded-lg ">
+      <div className="p-0 my-4 gap-1 flex flex-wrap rounded-lg ">
         {TABS.map((type, index) => (
           <button
             key={type}

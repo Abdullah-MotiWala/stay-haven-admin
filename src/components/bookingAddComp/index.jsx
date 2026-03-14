@@ -219,9 +219,9 @@ const BookingAddComp = () => {
 
   const getTypeOptions = () => {
     if (formData.bookingType === "Apartment") {
-      return [...new Set(apartment.map((a) => a.roomType.title))];
+      return [...new Set(apartment.map((a) => a.roomType?.title || a.data?.roomType.title))];
     }
-    return [...new Set(rooms.map((r) => r.roomType.title))];
+    return [...new Set(rooms.map((r) => r.roomType?.title || r.roomType))];
   };
 
   const getNumberOptions = () => {
@@ -834,7 +834,7 @@ const BookingAddComp = () => {
                       <img
                         src={hostData.profileImg}
                         alt={hostData.name}
-                        className="w-[85px] h-[85px] rounded-full object-cover border-2 border-gray-50 shadow-sm"
+                        className="w-100% h-[85px] rounded-full object-cover border-2 border-gray-50 shadow-sm"
                       />
                     </div>
 

@@ -24,8 +24,8 @@ export const getCustomers = async () => {
   return Api.get("dashboard/customers");
 };
 
-export const getRecentBookings = async () => {
-  return Api.get("bookings/recent");
+export const getRecentBookings = async (id) => {
+  return Api.get("bookings/recent",id);
 };
 
 export const getOpenTickets = async () => {

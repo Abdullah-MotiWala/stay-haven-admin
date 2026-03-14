@@ -26,26 +26,52 @@ const RoomDetailsForm = () => {
   const [gallery, setGallery] = useState([]);
 
   // Handle Main Image
-  const handleMainImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setMainImage({
-        name: file.name,
-        size: (file.size / 1024).toFixed(2) + " KB",
-        date: new Date().toLocaleString(),
-      });
-    }
-  };
+// Handle Main Image - FIXED
+const handleMainImageChange = (e) => {
+  const file = e.target.files?.[0];
+  
+  if (!file) {
+    console.log("No file selected");
+    return;
+  }
 
-  // Handle Gallery Images
-  const handleGalleryChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newFiles = files.map(file => ({
-      name: file.name,
-      date: new Date().toLocaleString(),
-    }));
-    setGallery([...gallery, ...newFiles]);
-  };
+  console.log("✅ Main Image Selected:", file.name, file.size);
+  
+  setMainImage({
+    name: file.name,
+    size: (file.size / 1024).toFixed(2) + " KB",
+    date: new Date().toLocaleString(),
+    file: file // Actual file bhi save karo
+  });
+
+  // Reset input for multiple selection
+  e.target.value = null;
+};
+
+// Handle Gallery Images - FIXED  
+const handleGalleryChange = (e) => {
+  const files = Array.from(e.target.files);
+  
+  if (files.length === 0) {
+    console.log("No gallery files selected");
+    return;
+  }
+
+  console.log("✅ Gallery Images Selected:", files.length, "files");
+  
+  const newFiles = files.map(file => ({
+    name: file.name,
+    size: (file.size / 1024).toFixed(2) + " KB",
+    date: new Date().toLocaleDateString(),
+    file: file
+  }));
+
+  setGallery(prev => [...prev, ...newFiles]);
+  
+  // Reset input
+  e.target.value = null;
+};
+
 
   const removeGalleryImage = (index) => {
     setGallery(gallery.filter((_, i) => i !== index));
@@ -71,13 +97,13 @@ const RoomDetailsForm = () => {
 
   useEffect(() => {
     if (!isEditMode) return;
- 
+
     const fetchRooms = async () => {
       setFetching(true);
       try {
         const res = await updateRoom(id);
         const rooms = res.data;
-       console.log("Rooms response", rooms)
+        console.log("Rooms response", rooms)
         form.setFieldsValue({
           name: rooms.name,
           roomNumber: rooms.room_number,
@@ -197,31 +223,31 @@ const RoomDetailsForm = () => {
           </div>
           <div className="p-6 px-36 pb-14">
             {/* <div className="flex   justify-between mb-10">
-              <div className="flex items-center gap-20 ">
-                <img
-                  src={DEFAULT_IMAGE}
-                  className="w-[330px] h-[152px] rounded-[16px] object-cover border"
-                  alt="hotel"
-                />
-                <div>
-                  <h2 className="text-xl font-semibold text-blue">
-                    Upload Hotel Image
-                  </h2>
-                  <p className="text-lightSeconday">Make sure image is clear</p>
+                <div className="flex items-center gap-20 ">
+                  <img
+                    src={DEFAULT_IMAGE}
+                    className="w-[330px] h-[152px] rounded-[16px] object-cover border"
+                    alt="hotel"
+                  />
+                  <div>
+                    <h2 className="text-xl font-semibold text-blue">
+                      Upload Hotel Image
+                    </h2>
+                    <p className="text-lightSeconday">Make sure image is clear</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4">
-                <div className="py-2">
-                  <span className="text-black font-semibold underline">
-                    Hotel ID
-                  </span>
+                <div className="flex items-center gap-4">
+                  <div className="py-2">
+                    <span className="text-black font-semibold underline">
+                      Hotel ID
+                    </span>
+                  </div>
+                  <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
+                    <span className="py-2">301</span>
+                  </div>
                 </div>
-                <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
-                  <span className="py-2">301</span>
-                </div>
-              </div>
-            </div> */}
+              </div> */}
 
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <div className="w-full">
@@ -229,13 +255,13 @@ const RoomDetailsForm = () => {
                   Room Name
                 </label>
                 {/* <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter hotel name"
-                /> */}
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter hotel name"
+                  /> */}
                 <Form.Item
                   name="name"
                   rules={[
@@ -271,13 +297,13 @@ const RoomDetailsForm = () => {
                   Select Hotel
                 </label>
                 {/* <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter location"
-                /> */}
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter location"
+                  /> */}
                 <Form.Item
                   name="select_hotel"
                   rules={[{ required: true, message: "hotel is required" }]}
@@ -294,13 +320,13 @@ const RoomDetailsForm = () => {
                   Room Type
                 </label>
                 {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
                 <Form.Item
                   name="room_type"
                   rules={[
@@ -320,13 +346,13 @@ const RoomDetailsForm = () => {
                   Bed Type
                 </label>
                 {/* <input
-                  type="text"
-                  name="cancellation_policy"
-                  value={formData.cancellation_policy}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                  placeholder="Enter policy"
-                /> */}
+                    type="text"
+                    name="cancellation_policy"
+                    value={formData.cancellation_policy}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
+                    placeholder="Enter policy"
+                  /> */}
                 <Form.Item
                   name="bed_type"
                   rules={[
@@ -363,13 +389,13 @@ const RoomDetailsForm = () => {
                   Guest Adults
                 </label>
                 {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
                 <Form.Item
                   name="guest"
                   rules={[
@@ -391,13 +417,13 @@ const RoomDetailsForm = () => {
                   Childrens
                 </label>
                 {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
                 <Form.Item
                   name="childrens"
                   rules={[
@@ -421,13 +447,13 @@ const RoomDetailsForm = () => {
                 Room Description
               </label>
               {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
               <Form.Item
                 name="description"
                 rules={[
@@ -449,13 +475,13 @@ const RoomDetailsForm = () => {
                       Price Per Night
                     </label>
                     {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
                     <Form.Item
                       name="price"
                       rules={[
@@ -477,13 +503,13 @@ const RoomDetailsForm = () => {
                       Room Status
                     </label>
                     {/* <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter email"
-                /> */}
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Enter email"
+                  /> */}
                     <Form.Item
                       name="status"
                       rules={[
@@ -515,90 +541,118 @@ const RoomDetailsForm = () => {
             <h2 className="text-[18px] mb-0 font-semibold text-gray-900">Room Images</h2>
           </div>
 
-          <div className="p-[8%] pt-2">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+         <div className="p-[8%] pt-2">
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    
+    {/* LEFT: Main Image Section - FIXED */}
+    <div className="flex flex-col gap-4">
+      <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
+      
+      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+        
+        <div className="flex justify-center mt-4">
+          <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+          <p className="text-sm text-gray-700 font-medium text-center px-4">
+            Drop your image here or <span className="text-blue underline">Browse</span>
+          </p>
+        </div>
 
-              {/* LEFT: Main Image Section */}
-              <div className="flex flex-col gap-4">
-                <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
-                <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                  <div className="flex justify-center mt-4">
-                    {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
-                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
-                    <p className="text-sm text-gray-700 font-medium text-center px-4">
-                      Drop your image here or <span className="text-blue underline">Browse</span>
-                    </p>
-                  </div>
+        <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
 
-                  <div>
-                    <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
-                    <input type="file" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  </div>
+        {/* ✅ FIXED: Input as DIRECT CHILD */}
+        <input
+          type="file"
+          accept="image/png, image/jpeg, image/jpg"
+          onChange={handleMainImageChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+      </div>
 
-                </div>
-
-                {/* Main Image File Info Card */}
-                {mainImage && (
-                  <div className=" max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
-                    <div className="flex items-center gap-3  overflow-hidden">
-                      <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-                        <FileText className="w-6 h-6 text-blue" />
-                      </div>
-                      <div className="truncate">
-                        <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">{mainImage.name}</p>
-                        <p className="text-[11px] text-gray-400 mb-0">{mainImage.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                      <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors"><img src={eye} alt="" /></button>
-                      <button onClick={() => setMainImage(null)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* RIGHT: Gallery Section */}
-              <div className="flex flex-col gap-4">
-                <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
-                <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                  <div className="flex justify-center mt-4">
-                    {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
-                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
-                    <p className="text-sm text-gray-700 font-medium text-center px-4">
-                      Upload multiple image
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
-                    <input type="file" onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  </div>
-                </div>
-
-                {/* Gallery File List (Scrollable if many files) */}
-                <div className="max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
-                  {gallery.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 ">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-                          <FileText className="w-6 h-6 text-blue" />
-                        </div>
-                        <div className="truncate">
-                          <p className="text-[13px] font-medium text-gray-800 truncate mb-0">{file.name}</p>
-                          <p className="text-[11px] text-gray-400">{file.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 shrink-0 ml-2">
-                        <button className="p-1.5 bg-[#DBEAFE] text-blue  rounded-md hover:bg-blue-200 transition-colors"><img src={eye} alt="" /></button>
-                        <button onClick={() => removeGalleryImage(index)} className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"><Trash2 size={16} /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
+      {/* ✅ File Info - Working */}
+      {mainImage && (
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+              <FileText className="w-6 h-6 text-blue" />
+            </div>
+            <div className="truncate">
+              <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">{mainImage.name}</p>
+              <p className="text-[11px] text-gray-400 mb-0">{mainImage.size} | {mainImage.date}</p>
             </div>
           </div>
+          <div className="flex gap-2 shrink-0">
+            <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
+              <img src={eye} alt="" className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setMainImage(null)} 
+              className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* RIGHT: Gallery Section - FIXED */}
+    <div className="flex flex-col gap-4">
+      <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
+      
+      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+        
+        <div className="flex justify-center mt-4">
+          <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+          <p className="text-sm text-gray-700 font-medium text-center px-4">
+            Upload multiple images
+          </p>
+        </div>
+
+        <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+
+        {/* ✅ FIXED: Input as DIRECT CHILD + multiple attribute */}
+        <input 
+          type="file"
+          multiple
+          accept="image/png, image/jpeg, image/jpg"
+          onChange={handleGalleryChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+      </div>
+
+      {/* ✅ Gallery List */}
+      {gallery.length > 0 && (
+        <div className="max-h-[200px] overflow-y-auto flex flex-col gap-2 p-2 bg-gray-50 rounded-lg border">
+          {gallery.map((file, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+                  <FileText className="w-6 h-6 text-blue" />
+                </div>
+                <div className="truncate">
+                  <p className="text-[13px] font-medium text-gray-800 truncate mb-0">{file.name}</p>
+                  <p className="text-[11px] text-gray-400">{file.size} | {file.date}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
+                  <img src={eye} alt="" className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => removeGalleryImage(index)}
+                  className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
         </div>
 
 
@@ -623,17 +677,17 @@ const RoomDetailsForm = () => {
       </Form>
 
       {/* {isModalOpen && (
-        <>
-          <SuccessModal
-            open={isModalOpen}
-            // onClose={() => setIsModalOpen(false)}
-            onClose={() => navigate("admin/rooms")}
-            showButton
-            buttonText="View Hotels"
-            onButtonClick={() => navigate("/admin/hotels")}
-          />
-        </>
-      )} */}
+          <>
+            <SuccessModal
+              open={isModalOpen}
+              // onClose={() => setIsModalOpen(false)}
+              onClose={() => navigate("admin/rooms")}
+              showButton
+              buttonText="View Hotels"
+              onButtonClick={() => navigate("/admin/hotels")}
+            />
+          </>
+        )} */}
     </>
   );
 };

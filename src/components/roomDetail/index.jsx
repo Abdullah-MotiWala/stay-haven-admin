@@ -9,6 +9,7 @@ import location from "../../assets/icons/location.svg";
 import tick from "../../assets/icons/tick.png";
 import wifi from "../../assets/icons/wifi.png";
 import { DEFAULT_IMAGE } from "../../shared/constant";
+import { useNavigate } from "react-router-dom";
 import editIcon from "../../assets/icons/editIcon.svg";
 import {
   Wifi,
@@ -34,10 +35,15 @@ function RoomDetail({ room }) {
     parking: ParkingCircle,
     "cold / warm water": Droplets,
   };
-
+let id = room?.id
 const [mainImage, setMainImage] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
   const [hasMore, setHasMore] = useState(false);
+  const navigate = useNavigate();
+  const handleEditClick = () => {
+    // navigate(`/admin/rooms/edit/${id}`);
+    navigate(`/admin/rooms/edit/${id}`);
+  };
 
   useEffect(() => {
     setMainImage(room.mainImage);
@@ -74,8 +80,8 @@ const [mainImage, setMainImage] = useState(null);
         <span className="text-lightSeconday text-md  font-medium tracking-wider">
           Room Details
         </span>
-        <button className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark hover:text-extradark transition-all duration-300">
-          <img src={editIcon} alt="Edit Icon" />
+        <button onClick={handleEditClick} className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark hover:bg-blue hover:text-white transition-all duration-300">
+          <img src={editIcon} alt="Edit Icon" className="hover:text-white" />
           Edit
         </button>
       </div>
@@ -124,7 +130,7 @@ const [mainImage, setMainImage] = useState(null);
               src={img ?? DEFAULT_IMAGE}
               alt={`Gallery Image ${index}`}
               className="w-full h-20 object-cover rounded-[15px]"
-              alt="thumb"
+              
               onClick={() => handleImageClick(img)}
             />
           ))}

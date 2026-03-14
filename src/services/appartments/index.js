@@ -15,6 +15,9 @@ export const getAllApartments = async (
 export const createAppartment = async (data) => {
   return Api.post("apartments", data);
 };
+export const getBedType = async (id) => {
+  return Api.get(`apartments/by-type/${id}`);
+};
 export const updateAppartment = async (id, data) => {
   return Api.patch(`apartments/${id}`, data);
 };

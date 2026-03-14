@@ -80,12 +80,12 @@ const NotificationsAlerts = ({ notifications }) => {
           return (
             <div
               key={index}
-              className={`flex items-start justify-between px-6 py-4 ${style.bg}`}
+              className={`flex items-start justify-between px-6 py-4 ${style?.bg}`}
             >
               <div className="flex gap-4">
-                <span className={`mt-1 w-3 h-3 rounded-full ${style.dot}`} />
+                <span className={`mt-1 w-3 h-3 rounded-full ${style?.dot}`} />
                 <div className="flex flex-col gap-0 m-0">
-                  <p className={`font-semibold text-sm m-0 ${style.title}`}>
+                  <p className={`font-semibold text-sm m-0 ${style?.title}`}>
                     {item.title}
                   </p>
                   <p className="text-sm text-black font-medium m-0 leading-snug">

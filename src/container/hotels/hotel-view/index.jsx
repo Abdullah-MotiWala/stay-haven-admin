@@ -84,8 +84,8 @@ const HotelProfile = () => {
     const fetchStatistics = async () => {
       try {
         const res = await getAllHotelsStatistics(id);
-        console.log(res.data, "asdadsaasdas2321413");
-        setStatistics(res.data);
+        console.log(res.data.data, "statistics==");
+        setStatistics(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -115,8 +115,8 @@ const HotelProfile = () => {
       try {
         setLoading(true);
         const res = await getHotelById(id);
-        console.log(res, "resresres");
-        setHotel(res.data);
+        console.log(res.data?.data, "Hotel===");
+        setHotel(res.data.data);
       } catch (err) {
         console.error("Hotel detail fetch karne mein error:", err);
       } finally {

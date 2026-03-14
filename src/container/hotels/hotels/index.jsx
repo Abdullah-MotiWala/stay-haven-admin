@@ -9,6 +9,8 @@ import {
   deleteHotel,
   getStats,
   lastHotelId,
+  getHotelsList,
+  
 } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
@@ -32,7 +34,7 @@ const HotelsListing = () => {
       try {
         const res = await getStats();
         console.log(res.data, "HOTEL===");
-        setStats(res.data);
+        setStats(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -60,7 +62,8 @@ const HotelsListing = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await getAllHotels(currentPage, itemsPerPage);
+        const res = await getHotelsList(currentPage, itemsPerPage);
+        console.log(res.data.data, "HOTELS===");
         setHotels(res.data || []);
         setRefresh(false);
       } catch (err) {

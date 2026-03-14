@@ -1,7 +1,7 @@
 import Api from "../../network/axiosClients";
 
-export const getAllBooking = async (data) => {
-    return Api.get("bookings", data);
+export const getAllBooking = async () => {
+    return Api.get("bookings");
 };
 export const createBooking = async (data) => {
     return Api.post("bookings", data);

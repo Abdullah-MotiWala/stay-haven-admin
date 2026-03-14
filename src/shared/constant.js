@@ -2,12 +2,34 @@ export const DEFAULT_IMAGE = "https://placehold.net/default.png";
 export const BASE_HOTEL_CODE = 301;
 export const ENTIRES_PER_PAGE_OPTION = [10, 20, 30, 40];
 
+// export const APPARTMENT_TYPES = [
+//   "All Apartments",
+//   "Single Bed",
+//   "Double Bed",
+//   "Three Bed",
+//   "Luxury Suites",
+// ];
 export const APPARTMENT_TYPES = [
-  "All Apartments",
-  "Single Bed",
-  "Double Bed",
-  "Three Bed",
-  "Luxury Suites",
+  {
+    label: "All Apartments",
+    typeId: null
+  },
+  {
+    label: "Single Bed",
+    typeId: "412ffc48-aa5c-40d9-8d3c-ca7cb241758d"
+  },
+  {
+    label: "Double Bed",
+    typeId: "41bde207-4e47-46d8-82e1-160646a41d27"
+  },
+   {
+    label: "Three Bed",
+    typeId: "61cd60c3-b361-4714-a6a0-a2e45ef6beac"
+  },
+   {
+    label: "Luxury Suites",
+    typeId: "7610e85b-78b6-4519-9fd6-cfddd1c21a76"
+  }
 ];
 export const TABS = [
   "General Settings",
@@ -19,11 +41,26 @@ export const TABS = [
 ];
 
 export const ROOM_TYPES = [
-  "All Rooms",
-  "one Bed Room",
-  "two Bed Room",
-  "Three Bed Room",
-  "Luxury Suites",
+  {
+    label: "All Apartments",
+    typeId: null
+  },
+  {
+    label: "Single Bed",
+    typeId: "412ffc48-aa5c-40d9-8d3c-ca7cb241758d"
+  },
+  {
+    label: "Double Bed",
+    typeId: "41bde207-4e47-46d8-82e1-160646a41d27"
+  },
+   {
+    label: "Three Bed",
+    typeId: "61cd60c3-b361-4714-a6a0-a2e45ef6beac"
+  },
+   {
+    label: "Luxury Suites",
+    typeId: "7610e85b-78b6-4519-9fd6-cfddd1c21a76"
+  }
 ];
 
 export const PAGE_CONFIG = {

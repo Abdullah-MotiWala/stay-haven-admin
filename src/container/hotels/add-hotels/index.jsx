@@ -345,26 +345,31 @@ const HotelForm = () => {
             <div className="flex justify-between mb-10">
               <div className="flex items-center gap-20">
                 {/* Image Upload Section */}
-                <div className="relative">
+                <div className="relative w-[330px] h-[152px]">
+                  {/* Image Preview */}
                   <img
                     src={imagePreview}
-                    className="w-[330px] h-[152px] rounded-[16px] object-cover border"
+                    className="w-full h-full rounded-[16px] object-cover border"
                     alt="hotel"
                   />
+
+                  {/* Overlay Label (Clickable Area) */}
                   <label
                     htmlFor="image-upload"
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-[16px] opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-[16px] opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10"
                   >
                     <span className="text-white text-sm font-medium">
                       {uploading ? "Uploading..." : "Change Image"}
                     </span>
                   </label>
+
+                  {/* Input (Ab ye bilkul gayab ho jayega) */}
                   <input
                     id="image-upload"
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="hidden"
+                    style={{ display: 'none' }} // Inline style browser default ko override karega
                     disabled={uploading}
                   />
                 </div>
@@ -386,7 +391,7 @@ const HotelForm = () => {
                   </span>
                 </div>
                 <div
-                  className={`w-24 text-center border py-2 rounded-md
+                  className={`w-24 text-center border py-3 rounded-md
     ${isDisabled
                       ? "bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none"
                       : "border-havengray text-black"

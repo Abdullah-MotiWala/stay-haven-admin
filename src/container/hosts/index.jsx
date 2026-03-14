@@ -102,7 +102,7 @@ const HostsListing = () => {
                     </div>
                 ) : (
                     <Table
-                        data={hosts}
+                        data={hosts.data}
                         onDelete={handleDelete}
                         title="Hosts Directory"
                         columns={columns}

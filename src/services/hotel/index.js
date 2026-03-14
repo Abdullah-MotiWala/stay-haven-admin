@@ -4,6 +4,10 @@ export const getAllHotels = async (currentPage, itemsPerPage) => {
   return Api.get(`/hotels?page=${currentPage}&limit=${itemsPerPage}`);
 };
 
+export const getHotelsList = async (currentPage, itemsPerPage) => {
+  return Api.get(`/hotels/list?page=${currentPage}&limit=${itemsPerPage}`);
+};
+
 export const getHotelNamesList = async (currentPage, itemsPerPage) => {
   return Api.get("/hotels/list");
 };
