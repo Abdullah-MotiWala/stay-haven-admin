@@ -23,7 +23,7 @@ const PricingAndTaxes = ({ symbol }) => {
 
           <Form.Item label="Select Tax Type" name="taxType" className="mb-6">
             <div className="flex  items-center">
-            <Radio.Group className="flex items-center gap-8">
+            <Radio.Group className="flex flex-wrap items-center gap-8">
               <Radio value="No Tax">No Tax</Radio>
               <Radio value="Fixed">Fixed</Radio>
               <Radio value="Percentage">Percentage</Radio>
@@ -54,7 +54,7 @@ const PricingAndTaxes = ({ symbol }) => {
           <hr className="mb-6" />
           
           <Form.Item label="Select Service Charges Type" name="serviceChargeType" className="mb-6">
-            <Radio.Group className="flex gap-8">
+            <Radio.Group className="flex flex-wrap gap-8">
               <Radio value="No charges">No charges</Radio>
               <Radio value="Fixed">Fixed</Radio>
               <Radio value="Percentage">Percentage</Radio>

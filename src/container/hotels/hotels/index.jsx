@@ -62,7 +62,7 @@ const HotelsListing = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await getHotelsList(currentPage, itemsPerPage);
+        const res = await getAllHotels(currentPage, itemsPerPage);
         console.log(res.data.data, "HOTELS===");
         setHotels(res.data || []);
         setRefresh(false);

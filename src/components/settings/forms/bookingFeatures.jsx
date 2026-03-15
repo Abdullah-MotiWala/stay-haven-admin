@@ -89,7 +89,7 @@ const BookingFeatures = () => {
              <h3 className="text-lg text-extradark font-semibold">Add Custom Features</h3>
               <p className="text-lightText text-base font-normal">Add any additional Features not listed above</p>
             <Input 
-                className="w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" 
+                className="w-full sm:w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" 
                 placeholder="Enter Custom feature"
                 value={featureInput}
                 onChange={(e) => setFeatureInput(e.target.value)}
@@ -97,7 +97,7 @@ const BookingFeatures = () => {
             <button 
                 type="button" 
                 onClick={() => handleAdd(featureInput, "ROOM_FEATURE")} 
-                className="px-8 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
+                className="px-8 mt-2 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
             >
                  Add in the above list
             </button>
@@ -132,7 +132,7 @@ const BookingFeatures = () => {
              <h3 className="text-lg text-extradark font-semibold">Add Custom Facilities</h3>
           <p className="text-lightText text-base font-normal">Add any additional facilities not listed above</p>
             <Input 
-                className="w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" 
+                className="w-full sm:w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" 
                 placeholder="Enter Custom facility"
                 value={facilityInput}
                 onChange={(e) => setFacilityInput(e.target.value)}
@@ -140,7 +140,7 @@ const BookingFeatures = () => {
             <button 
                 type="button" 
                 onClick={() => handleAdd(facilityInput, "ROOM_FACILITY")} 
-                className="px-8 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
+                className="px-8 mt-2 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
             >
                  Add in the above list
             </button>

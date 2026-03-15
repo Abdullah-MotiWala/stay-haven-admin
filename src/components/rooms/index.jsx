@@ -150,13 +150,13 @@ const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
             onClick={() => setActiveType(type)}
             className={`
         px-2 py-2 text-sm font-medium whitespace-nowrap
-        transition-colors duration-200 rounded-0 m-0
+        transition-colors duration-200  m-0
         ${activeType === type
                 ? "bg-blue text-white"
                 : "bg-white text-extradark hover:bg-gray-50"
               }
-        ${index === 0 ? "" : ""}
-        ${index === ROOM_TYPES.length - 1 ? "" : ""}
+       ${index === 0 ? "rounded-l-lg" : "rounded-0"}
+        ${index === ROOM_TYPES.length - 1 ? "rounded-r-lg" : "rounded-0"}
       `}
           >
             {type.label}
