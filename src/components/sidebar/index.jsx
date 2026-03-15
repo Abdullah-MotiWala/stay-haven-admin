@@ -109,7 +109,7 @@ const SidebarContent = ({ location }) => {
           icon={<LogoutOutlined />}
           block
           onClick={handleLogout} // Click handler connect kiya
-          className="rounded-md h-12 bg-white text-lightRed font-medium border-lightRed hover:text-red-600"
+          className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed hover:text-red-600"
         >
           Logout
         </Button>
