@@ -7,7 +7,8 @@ import OpenTickets from "./openTickets";
 import AvailabilityProgress from "./roomCharts";
 import RoomAvailability from "./roomCharts";
 
-const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets, notifications }) => {
+const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets, notifications , paginationdata}) => {
+ console.log("DashboardPage Props", paginationdata)
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} />

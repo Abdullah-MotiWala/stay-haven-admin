@@ -46,7 +46,7 @@ const HotelProfile = () => {
   const [statistics, setStatistics] = useState(false);
   const [recentBookings, setRecentBookings] = useState([]);
 
-  const uiHotelId = location.state?.lastId;
+  const uiHotelId = hotel?.hotelId || location.state?.lastId;
   console.log(uiHotelId, "uiHotelIduiHotelId32423");
 
   useEffect(() => {
@@ -298,7 +298,7 @@ const HotelProfile = () => {
         <Breadcrumb title="Hotels" subtitle="View hotel" />
       </div>
 
-      <div className="w-full overflow-x-hidden bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+      <div className="w-full overflow-x-hidden bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 mx-0">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-[18px] font-bold text-[#1B2559]">
             Hotel Profile

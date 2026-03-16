@@ -10,7 +10,7 @@ import {
   getStats,
   lastHotelId,
   getHotelsList,
-  
+
 } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
@@ -135,8 +135,8 @@ const HotelsListing = () => {
   ];
 
   const onPageChange = (page, pageSize) => {
-    setCurrentPage(page); 
-    setItemsPerPage(pageSize); 
+    setCurrentPage(page);
+    setItemsPerPage(pageSize);
   };
 
   return (
@@ -166,6 +166,7 @@ const HotelsListing = () => {
             setRefresh={setRefresh}
             lastId={lastId?.nextNumericId}
             path={`/admin/hotel/view`}
+            hoteloptions={true}
           />
         )}
 
@@ -190,7 +191,7 @@ const HotelsListing = () => {
             onChange={onPageChange}
             // showSizeChanger={false}
             className="flex justify-end "
-            // style={{ paddingTop: "20px", paddingBottom: "20px" }} // Adds padding for better spacing
+          // style={{ paddingTop: "20px", paddingBottom: "20px" }} // Adds padding for better spacing
           />
         </div>
       </div>

@@ -16,7 +16,7 @@ import {
   getApartmentAvailability,
   getOpenTickets
 } from "../../services/dashboard/";
-import {getAllBooking} from "../../services/booking"
+import { getAllBooking } from "../../services/booking"
 import { openNotification } from "../../network/notification";
 import { getNotificationApi } from "../../services/notification";
 const Dashboard = () => {
@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [openTickets, setOpenTickets] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [allBooking, setAllBookings] = useState([]);
-
+  const [paginationdata, setPaginationData] = useState([]);
 
   useEffect(() => {
     fetchAllDashboardData();
@@ -60,7 +60,7 @@ const Dashboard = () => {
         getOpenTickets(),
         getNotificationApi(),
         getAllBooking()
-        
+
 
       ]);
 
@@ -74,7 +74,7 @@ const Dashboard = () => {
       setOpenTickets(openTicketsRes?.data?.data)
       setNotifications(notifications?.data?.data || []);
       setAllBookings(AllBooking?.data?.data || []);
-
+      setPaginationData(AllBooking?.data || []);
       console.log("Stats:", statsRes?.data?.data);
       console.log("Booking Statistics:", bookingStatsRes?.data?.data);
       console.log("Rooms Availability:", roomsAvailabilityRes?.data?.data);
@@ -126,7 +126,7 @@ const Dashboard = () => {
   ];
   return (
     <div>
-      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={allBooking} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} />
+      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={allBooking} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} paginationdata={paginationdata} />
     </div>
   );
 };

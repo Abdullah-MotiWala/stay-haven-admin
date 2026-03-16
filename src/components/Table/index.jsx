@@ -26,7 +26,8 @@ const HotelDirectory = ({
   checkbox = true,
   activeType,
   roomTypes = [],
-  onStatusToggle
+  onStatusToggle,
+  hoteloptions = false
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -47,7 +48,7 @@ const HotelDirectory = ({
 
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
-console.log("Filtering data ", data);
+    console.log("Filtering data ", data);
     return data.filter((item) => {
       const matchesSearch =
         !searchTerm ||
@@ -104,7 +105,7 @@ console.log("Filtering data ", data);
       );
     });
 
-  
+
   }, [searchTerm, data, filters]);
 
   const handleFilterChange = (key, value) => {
@@ -398,8 +399,8 @@ console.log("Filtering data ", data);
                     {bulkOpen && (
                       <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
                         {[
-                          "Active Selected",
-                          "InActive Selected",
+                          "Active",
+                          "InActive",
                           "Delete",
                           "Draft",
                           "Maintenance",
@@ -408,7 +409,7 @@ console.log("Filtering data ", data);
                             key={item}
                             onClick={() => {
                               handleBulkAction(
-                                item.split(" ")[0].toUpperCase(),
+                                item.split(" ")[0].toLowerCase(),
                               );
                               setBulkOpen(!bulkOpen);
                             }}
@@ -435,7 +436,7 @@ console.log("Filtering data ", data);
           )}
 
           {view && (
-            <button className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
+            <button onClick={() => navigate("/admin/bookings")} className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
               View
             </button>
           )}
@@ -527,10 +528,24 @@ console.log("Filtering data ", data);
                   }
                 >
                   <Option value="">Sort by Status</Option>
-                  <Option value="Booked  ">Booked</Option>
-                  <Option value="Completed">Completed</Option>
-                  <Option value="Cancelled">Cancelled</Option>
-                  <Option value="Checked-In">Checked In</Option>
+                  {hoteloptions ? (
+                    <>
+                      <Option value="active">Active</Option>
+                      <Option value="inactive">inActive</Option>
+                      <Option value="maintenance">Maintenance</Option>
+                      <Option value="draft">Draft</Option>
+                    </>
+                  ) : (
+                    <>
+
+                      <Option value="Booked">Booked</Option>
+                      <Option value="Completed">Completed</Option>
+                      <Option value="Cancelled">Cancelled</Option>
+                      <Option value="Checked-In">Checked In</Option>
+                    </>
+                  )}
+
+
                 </Select>
               </div>
 

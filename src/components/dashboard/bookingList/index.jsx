@@ -1,7 +1,19 @@
 import React from "react";
 import HotelDirectory from "../../Table";
+import { Pagination, Select } from "antd";
+import { useState } from "react";
+const entriesPerPageOptions = [10, 20, 30, 40];
 
-const BookingList = ({recentBookings}) => {
+const BookingList = ({ recentBookings }) => {
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [stats, setStats] = useState(null);
+
+  const onPageChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setItemsPerPage(pageSize);
+  };
+
   const columns = [
     { key: "bookingId", label: "Booking ID", type: "text" },
     { key: "guestName", label: "Guest Name", type: "text" },
@@ -64,17 +76,52 @@ const BookingList = ({recentBookings}) => {
       status: "Checked-In",
     },
   ];
-  console.log(recentBookings,"recentBookings===")
+  console.log(recentBookings, "recentBookings===")
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const paginatedBookings = recentBookings.slice(startIndex, endIndex);
   return (
     <div>
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
-          data={recentBookings}
+          data={paginatedBookings}
           title="Bookings List"
           columns={columns}
           filter={false}
           view={true}
+         
         />
+        <div className="mt-4 flex justify-between">
+          <div>
+            <Select
+              value={itemsPerPage}
+              className="text-black"
+              onChange={(value) => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
+              options={entriesPerPageOptions.map((option) => ({
+                label: option,
+                value: option,
+              }))}
+            />
+
+            <span className="text-lightSeconday ml-4">
+              Entries per page
+            </span>
+          </div>
+
+          <Pagination
+            current={currentPage}
+            total={recentBookings.length}
+            pageSize={itemsPerPage}
+            onChange={onPageChange}
+            className="flex justify-end"
+          />
+
+        </div>
       </div>
     </div>
   );

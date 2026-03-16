@@ -44,6 +44,9 @@ const HotelForm = () => {
         const res = await lastHotelId();
         console.log(res?.data, "lastID===");
         setLastId(res?.data);
+        if (!isEditMode) {
+          form.setFieldValue("hotelId", res?.data?.nextNumericId);
+        }
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -59,9 +62,8 @@ const HotelForm = () => {
       setFetching(true);
       try {
         const res = await getHotelById(id);
-        const hotel = res.data;
-        console.log(hotel.status, "hotel.statushotel.status");
-        setHotel(hotel);
+        const hotelres = res.data || res.data.data;
+        console.log(hotel, "hotel.statushotel.status");
 
         // Set image preview if exists
         if (hotel.imageUrl) {
@@ -69,15 +71,19 @@ const HotelForm = () => {
         }
 
         form.setFieldsValue({
-          name: hotel.name,
-          city: hotel.city,
-          address: hotel.address,
-          email: hotel.email,
-          cancellation_policy: hotel.cancellation_policy,
-          isActive: hotel.status,
-          amenities: hotel.amenities?.map((a) => a.id) || [],
-          rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
+          hotelId: hotelres.hotelId,
+          name: hotelres.name,
+          city: hotelres.city,
+          address: hotelres.address,
+          email: hotelres.email,
+          cancellation_policy: hotelres.cancellation_policy,
+          isActive: hotelres.status,
+          amenities: hotelres.amenities?.map((a) => a.id) || [],
+          rooms: hotelres.roomsIncluded?.map((r) => r.id) || [],
         });
+
+        // setHotel(hotel);
+
       } catch (err) {
         openNotification("error", "Failed to load hotel");
       } finally {
@@ -250,6 +256,7 @@ const HotelForm = () => {
       }
 
       const payload = {
+        hotelId: values.hotelId,
         name: values.name,
         city: values.city,
         address: values.address,
@@ -308,6 +315,7 @@ const HotelForm = () => {
         onFinish={handleSubmit}
         className="min-h-screen w-full md:p-8 font-sans"
       >
+
         <div>
           <div
             className="flex items-center gap-4 cursor-pointer"
@@ -386,21 +394,25 @@ const HotelForm = () => {
 
               <div className="flex items-center gap-4">
                 <div className="py-2">
-                  <span className="text-black font-semibold underline">
+                  <span className="text-black font-semibold underline whitespace-nowrap">
                     Hotel ID
                   </span>
                 </div>
                 <div
-                  className={`w-24 text-center border py-3 rounded-md
-    ${isDisabled
-                      ? "bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none"
+                  className={`w-24 text-center border rounded-md
+  ${isDisabled
+                      ? "bg-havengray text-extradark border-lightSeconday"
                       : "border-havengray text-black"
-                    }
-  `}
+                    }`}
                 >
-                  <span className="select-none">
-                    {isEditMode ? hotel.hotelId : lastId?.nextNumericId}
-                  </span>
+                  <Form.Item name="hotelId" className="m-0">
+                    <Input
+                      id="hotelId"
+                      className="text-center border-none bg-transparent font-medium"
+                      // defaultValue={isEditMode ? hotel.hotelId : lastId?.nextNumericId}
+                   
+                    />
+                  </Form.Item>
                 </div>
               </div>
             </div>
@@ -412,6 +424,7 @@ const HotelForm = () => {
                 </label>
                 <Form.Item
                   name="name"
+                  preserve={true}
                   rules={[
                     { required: true, message: "Hotel name is required" },
                   ]}
