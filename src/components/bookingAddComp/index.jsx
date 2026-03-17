@@ -58,7 +58,7 @@ const BookingAddComp = () => {
     paymentMethod: "Bank",
     status: "Checked-In",
     isApartment: false,
-    infants: 0 ,
+    infants: 0,
   });
 
   const [hostData, setHostData] = useState({
@@ -68,6 +68,49 @@ const BookingAddComp = () => {
     phone: "+92 331 672 5657579",
     email: "aliraza03@gmail.com",
   });
+
+  useEffect(() => {
+    if (!isEditMode || rooms.length === 0) return;
+
+    let foundBooking = null;
+    let foundRoom = null;
+
+    for (const room of rooms) {
+      const booking = room.bookings?.find((b) => b.id === id);
+      if (booking) {
+        foundBooking = booking;
+        foundRoom = room;
+        break;
+      }
+    }
+
+    if (foundBooking) {
+      setFormData((prev) => ({
+        ...prev,
+
+        // ✅ Correct mapping
+        guestName: foundBooking.guestName || "",
+        phone: foundBooking.guestPhone || "",
+        email: foundBooking.guestEmail || "",
+
+        checkIn: foundBooking.checkIn || "",
+        checkOut: foundBooking.checkOut || "",
+
+        roomId: foundRoom?.id || "",
+        roomNumber: foundRoom?.roomNumber || "",
+        roomType: foundRoom?.roomType?.title || "",
+
+        pricePerNight: foundBooking.pricePerNight || 0,
+
+        numGuests: `${foundBooking.adults} Adult`,
+        infants: foundBooking.infants || 0,
+
+        paymentMethod: foundBooking.paymentMethod || "",
+        status: foundBooking.status || "",
+      }));
+    }
+    console.log(foundBooking, "founding booking");
+  }, [id, isEditMode, rooms]);
 
   const handleRoomSelect = (roomId) => {
     // Farz karein 'rooms' aapki wo list hai jo API se aayi hai
@@ -106,7 +149,7 @@ const BookingAddComp = () => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setRooms(data);
         console.log(data, "Rooms");
-
+     
       } catch (err) {
         console.error("Error fetching rooms:", err);
         openNotification("error", "Failed to load rooms");
@@ -450,7 +493,7 @@ const BookingAddComp = () => {
                     </Option>
                     <Option value={5}>
                       5 Maxinfants
-                    </Option> 
+                    </Option>
                     <Option value={6}>
                       6 Maxinfants
                     </Option>
