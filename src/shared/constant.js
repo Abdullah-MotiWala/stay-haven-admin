@@ -100,6 +100,7 @@ export const STETPS_FIELDS = {
     "description",
     "pricePerNight",
     "status",
+    "maxinfants"
   ],
   1: ["features", "amenities", "facility"],
 };

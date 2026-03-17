@@ -167,6 +167,7 @@
           filter={true}
           view={false}
           path={`/admin/booking/view`}
+          editpath={`/admin/booking/edit`}
           inp={true}
           onlyFilter={true}
           checkbox={false}

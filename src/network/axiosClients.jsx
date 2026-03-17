@@ -98,7 +98,7 @@ Api.interceptors.response.use(
         )
       )
     ) {
-      openNotification("error", message);
+      // openNotification("error", message);
     }
 
     res.data = { ...res.data, success: false };

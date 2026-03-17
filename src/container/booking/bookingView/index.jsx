@@ -15,7 +15,7 @@ const BoookingView = () => {
             try {
                 const res = await getById(id);
                 console.log(res.data, "data from API");
-                setBookingData(res.data);
+                setBookingData(res.data.data);
             } catch (err) {
                 console.error("Failed to load booking details:", err);
                 openNotification("error", "Failed to load booking details");

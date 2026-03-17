@@ -17,9 +17,11 @@ import {
   Avatar,
   Upload,
 } from "antd";
+
 import cloudimg from "../../../assets/icons/cloud-upload.png";
 import { DeleteFilled, EditOutlined, UploadOutlined } from "@ant-design/icons";
 import editIcon from "../../../assets/icons/editIcon.svg";
+import { Trash2 } from "lucide-react";
 
 // import { createRoom, getById, updateRoom } from "../../../services/rooms";
 import {
@@ -34,7 +36,7 @@ const AddNewAppartment = () => {
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const [form] = Form.useForm();
-
+  const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,8 +56,10 @@ const AddNewAppartment = () => {
   const [uploading, setUploading] = useState(false);
   const selectedFeatures = Form.useWatch("features", form) || [];
   const selectedFacility = Form.useWatch("facility", form) || [];
+  const [policyList, setPolicyList] = useState([]);
   const selectedAmenities = Form.useWatch("amenities", form) || [];
-
+  const [mainImage, setMainImage] = useState(null);
+  const selectedPolicy = Form.useWatch("policy", form) || [];
   const { Option } = Select;
 
   useEffect(() => {
@@ -111,8 +115,10 @@ const AddNewAppartment = () => {
           phoneNumber: appartment.host?.phone,
           // featureIds: appartment.featureIds || [],
           facility: appartment.features?.map((a) => a.id) || [],
+          policy:appartment.features?.map((a) => a.id) || [],
           amenities: appartment.features?.map((r) => r.id) || [],
           features: appartment.features?.map((r) => r.id) || [],
+          maxinfants: appartment.maxInfants || 0,
         });
       } catch (err) {
         openNotification("error", "Failed to load hotel");
@@ -127,17 +133,19 @@ const AddNewAppartment = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, roomTypeRes, policyTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
           getAllFeature("ROOM_TYPE"),
+          getAllFeature("POLICY"),
         ]);
         console.log(roomTypeRes, "roomTypeResroomTypeRes===");
         setAmenitiesList(amenityRes.data.data);
         setFeaturesList(featuresRes.data.data);
         setFacilityList(facilityRes.data.data);
         setRoomTypesList(roomTypeRes.data.data);
+        setPolicyList(policyTypeRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -193,6 +201,10 @@ const AddNewAppartment = () => {
       reader.readAsDataURL(file);
     }
   };
+  const removeMainImage = () => {
+    setMainImage(null);
+    setMainImagePreview(null);
+  };
 
   // Upload main image
   const uploadMainImage = async () => {
@@ -237,16 +249,16 @@ const AddNewAppartment = () => {
     console.log("Selected gallery files:", files);
 
     if (files.length > 0) {
-      // Check total files count (max 10 images)
-      if (galleryFiles.length + files.length > 10) {
-        openNotification("error", "Maximum 10 gallery images allowed");
+
+      if (galleryFiles.length + files.length > 5) {
+        openNotification("error", "Maximum 5 gallery images allowed");
         return;
       }
 
-      // Validate each file
+
       const validFiles = files.filter(file => {
-        // Check file size (max 2MB each)
-        if (file.size > 2 * 1024 * 1024) {
+
+        if (file.size > 1 * 1024 * 1024) {
           openNotification("error", `${file.name} size should be less than 2MB`);
           return false;
         }
@@ -280,8 +292,8 @@ const AddNewAppartment = () => {
 
   // Remove single gallery image
   const removeGalleryImage = (index) => {
-    setGalleryFiles(prev => prev.filter((_, i) => i !== index));
-    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    setGallery((prev) => prev.filter((_, i) => i !== index));
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Upload multiple gallery images - USING uploadMultipleMedia
@@ -407,6 +419,7 @@ const AddNewAppartment = () => {
   //     setLoading(false);
   //   }
   // };
+
   const handleSubmit = async (values) => {
     setLoading(true);
 
@@ -449,10 +462,12 @@ const AddNewAppartment = () => {
       description: values.description,
       pricePerNight: Number(values.pricePerNight),
       status: values.status,
-      featureIds: [...values.features, ...values.amenities, ...values.facility],
+      featureIds: [...values.features, ...values.amenities, ...values.facility , ...values.policy],
       hostName: values.hostname,
       hostEmail: values.email,
       hostPhone: values.phoneNumber,
+      maxInfants: Number(values.maxinfants),
+
       // hostImage: "https://ui-avatars.com/api/?name=Abdullah+Khan",
     };
 
@@ -622,7 +637,7 @@ const AddNewAppartment = () => {
                       // OnChange check karne ke liye (Debugging)
                       onChange={(val) => console.log("Selected Value:", val)}
                     >
-                      {hotelsList?.map((item) => (
+                      {Array.isArray(hotelsList) && hotelsList.map((item) => (
                         <Select.Option key={item.id} value={item.id}>
                           {item.name}
                         </Select.Option>
@@ -774,7 +789,37 @@ const AddNewAppartment = () => {
               </div>
 
               <div>
+
                 <div className="w-full ">
+                  <div className="w-full">
+                    <label className="text-base text-lightSeconday font-medium">
+                      Maxinfants
+                    </label>
+                    <Form.Item
+                      preserve={true}
+                      name="maxinfants"
+                      label=""
+                      rules={[
+                        { required: true, message: "maxinfants is required" },
+                      ]}
+                    >
+                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                        {[
+                          { label: "1 Maxinfants", value: "1" },
+                          { label: "2 Maxinfants", value: "2" },
+                          { label: "3 Maxinfants", value: "3" },
+                          { label: "4 Maxinfants", value: "4" },
+                          { label: "5 Maxinfants", value: "5" },
+                          { label: "6 Maxinfants", value: "6" },
+
+                        ].map((item) => (
+                          <Option key={item.value} value={item.value}>
+                            {item.label}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </div>
                   <label className="text-base text-lightSeconday font-medium">
                     Appartment Description
                   </label>
@@ -849,6 +894,13 @@ const AddNewAppartment = () => {
               </div>
             </div>
           </div>
+
+
+
+
+
+
+
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 font-sans overflow-hidden">
             <div className="px-6 py-3 border-b border-gray-100">
               <h2 className="text-[18px] mb-0 font-semibold text-gray-900">
@@ -863,31 +915,41 @@ const AddNewAppartment = () => {
                   <label className="text-[15px] font-semibold text-gray-900">
                     Upload Appartment (Main) image
                   </label>
-                  <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                    <div className="flex justify-center mt-4">
-                      {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
-                      <img
-                        src={cloudimg}
-                        alt=""
-                        className="w-6 h-6 text-gray-700"
-                      />
-                      <p className="text-sm text-gray-700 font-medium text-center px-4">
-                        Drop your image here or{" "}
-                        <span className="text-blue underline">Browse</span>
-                      </p>
-                    </div>
+                  {!mainImagePreview ? (
+                    <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                      <div className="flex justify-center mt-4">
+                        {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
+                        <img
+                          src={cloudimg}
+                          alt=""
+                          className="w-6 h-6 text-gray-700"
+                        />
+                        <p className="text-sm text-gray-700 font-medium text-center px-4">
+                          Drop your image here or{" "}
+                          <span className="text-blue underline">Browse</span>
+                        </p>
+                      </div>
 
-                    <div>
-                      <p className="text-[11px] text-gray-400">
-                        Only JPG/PNG Files under 2 MB
-                      </p>
-                      <input
-                        type="file"
-                        onChange={handleMainImageChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
+                      <div>
+                        <p className="text-[11px] text-gray-400">
+                          Only JPG/PNG Files under 1 MB
+                        </p>
+                        <input
+                          type="file"
+                          onChange={handleMainImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                      </div>
+
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative w-full">
+                      <img src={mainImagePreview} alt="Main Preview" className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200" />
+                      <button type="button" onClick={removeMainImage} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
 
                   {/* Main Image File Info Card */}
                   {/* {mainImage && (
@@ -923,7 +985,7 @@ const AddNewAppartment = () => {
                 {/* RIGHT: Gallery Section */}
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-gray-900">
-                    Gallery (Optional) - Max 10 images
+                    Gallery (Optional) - Max 5 images
                   </label>
                   <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
                     <div className="flex justify-center mt-4">
@@ -939,7 +1001,7 @@ const AddNewAppartment = () => {
 
                     <div>
                       <p className="text-[11px] text-gray-400">
-                        Only JPG/PNG Files under 2 MB each
+                        Only JPG/PNG Files under 1 MB each
                       </p>
                       <input
                         type="file"
@@ -975,7 +1037,7 @@ const AddNewAppartment = () => {
 
                   {/* Selected Count */}
                   <p className="text-xs text-gray-400">
-                    {galleryFiles.length}/10 images selected
+                    {galleryFiles.length}/5 images selected
                   </p>
                 </div>
               </div>
@@ -1035,6 +1097,38 @@ const AddNewAppartment = () => {
           </div>
 
           <div>
+            <div>
+              {[
+                { title: "Room Features", name: "features", list: featuresList, selected: selectedFeatures, label: "Select Room Features" },
+                { title: "Ameneties", name: "amenities", list: amenitiesList, selected: selectedAmenities, label: "Select Ameneties" },
+                { title: "Policy", name: "policy", list: policyList, selected: selectedPolicy, label: "Select Policy" },
+                { title: "Room Facilities", name: "facility", list: facilityList, selected: selectedFacility, label: "Select Room Facilities" },
+              ].map(({ title, name, list, selected, label }) => (
+                <div key={name} className="bg-white rounded-2xl shadow-sm border border-lightSeconday mb-4">
+                  <div className="px-6 py-4">
+                    <h2 className="text-lg font-semibold text-black">{title}</h2>
+                    <hr />
+                  </div>
+                  <div className="p-6 px-36 pb-14">
+                    <h3 className="font-semibold mb-4">{label}</h3>
+                    <Form.Item preserve={true} name={name} className="w-full" rules={[{ required: true, message: `Please select at least one ${title.toLowerCase()}` }]}>
+                      <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
+                        {list.map((a) => (
+                          <div key={a.id} className="w-full">
+                            <Checkbox value={a.id} className="w-full flex items-center">
+                              <span className={`block w-full text-sm font-medium ${selected.includes(a.id) ? "text-blue" : "text-lightText"}`}>
+                                {a.title}
+                              </span>
+                            </Checkbox>
+                          </div>
+                        ))}
+                      </Checkbox.Group>
+                    </Form.Item>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
               <div className="px-6 py-4  ">
                 <h2 className="text-lg font-semibold text-black  ">
@@ -1081,6 +1175,7 @@ const AddNewAppartment = () => {
                 </Form.Item>
               </div>
             </div>
+
             <div className="bg-white rounded-2xl shadow-sm border border-lightSeconday ">
               <div className="px-6 py-4  ">
                 <h2 className="text-lg font-semibold text-black  ">
@@ -1178,7 +1273,7 @@ const AddNewAppartment = () => {
                 </h2>
                 <hr />
               </div>
-              <div className="max-w-4xl mx-auto bg-white  rounded-lg">
+              <div className="max-w-4xl px-4 mx-auto bg-white  rounded-lg">
                 {/* <div className="flex items-center gap-4 mb-8">
                   <div className="relative">
                     <Avatar
@@ -1202,32 +1297,36 @@ const AddNewAppartment = () => {
                   </div>
                 </div> */}
                 <div className="flex items-center gap-10 mb-14 ">
-                  <div className="relative">
-                    <Avatar
-                      size={120}
-                      src={hostImagePreview !== DEFAULT_IMAGE ? hostImagePreview : "https://ui-avatars.com/api/?name=Host+Image"}
-                    />
+                  <div className="relative inline-block">
+                    {/* ✅ Pure Avatar ko label mein wrap kar diya taake click karne par input trigger ho */}
+                    <label htmlFor="host-image-upload" className="cursor-pointer">
+                      <Avatar
+                        size={120}
+                        src={hostImagePreview !== DEFAULT_IMAGE ? hostImagePreview : "https://ui-avatars.com/api/?name=Host+Image"}
+                        className="hover:opacity-80 transition-opacity" // Optional: click feel dene ke liye
+                      />
+                    </label>
 
-                    {/* ✅ Hidden file input for host image */}
                     <input
                       id="host-image-upload"
                       type="file"
                       accept="image/*"
                       onChange={handleHostImageChange}
                       className="hidden"
+                      style={{ display: "none" }}
                     />
 
-                    {/* ✅ Label that triggers file input */}
-                    {/* <label
+                    {/* ✅ Agar aap edit icon bhi wapis lana chahen to label ko yahan bhi use kar sakte hain */}
+                    <label
                       htmlFor="host-image-upload"
-                      className="absolute bottom-3 right-2 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer p-1 bg-blue hover:bg-blue-700 transition-colors"
+                      className="absolute bottom-2 right-2 bg-blue rounded-full flex items-center justify-center cursor-pointer p-2 hover:bg-blue-700 transition-colors shadow-lg"
                     >
                       <img
                         src={editIcon}
                         alt="Edit Icon"
                         className="w-4 h-4"
                       />
-                    </label> */}
+                    </label>
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-blue line-clamp-0">

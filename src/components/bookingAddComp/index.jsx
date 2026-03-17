@@ -58,6 +58,7 @@ const BookingAddComp = () => {
     paymentMethod: "Bank",
     status: "Checked-In",
     isApartment: false,
+    infants: 0 ,
   });
 
   const [hostData, setHostData] = useState({
@@ -176,6 +177,8 @@ const BookingAddComp = () => {
         apartmentId: selectedObj?.id || "",
         roomNumber: selectedObj?.apartmentNumber || "",
         apartmentName: isApartment ? value : "",
+
+
 
       }));
       console.log(selectedObj, "selected Object for Hotel/Apartment");
@@ -364,7 +367,7 @@ const BookingAddComp = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter full Name"
-                      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
+                      className="w-full bg-white border-2 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
                     />
                   </div>
                   <div className="flex flex-col">
@@ -378,7 +381,7 @@ const BookingAddComp = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter Number"
-                      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
+                      className="w-full bg-white border-2 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
                     />
                   </div>
                   <div className="flex flex-col">
@@ -391,7 +394,7 @@ const BookingAddComp = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter email"
-                      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
+                      className="w-full bg-white border-2 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
                     />
                   </div>
                   <div className="flex flex-col">
@@ -405,9 +408,54 @@ const BookingAddComp = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter CNIC"
-                      className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
+                      className="w-full bg-white border-2 border-lightSeconday rounded-lg px-4 py-3 text-dark font-medium outline-none m-0"
                     />
                   </div>
+                </div>
+
+
+                <div className="flex flex-col">
+                  <label className="text-lightSeconday text-13 font-bold ml-1">
+                    {/* {formData.bookingType === "Apartment"
+                        ? "Apartment Name"
+                        : "Hotel Name"} */} Maxinfants
+                  </label>
+                  <Select
+                    className="w-full h-12 border border-lightSeconday rounded-lg font-medium"
+                    placeholder={"Select maxinfants"}
+                    value={formData.infants || undefined}
+                    onChange={(val) =>
+                      handleChange({
+                        target: { name: "infants", value: val },
+                      })
+                    }
+                    suffixIcon={
+                      <ChevronDown size={18} className="text-gray-400" />
+                    }
+                  >
+                    <Option value={0}>
+                      0 Maxinfants
+                    </Option>
+                    <Option value={1}>
+                      1 Maxinfants
+                    </Option>
+                    <Option value={2}>
+                      2 Maxinfants
+                    </Option>
+                    <Option value={3}>
+                      3 Maxinfants
+                    </Option>
+                    <Option value={4}>
+                      4 Maxinfants
+                    </Option>
+                    <Option value={5}>
+                      5 Maxinfants
+                    </Option> 
+                    <Option value={6}>
+                      6 Maxinfants
+                    </Option>
+
+                  </Select>
                 </div>
               </div>
 

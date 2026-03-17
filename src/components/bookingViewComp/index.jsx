@@ -83,7 +83,7 @@ const BookingComp = (props) => {
 
         <div className='flex gap-1 border-solid border-b border-gray-300 mb-2 pb-4 flex items-center gap-4'>
             <img src={leftangle} alt="" />
-            <button className='text-gray-600 flex' onClick={() => navigate("/admin/booking")}>Back</button>
+            <button className='text-gray-600 flex' onClick={() => navigate("/admin/bookings")}>Back</button>
 
         </div>
 
@@ -101,8 +101,8 @@ const BookingComp = (props) => {
                 </div>
 
             </div>
-            <button className="border border-2 p-2 w-90 items-center flex gap-2 font-medium rounded-full bg-slate-100">
-                <span><img src={edit} alt="" onClick={() => navigate(`/admin/booking/edit/${ids}`)} /></span>Edit
+            <button className="border border-2 p-2 w-90 items-center flex gap-2 font-medium rounded-full bg-slate-100 hover:bg-blue hover:text-white transform transition-all duration-300" onClick={() => navigate(`/admin/booking/edit/${ids}`)}>
+                <span><img src={edit} alt=""  onClick={() => navigate(`/admin/booking/edit/${ids}`)} /></span>Edit
             </button>
         </div>
 

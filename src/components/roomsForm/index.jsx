@@ -26,51 +26,51 @@ const RoomDetailsForm = () => {
   const [gallery, setGallery] = useState([]);
 
   // Handle Main Image
-// Handle Main Image - FIXED
-const handleMainImageChange = (e) => {
-  const file = e.target.files?.[0];
-  
-  if (!file) {
-    console.log("No file selected");
-    return;
-  }
+  // Handle Main Image - FIXED
+  const handleMainImageChange = (e) => {
+    const file = e.target.files?.[0];
 
-  console.log("✅ Main Image Selected:", file.name, file.size);
-  
-  setMainImage({
-    name: file.name,
-    size: (file.size / 1024).toFixed(2) + " KB",
-    date: new Date().toLocaleString(),
-    file: file // Actual file bhi save karo
-  });
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
 
-  // Reset input for multiple selection
-  e.target.value = null;
-};
+    console.log("✅ Main Image Selected:", file.name, file.size);
 
-// Handle Gallery Images - FIXED  
-const handleGalleryChange = (e) => {
-  const files = Array.from(e.target.files);
-  
-  if (files.length === 0) {
-    console.log("No gallery files selected");
-    return;
-  }
+    setMainImage({
+      name: file.name,
+      size: (file.size / 1024).toFixed(2) + " KB",
+      date: new Date().toLocaleString(),
+      file: file // Actual file bhi save karo
+    });
 
-  console.log("✅ Gallery Images Selected:", files.length, "files");
-  
-  const newFiles = files.map(file => ({
-    name: file.name,
-    size: (file.size / 1024).toFixed(2) + " KB",
-    date: new Date().toLocaleDateString(),
-    file: file
-  }));
+    // Reset input for multiple selection
+    e.target.value = null;
+  };
 
-  setGallery(prev => [...prev, ...newFiles]);
-  
-  // Reset input
-  e.target.value = null;
-};
+  // Handle Gallery Images - FIXED  
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) {
+      console.log("No gallery files selected");
+      return;
+    }
+
+    console.log("✅ Gallery Images Selected:", files.length, "files");
+
+    const newFiles = files.map(file => ({
+      name: file.name,
+      size: (file.size / 1024).toFixed(2) + " KB",
+      date: new Date().toLocaleDateString(),
+      file: file
+    }));
+
+    setGallery(prev => [...prev, ...newFiles]);
+
+    // Reset input
+    e.target.value = null;
+  };
 
 
   const removeGalleryImage = (index) => {
@@ -443,6 +443,8 @@ const handleGalleryChange = (e) => {
 
             </div>
             <div className="w-full">
+              
+
               <label className="text-base text-lightSeconday font-medium">
                 Room Description
               </label>
@@ -541,117 +543,117 @@ const handleGalleryChange = (e) => {
             <h2 className="text-[18px] mb-0 font-semibold text-gray-900">Room Images</h2>
           </div>
 
-         <div className="p-[8%] pt-2">
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-    
-    {/* LEFT: Main Image Section - FIXED */}
-    <div className="flex flex-col gap-4">
-      <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
-      
-      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-        
-        <div className="flex justify-center mt-4">
-          <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
-          <p className="text-sm text-gray-700 font-medium text-center px-4">
-            Drop your image here or <span className="text-blue underline">Browse</span>
-          </p>
-        </div>
+          <div className="p-[8%] pt-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-        <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+              {/* LEFT: Main Image Section - FIXED */}
+              <div className="flex flex-col gap-4">
+                <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
 
-        {/* ✅ FIXED: Input as DIRECT CHILD */}
-        <input
-          type="file"
-          accept="image/png, image/jpeg, image/jpg"
-          onChange={handleMainImageChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-      </div>
+                <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
 
-      {/* ✅ File Info - Working */}
-      {mainImage && (
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-              <FileText className="w-6 h-6 text-blue" />
-            </div>
-            <div className="truncate">
-              <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">{mainImage.name}</p>
-              <p className="text-[11px] text-gray-400 mb-0">{mainImage.size} | {mainImage.date}</p>
+                  <div className="flex justify-center mt-4">
+                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+                    <p className="text-sm text-gray-700 font-medium text-center px-4">
+                      Drop your image here or <span className="text-blue underline">Browse</span>
+                    </p>
+                  </div>
+
+                  <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+
+                  {/* ✅ FIXED: Input as DIRECT CHILD */}
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onChange={handleMainImageChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+
+                {/* ✅ File Info - Working */}
+                {mainImage && (
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+                        <FileText className="w-6 h-6 text-blue" />
+                      </div>
+                      <div className="truncate">
+                        <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">{mainImage.name}</p>
+                        <p className="text-[11px] text-gray-400 mb-0">{mainImage.size} | {mainImage.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
+                        <img src={eye} alt="" className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setMainImage(null)}
+                        className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT: Gallery Section - FIXED */}
+              <div className="flex flex-col gap-4">
+                <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
+
+                <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+
+                  <div className="flex justify-center mt-4">
+                    <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+                    <p className="text-sm text-gray-700 font-medium text-center px-4">
+                      Upload multiple images
+                    </p>
+                  </div>
+
+                  <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
+
+                  {/* ✅ FIXED: Input as DIRECT CHILD + multiple attribute */}
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/jpg"
+                    onChange={handleGalleryChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+
+                {/* ✅ Gallery List */}
+                {gallery.length > 0 && (
+                  <div className="max-h-[200px] overflow-y-auto flex flex-col gap-2 p-2 bg-gray-50 rounded-lg border">
+                    {gallery.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
+                            <FileText className="w-6 h-6 text-blue" />
+                          </div>
+                          <div className="truncate">
+                            <p className="text-[13px] font-medium text-gray-800 truncate mb-0">{file.name}</p>
+                            <p className="text-[11px] text-gray-400">{file.size} | {file.date}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
+                            <img src={eye} alt="" className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => removeGalleryImage(index)}
+                            className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex gap-2 shrink-0">
-            <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
-              <img src={eye} alt="" className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setMainImage(null)} 
-              className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* RIGHT: Gallery Section - FIXED */}
-    <div className="flex flex-col gap-4">
-      <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
-      
-      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-        
-        <div className="flex justify-center mt-4">
-          <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
-          <p className="text-sm text-gray-700 font-medium text-center px-4">
-            Upload multiple images
-          </p>
-        </div>
-
-        <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 2 MB</p>
-
-        {/* ✅ FIXED: Input as DIRECT CHILD + multiple attribute */}
-        <input 
-          type="file"
-          multiple
-          accept="image/png, image/jpeg, image/jpg"
-          onChange={handleGalleryChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-      </div>
-
-      {/* ✅ Gallery List */}
-      {gallery.length > 0 && (
-        <div className="max-h-[200px] overflow-y-auto flex flex-col gap-2 p-2 bg-gray-50 rounded-lg border">
-          {gallery.map((file, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border">
-              <div className="flex items-center gap-3">
-                <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-                  <FileText className="w-6 h-6 text-blue" />
-                </div>
-                <div className="truncate">
-                  <p className="text-[13px] font-medium text-gray-800 truncate mb-0">{file.name}</p>
-                  <p className="text-[11px] text-gray-400">{file.size} | {file.date}</p>
-                </div>
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
-                  <img src={eye} alt="" className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => removeGalleryImage(index)}
-                  className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-</div>
 
         </div>
 

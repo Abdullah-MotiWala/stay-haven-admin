@@ -5,37 +5,40 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { openNotification } from "../../../network/notification";
 import { Authenticate, SelfUser } from "../../../redux/features/authSlice";
+import { useState } from "react";
 
 const Login = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
+  const handleLogin = async (values) => {
+    setLoading(true); // 1. Sabse pehle loading start karein
+    try {
+      const payload = { ...values, userType: "admin" };
+      const res = await loginApi(payload); // 2. Ab API call ka wait karein
 
-const handleLogin = async (values) => {
-  try {
-    const payload = { ...values, userType: "admin" };
-    const res = await loginApi(payload);
+      const userData = res.data.data;
+      if (!userData.token) {
+        throw new Error("Login failed");
+      } else {
+        localStorage.setItem("token", userData.token);
+        localStorage.setItem("userType", userData.userType);
+        localStorage.setItem("fullName", userData.name || userData.fullName);
 
-    const userData = res.data.data; 
-    console.log("User Data:", userData);
-    if (!userData.token) {
-      throw new Error("Login failed");
-    } else {
-      localStorage.setItem("token", userData.token);
-      localStorage.setItem("userType", userData.userType);
-      localStorage.setItem("fullName", userData.name || userData.fullName);
+        dispatch(Authenticate({ token: userData.token }));
+        dispatch(SelfUser(userData));
 
-      dispatch(Authenticate({ token: userData.token })); 
-      dispatch(SelfUser(userData)); 
-
-      openNotification("success", "Welcome back, " + (userData.name || "Admin"));
-
-      navigate("/admin/dashboard", { replace: true });
+        openNotification("success", "Welcome back, " + (userData.name || "Admin"));
+        navigate("/admin/dashboard", { replace: true });
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Invalid email or password";
+      openNotification("error", errorMsg);
+      setLoading(false); // Error ki surat mein yahan band karein
     }
-  } catch (err) {
-    const errorMsg = err.response?.data?.message || "Invalid email or password";
-    openNotification("error", errorMsg);
-  }
-};
+    // Note: Agar navigate ho raha hai to loading true hi rehne den 
+    // warna agar aap isi page par ruk rahe hain to setLoading(false) catch ya finally mein lazmi karein.
+  };
   return (
     <>
       <div className="flex items-center justify-center p-4 ">
@@ -62,20 +65,20 @@ const handleLogin = async (values) => {
                 className="rounded-xl h-12"
               />
             </Form.Item>
-            <Checkbox className="mt-1 text-xs">
+            {/* <Checkbox className="mt-1 text-xs">
               I have read and agree to the{" "}
               <span className="text-blue">Terms </span>and
               <span className="text-blue"> Conditions</span>
-            </Checkbox>
+            </Checkbox> */}
 
             <Button
               // type="submit"
-                htmlType="submit"
-
+              htmlType="submit"
               block
+              loading={loading}
               className="w-full bg-mainPrimary hover:!bg-mainPrimary text-white text-sm text-white h-14 rounded-xl text-lg font-bold mt-4  shadow-lg"
             >
-              Login
+              {loading ? "Logining..." : "Login"}
             </Button>
             {/* <div className="mt-3 text-center">
               <a href="" className="text-center text-blue pt-2 underline">

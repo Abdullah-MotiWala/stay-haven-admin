@@ -5,6 +5,7 @@ import { useState } from "react";
 import location from "../../../assets/icons/location.svg";
 import tick from "../../../assets/icons/tick.png";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
+import { useNavigate } from "react-router-dom";
 import editIcon from "../../../assets/icons/editIcon.svg";
 import {
   Wifi,
@@ -33,6 +34,7 @@ function AppartmentDetail({ data }) {
 const [mainImage, setMainImage] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
   const [hasMore, setHasMore] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMainImage(data.mainImage);
@@ -69,7 +71,7 @@ const [mainImage, setMainImage] = useState(null);
         <span className="text-lightSeconday text-md  font-medium tracking-wider">
           Appartment Details
         </span>
-        <button className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark hover:text-extradark transition-all duration-300">
+        <button onClick={()=>navigate("/admin/appartment/edit/" + data.id)} className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-semibold text-extradark hover:text-extradark hover:!bg-maxLightRed transition-all duration-300">
           <img src={editIcon} alt="Edit Icon" />
           Edit
         </button>
@@ -119,7 +121,7 @@ const [mainImage, setMainImage] = useState(null);
               src={img ?? DEFAULT_IMAGE}
               alt={`Gallery Image ${index}`}
               className="w-full h-20 object-cover rounded-[15px]"
-              alt="thumb"
+            
               onClick={() => handleImageClick(img)}
             />
           ))}

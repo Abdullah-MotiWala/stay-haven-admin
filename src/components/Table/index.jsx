@@ -27,7 +27,8 @@ const HotelDirectory = ({
   activeType,
   roomTypes = [],
   onStatusToggle,
-  hoteloptions = false
+  hoteloptions = false,
+  editpath
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -36,7 +37,7 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
-
+  const targetPath = editpath ? editpath : path;
   const [filters, setFilters] = useState({
     roomType: "",
     hotelName: "",
@@ -448,35 +449,39 @@ const HotelDirectory = ({
             <h3 className="text-gray-900 font-bold text-lg mb-5">
               Apply Filters
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${hoteloptions ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-4`}>
               {/* Select Room - Ant Design */}
-              <div className="relative ant-select-custom">
-                <Select
-                  placeholder={
-                    activeType === "Apartment Bookings"
-                      ? "Select Apartment"
-                      : "Select Room"
-                  }
-                  value={filters.roomType || undefined}
-                  onChange={(val) => handleFilterChange("roomType", val)}
-                  className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={
-                    <ChevronDown size={18} className="text-gray-900" />
-                  }
-                >
-                  <Option value="">Select Room</Option>
-                  {roomTypes.length > 0 ? (
-                    roomTypes.map(type => (
-                      <Option key={type.id} value={type.id}>{type.title}</Option>
-                    ))
-                  ) : (
-                    <>
-                      <Option value="One Bed Room">One Bed Room</Option>
-                      <Option value="Two Bed Room">Two Bed Room</Option>
-                    </>
-                  )}
-                </Select>
-              </div>
+              {
+                hoteloptions ? null : (<>
+                  <div className="relative ant-select-custom">
+                    <Select
+                      placeholder={
+                        activeType === "Apartment Bookings"
+                          ? "Select Apartment"
+                          : "Select Room"
+                      }
+                      value={filters.roomType || undefined}
+                      onChange={(val) => handleFilterChange("roomType", val)}
+                      className="w-full h-[50px] custom-antd-select"
+                      suffixIcon={
+                        <ChevronDown size={18} className="text-gray-900" />
+                      }
+                    >
+                      <Option value="">Select Room</Option>
+                      {roomTypes.length > 0 ? (
+                        roomTypes.map(type => (
+                          <Option key={type.id} value={type.id}>{type.title}</Option>
+                        ))
+                      ) : (
+                        <>
+                          <Option value="One Bed Room">One Bed Room</Option>
+                          <Option value="Two Bed Room">Two Bed Room</Option>
+                        </>
+                      )}
+                    </Select>
+                  </div>
+                </>)
+              }
 
               {/* Select Hotel - Ant Design */}
               <div className="relative ant-select-custom">
@@ -499,22 +504,24 @@ const HotelDirectory = ({
               </div>
 
               {/* Sort by Duration - Ant Design */}
-              <div className="relative ant-select-custom">
-                <Select
-                  placeholder="Sort by Duration"
-                  value={filters.duration || undefined}
-                  onChange={(val) => handleFilterChange("duration", val)}
-                  className="w-full h-[50px] custom-antd-select"
-                  suffixIcon={
-                    <ChevronDown size={18} className="text-gray-900" />
-                  }
-                >
-                  <Option value="">Sort by Duration</Option>
-                  <Option value="24h">24 Hours</Option>
-                  <Option value="1w">1 Week</Option>
-                  <Option value="3w">3 Weeks</Option>
-                </Select>
-              </div>
+              {hoteloptions ? null : (
+                <div className="relative ant-select-custom">
+                  <Select
+                    placeholder="Sort by Duration"
+                    value={filters.duration || undefined}
+                    onChange={(val) => handleFilterChange("duration", val)}
+                    className="w-full h-[50px] custom-antd-select"
+                    suffixIcon={
+                      <ChevronDown size={18} className="text-gray-900" />
+                    }
+                  >
+                    <Option value="">Sort by Duration</Option>
+                    <Option value="24h">24 Hours</Option>
+                    <Option value="1w">1 Week</Option>
+                    <Option value="3w">3 Weeks</Option>
+                  </Select>
+                </div>
+              )}
 
               {/* Sort by Status - Ant Design */}
               <div className="relative ant-select-custom">
@@ -548,40 +555,44 @@ const HotelDirectory = ({
 
                 </Select>
               </div>
+              {
+                hoteloptions ? null : (
+                  <> <div className="relative w-full">
+                    <img
+                      src={tablecalender}
+                      alt="calendar"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
+                    />
+                    <input
+                      type="date"
+                      value={filters.dateFrom}
+                      onChange={(e) =>
+                        handleFilterChange("dateFrom", e.target.value)
+                      }
+                      className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
+                    />
+                  </div>
 
-              {/* Date From - Aapka Pehla Wala Custom Code */}
-              <div className="relative w-full">
-                <img
-                  src={tablecalender}
-                  alt="calendar"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
-                />
-                <input
-                  type="date"
-                  value={filters.dateFrom}
-                  onChange={(e) =>
-                    handleFilterChange("dateFrom", e.target.value)
-                  }
-                  className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
-                />
-              </div>
+                    {/* Date To - Fixed handleFilterChange Key */}
+                    <div className="relative w-full">
+                      <img
+                        src={tablecalender}
+                        alt="calendar"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
+                      />
+                      <input
+                        type="date"
+                        value={filters.dateTo}
+                        onChange={(e) => handleFilterChange("dateTo", e.target.value)} // Fixed key to dateTo
+                        className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
+                      />
+                    </div></>
+                )
+              }
 
-              {/* Date To - Fixed handleFilterChange Key */}
-              <div className="relative w-full">
-                <img
-                  src={tablecalender}
-                  alt="calendar"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-20"
-                />
-                <input
-                  type="date"
-                  value={filters.dateTo}
-                  onChange={(e) => handleFilterChange("dateTo", e.target.value)} // Fixed key to dateTo
-                  className="w-full bg-inpgraysecondary border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-700 font-medium focus:outline-none appearance-none custom-date-input"
-                />
-              </div>
 
-              <div className="lg:col-span-2 flex items-center justify-end gap-3">
+
+              <div className={`lg:col-span-2  flex items-center justify-end gap-3`}>
                 <button
                   onClick={resetFilters}
                   className="flex items-center gap-2 px-6 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-all border border-gray-100"
@@ -639,7 +650,7 @@ const HotelDirectory = ({
               <tr>
                 <td
                   colSpan={columns?.length + 1}
-                  className="py-12 text-center text-sm text-gray-500"
+                  className="py-12 text-center text-sm  text-gray-500"
                 >
                   No data found
                 </td>
@@ -661,7 +672,7 @@ const HotelDirectory = ({
   `}
                   >
                     {checkbox && (
-                      <td className="border-b border-t border-r border-dashed">
+                      <td className="border-b border-t border-r border-dashed ">
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(row.id)}
@@ -674,12 +685,15 @@ const HotelDirectory = ({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={`px-2 py-4  text-sm border-b border-t  border-l border-dashed
-                        ${col.type === "status" ? "text-center" : ""}
-                        ${col.type === "actions" ? "text-right relative" : ""}
-                      `}
+                        className={`px-2 py-4 text-sm border-b border-t border-l border-dashed 
+    ${col.type === "status" || col.type === "text" || col.type === "number" ? "text-center" : "text-left"}
+    ${col.type === "actions" ? "!text-center relative" : ""}
+  `}
                       >
-                        {renderCell(enrichedRow, col, index)}
+                        <div className={`flex items-center ${(col.type === "status" || col.type === "text" || col.type === "number" || col.type === "actions") ? "justify-center" : "justify-start"
+                          }`}>
+                          {renderCell(enrichedRow, col, index)}
+                        </div>
 
                         {/* ACTION DROPDOWN */}
                         {col.type === "actions" && rowActionOpen === index && (
@@ -698,7 +712,7 @@ const HotelDirectory = ({
                             <button
                               onClick={() => {
                                 setRowActionOpen(null);
-                                navigate(`${path}/${row.id}`, {
+                                navigate(`${targetPath}/${row.id}`, {
                                   state: { lastId },
                                 });
                               }}
