@@ -35,8 +35,8 @@ function RoomDetail({ room }) {
     parking: ParkingCircle,
     "cold / warm water": Droplets,
   };
-let id = room?.id
-const [mainImage, setMainImage] = useState(null);
+  let id = room?.id
+  const [mainImage, setMainImage] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
   const [hasMore, setHasMore] = useState(false);
   const navigate = useNavigate();
@@ -48,14 +48,14 @@ const [mainImage, setMainImage] = useState(null);
   useEffect(() => {
     setMainImage(room.mainImage);
     if (room?.galleryImages?.length > 0) {
-      setCurrentImages(room.galleryImages.slice(0, 4)); 
+      setCurrentImages(room.galleryImages.slice(0, 4));
       setHasMore(room.galleryImages.length > 4);
     } else {
       setMainImage(null);
       setCurrentImages([]);
       setHasMore(false);
     }
-  }, [room]); 
+  }, [room]);
 
   const handleImageClick = (image) => {
     setMainImage(image);
@@ -130,7 +130,7 @@ const [mainImage, setMainImage] = useState(null);
               src={img ?? DEFAULT_IMAGE}
               alt={`Gallery Image ${index}`}
               className="w-full h-20 object-cover rounded-[15px]"
-              
+
               onClick={() => handleImageClick(img)}
             />
           ))}
@@ -154,7 +154,7 @@ const [mainImage, setMainImage] = useState(null);
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap  items-center gap-2">
         <span className="flex items-center gap-1  text-[13px] fount-medium  rounded-md text-sm">
           <img src={gests} alt="test" />
           {room.roomSize ?? "N/A"}
@@ -184,14 +184,16 @@ const [mainImage, setMainImage] = useState(null);
                 .map((item, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 text-xs md:text-sm font-medium text-extradark"
+                    className="flex items-center gap-3 text-xs md:text-sm font-medium text-extradark overflow-hidden"
                   >
                     <img
                       src={tick}
                       alt=""
-                      className="h-5 w-5 bg-lightGreen p-1 rounded-full"
+                      className="h-5 w-5 bg-lightGreen p-1 rounded-full shrink-0"
                     />
-                    {item.title}
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                      {item.title}
+                    </span>
                   </div>
                 ))
             ) : (
@@ -206,7 +208,7 @@ const [mainImage, setMainImage] = useState(null);
           </h3>
           <div className="flex flex-wrap gap-1">
             {room?.features?.filter((item) => item.type === "AMENITY").length >
-            0 ? (
+              0 ? (
               room.features
                 .filter((item) => item.type === "AMENITY")
                 .map((item, index) => {

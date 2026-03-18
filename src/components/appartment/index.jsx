@@ -25,7 +25,7 @@ import {
 } from "../../shared/constant";
 
 export default function Appartments() {
-const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]);  const [selectedAppartment, setSelectedAppartment] = useState(null);
+  const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]); const [selectedAppartment, setSelectedAppartment] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -43,33 +43,33 @@ const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]);  const [selec
   const { Option } = Select;
 
   const fetchData = async () => {
-  try {
-    let res;
+    try {
+      let res;
 
-    if (activeType.typeId === null) {
-      // All apartments
-      res = await getAllApartments(
-        currentPage,
-        itemsPerPage,
-        status,
-        search,
-        sort
-      );
-    } else {
-      // Filter by type
-      res = await getBedType(activeType.typeId);
+      if (activeType.typeId === null) {
+        // All apartments
+        res = await getAllApartments(
+          currentPage,
+          itemsPerPage,
+          status,
+          search,
+          sort
+        );
+      } else {
+        // Filter by type
+        res = await getBedType(activeType.typeId);
+      }
+
+      setAppartmentsData(res?.data);
+
+      if (res?.data?.data?.length > 0) {
+        setSelectedAppartment(res.data.data[0]);
+      }
+      console.log(res.data, "Apartment Data===");
+    } catch (err) {
+      console.error("Data fetch error", err);
     }
-
-    setAppartmentsData(res?.data);
-
-    if (res?.data?.data?.length > 0) {
-      setSelectedAppartment(res.data.data[0]);
-    }
-console.log(res.data, "Apartment Data===");
-  } catch (err) {
-    console.error("Data fetch error", err);
-  }
-};
+  };
   useEffect(() => {
     fetchData();
   }, [currentPage, itemsPerPage, search, activeType]);
@@ -157,11 +157,10 @@ console.log(res.data, "Apartment Data===");
         px-2 py-2 text-sm font-medium whitespace-nowrap
         transition-colors duration-200 rounded-0 m-0 
         
-        ${
-          activeType === type
-            ? "bg-blue text-white"
-            : "bg-white text-extradark hover:bg-gray-50"
-        }
+        ${activeType === type
+                ? "bg-blue text-white"
+                : "bg-white text-extradark hover:bg-gray-50"
+              }
         ${index === 0 ? "" : ""}
         ${index === APPARTMENT_TYPES.length - 1 ? "" : ""}
       `}
@@ -199,35 +198,35 @@ console.log(res.data, "Apartment Data===");
               <div className="bg-white p-3 rounded-xlg shadow-md border border-lightSeconday animate-in fade-in slide-in-from-top-2 duration-300">
                 <h3 className="text-[18px] font-medium">Apply Filter</h3>
 
-                <div className="flex justify-between px-2 py-2">
-                  <div className="bg-green-400  flex  gap-4">
-                    <Select
-                      className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setSort(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
-                    >
-                      <Option value="sort" disabled>
-                        Sort by hotel name
-                      </Option>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-2 py-2">  
+                                  <div className="bg-green-400 flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                  <Select
+                    className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    defaultValue="sort"
+                    onChange={(value) => setSort(value)}
+                    suffixIcon={<img src={right_arrow} alt="" />}
+                  >
+                    <Option value="sort" disabled>
+                      Sort by hotel name
+                    </Option>
 
-                      <Option value="ASC">A → Z</Option>
-                      <Option value="DESC">Z → A</Option>
-                    </Select>
-                    <Select
-                      className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setStatus(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
-                    >
-                      <Option value="sort" disabled>
-                        Sort by Staus
-                      </Option>
+                    <Option value="ASC">A → Z</Option>
+                    <Option value="DESC">Z → A</Option>
+                  </Select>
+                  <Select
+                    className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    defaultValue="sort"
+                    onChange={(value) => setStatus(value)}
+                    suffixIcon={<img src={right_arrow} alt="" />}
+                  >
+                    <Option value="sort" disabled>
+                      Sort by Staus
+                    </Option>
 
-                      <Option value="available">Available</Option>
-                      <Option value="occupied">Occupied</Option>
-                    </Select>
-                  </div>
+                    <Option value="available">Available</Option>
+                    <Option value="occupied">Occupied</Option>
+                  </Select>
+                </div>
                   <button
                     onClick={() => fetchData()}
                     className="bg-blue hover:bg-blue text-white px-2 py-2.5 w-36 rounded-md font-semibold transition-all text-sm h-11"

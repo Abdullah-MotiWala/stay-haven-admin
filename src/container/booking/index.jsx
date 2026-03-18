@@ -140,7 +140,7 @@
         {roomTypes.map((type, index) => (
           <button
             key={type}
-            onClick={() =>  setActiveType(type)}
+            onClick={() =>setActiveType(type)}
             className={`
               px-2 py-2 text-sm font-medium whitespace-nowrap
               transition-colors duration-200 rounded-0 m-0 

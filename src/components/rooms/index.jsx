@@ -8,7 +8,7 @@ import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getAllRooms, getStats, deleteRoom ,getBedtypeId } from "../../services/rooms";
+import { getAllRooms, getStats, deleteRoom, getBedtypeId } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
@@ -17,7 +17,7 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION, ROOM_TYPES } from "../../shared/constant";
 
 export default function Rooms() {
-const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
+  const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
@@ -35,36 +35,36 @@ const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
 
   const { Option } = Select;
 
- const fetchData = async () => {
-  try {
-    let res;
+  const fetchData = async () => {
+    try {
+      let res;
 
-    if (activeType.typeId === null) {
-      // ALL ROOMS
-      res = await getAllRooms(
-        currentPage,
-        itemsPerPage,
-        status,
-        search,
-        sort
-      );
-    } else {
-      // FILTERED ROOMS
-      res = await getBedtypeId(activeType.typeId);
+      if (activeType.typeId === null) {
+        // ALL ROOMS
+        res = await getAllRooms(
+          currentPage,
+          itemsPerPage,
+          status,
+          search,
+          sort
+        );
+      } else {
+        // FILTERED ROOMS
+        res = await getBedtypeId(activeType.typeId);
+      }
+
+      console.log(res?.data);
+
+      setRooms(res?.data);
+
+      if (res?.data?.data?.length > 0) {
+        setSelectedRoom(res.data.data[0]);
+      }
+
+    } catch (err) {
+      console.error("Data fetch error", err);
     }
-
-    console.log(res?.data);
-
-    setRooms(res?.data);
-
-    if (res?.data?.data?.length > 0) {
-      setSelectedRoom(res.data.data[0]);
-    }
-
-  } catch (err) {
-    console.error("Data fetch error", err);
-  }
-};
+  };
   useEffect(() => {
     console.log("UseEffect Run Times");
 
@@ -195,8 +195,8 @@ const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
               <div className="bg-white p-3 rounded-xlg shadow-md border border-lightSeconday animate-in fade-in slide-in-from-top-2 duration-300">
                 <h3 className="text-[18px] font-medium">Apply Filter</h3>
 
-                <div className="flex justify-between px-2 py-2">
-                  <div className="bg-green-400  flex  gap-4">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                  <div className="bg-green-400  flex flex-col sm:flex-row flex-wrap gap-3 w-full">
                     <Select
                       className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                       defaultValue="sort"

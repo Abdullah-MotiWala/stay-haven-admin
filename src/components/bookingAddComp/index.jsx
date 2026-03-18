@@ -4,7 +4,7 @@ import selection from "../../assets/icons/selection.png";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import calenderIcon from "../../assets/icons/calendarIcon.png";
-import { createBooking } from "../../services/booking";
+import { createBooking, getById, updateBooking } from "../../services/booking";
 import { getAllRooms } from "../../services/rooms";
 import { openNotification } from "../../network/notification";
 import { updateStats } from "../../services/booking";
@@ -70,47 +70,62 @@ const BookingAddComp = () => {
   });
 
   useEffect(() => {
-    if (!isEditMode || rooms.length === 0) return;
+    if (!isEditMode) return;
 
-    let foundBooking = null;
-    let foundRoom = null;
+    const fetchBookingById = async () => {
+      try {
+        const res = await getById(id);
+        const booking = res?.data?.data || res?.data;
 
-    for (const room of rooms) {
-      const booking = room.bookings?.find((b) => b.id === id);
-      if (booking) {
-        foundBooking = booking;
-        foundRoom = room;
-        break;
+        console.log(booking, "Fetched Booking");
+
+        if (booking) {
+          setFormData((prev) => ({
+            ...prev,
+
+            bookingType: booking.isApartment ? "Apartment" : "Room",
+
+            guestName: booking.guestInfo?.name || "",
+            phone: booking.phone || booking.guestInfo?.phone || "",
+            email: booking.email || booking.guestInfo?.email || "",
+            cnic: booking.cnic || "",
+
+            hotelName: booking.hotelName || booking.stayDetails?.hotelName || "",
+            hotelId: booking.hotelId || "",
+
+            roomId: booking.roomId || "",
+            apartmentId: booking.apartmentId || "",
+
+            roomType: booking.roomType || "",
+            roomNumber: booking.roomNumber || booking.stayDetails?.roomNumber || "",
+
+            apartmentName: booking.apartmentName || "",
+            apartmentNumber: booking.apartmentNumber || "",
+
+            numGuests: booking.numGuests || booking.stayDetails?.adults || "01 Adult",
+            infants: booking.infants || booking.stayDetails?.infants || 0,
+
+            checkIn: booking.checkIn || booking.stayDetails?.checkIn || "",
+            checkOut: booking.checkOut || booking.stayDetails?.checkOut || "",
+            duration: booking.duration || booking.stayDetails?.totalNights || 0,
+
+            pricePerNight: booking.pricePerNight || booking.paymentSummary?.pricePerNight || 0,
+
+            taxes: booking.taxes || booking.paymentSummary?.taxes || 10,
+            discount: booking.discount || booking.paymentSummary?.discount || 5,
+
+            paymentMethod: booking.paymentMethod || "Bank",
+            status: booking.status || "Checked-In",
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+        openNotification("error", "Failed to fetch booking");
       }
-    }
+    };
 
-    if (foundBooking) {
-      setFormData((prev) => ({
-        ...prev,
-
-        // ✅ Correct mapping
-        guestName: foundBooking.guestName || "",
-        phone: foundBooking.guestPhone || "",
-        email: foundBooking.guestEmail || "",
-
-        checkIn: foundBooking.checkIn || "",
-        checkOut: foundBooking.checkOut || "",
-
-        roomId: foundRoom?.id || "",
-        roomNumber: foundRoom?.roomNumber || "",
-        roomType: foundRoom?.roomType?.title || "",
-
-        pricePerNight: foundBooking.pricePerNight || 0,
-
-        numGuests: `${foundBooking.adults} Adult`,
-        infants: foundBooking.infants || 0,
-
-        paymentMethod: foundBooking.paymentMethod || "",
-        status: foundBooking.status || "",
-      }));
-    }
-    console.log(foundBooking, "founding booking");
-  }, [id, isEditMode, rooms]);
+    fetchBookingById();
+  }, [id, isEditMode]);
 
   const handleRoomSelect = (roomId) => {
     // Farz karein 'rooms' aapki wo list hai jo API se aayi hai
@@ -149,7 +164,7 @@ const BookingAddComp = () => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setRooms(data);
         console.log(data, "Rooms");
-     
+
       } catch (err) {
         console.error("Error fetching rooms:", err);
         openNotification("error", "Failed to load rooms");
@@ -257,7 +272,13 @@ const BookingAddComp = () => {
     if (formData.bookingType === "Apartment") {
       return [...new Set(apartment.map((a) => a.apartmentName))];
     }
-    return [...new Set(rooms.map((r) => r.hotel?.name))];
+    return [
+      ...new Set(
+        Array.isArray(rooms)
+          ? rooms.map((r) => r.hotel?.name)
+          : []
+      ),
+    ];
   };
   const abc = getHotelOptions()
   console.log(abc, "this is hotel options");
@@ -284,6 +305,31 @@ const BookingAddComp = () => {
       .map((r) => r.roomNumber);
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   try {
+  //     const finalPayload = {
+  //       ...formData,
+  //       isApartment: formData.bookingType === "Apartment",
+  //     };
+
+  //     console.log("Final Payload:", finalPayload);
+
+  //     const res = await createBooking(finalPayload);
+
+  //     if (res.status === 200 || res.status === 201) {
+  //       openNotification("success", "Booking saved successfully!");
+  //       setIsModalOpen(true);
+  //     }
+  //   } catch (err) {
+  //     openNotification("error", "Error saving booking");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -296,10 +342,23 @@ const BookingAddComp = () => {
 
       console.log("Final Payload:", finalPayload);
 
-      const res = await createBooking(finalPayload);
+      let res;
+
+      if (isEditMode) {
+        // ✅ UPDATE
+        res = await updateBooking(id, finalPayload);
+      } else {
+        // ✅ CREATE
+        res = await createBooking(finalPayload);
+      }
 
       if (res.status === 200 || res.status === 201) {
-        openNotification("success", "Booking saved successfully!");
+        openNotification(
+          "success",
+          isEditMode
+            ? "Booking updated successfully!"
+            : "Booking created successfully!"
+        );
         setIsModalOpen(true);
       }
     } catch (err) {

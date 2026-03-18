@@ -10,7 +10,7 @@ function RoomCard({ room, active, onClick }) {
   const navigate = useNavigate()
   console.log(room, "roomroomroom");
   let id = room?.id
-    const handleEditClick = () => {
+  const handleEditClick = () => {
     // navigate(`/admin/rooms/edit/${id}`);
     navigate(`/admin/rooms/edit/${id}`);
   };
@@ -66,7 +66,7 @@ function RoomCard({ room, active, onClick }) {
                     <button
                       className="flex items-center gap-3 w-full py-2 text-sm text-black font-semibold"
                       // onClick={() => navigate(`/admin/rooms/edit/${room.id}`)}
-            onClick={handleEditClick}
+                      onClick={handleEditClick}
 
                     >
                       Edit
@@ -80,21 +80,18 @@ function RoomCard({ room, active, onClick }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[#7C8DB5] font-medium mb-3">
-            <span className="flex items-center font-medium text-[14px] gap-1 border-r-2 border-gray-100">
+          <div className="flex flex-wrap items-center gap-2 text-[#7C8DB5] font-medium mb-3">
+            <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">
               <img src={location} alt="" /> {room?.hotel?.name ?? "N/A"}
             </span>
 
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1  text-[13px] fount-medium  rounded-md text-sm">
-                <img src={checkList} alt="test" />
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
+              <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">                <img src={checkList} alt="test" />
                 {room.roomSize ?? "N/A"}
               </span>
-              <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
-                <img src={checkList} alt="" /> {room.bedType ?? "N/A"}
+              <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">                <img src={checkList} alt="" /> {room.bedType ?? "N/A"}
               </span>
-              <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
-                <img src={checkList} alt="" /> {room.maxAdults ?? "N/A"}
+              <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">                <img src={checkList} alt="" /> {room.maxAdults ?? "N/A"}
               </span>
             </div>
           </div>

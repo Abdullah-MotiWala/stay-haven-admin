@@ -38,11 +38,13 @@ export const TABS = [
   "Booking Policies",
   "Room Rules",
   "Pricing & Taxes",
+  "Forget Password",
+  "Social Media "
 ];
 
 export const ROOM_TYPES = [
   {
-    label: "All Apartments",
+    label: "All Rooms",
     typeId: null
   },
   {

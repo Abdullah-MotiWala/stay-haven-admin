@@ -75,20 +75,20 @@ function AppartmentCard({  data, active, onClick }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[#7C8DB5] font-medium mb-3">
-            <span className="flex items-center font-medium text-[14px] gap-1 border-r-2 border-gray-100">
-              <img src={location} alt="" /> {data?.hotel?.name ?? "N/A"}
+          <div className="flex  flex-wrap items-center gap-2 text-[#7C8DB5] font-medium mb-3">
+<span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">   
+             <img src={location} alt="" /> {data?.hotel?.name ?? "N/A"}
             </span>
 
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1  text-[13px] fount-medium  rounded-md text-sm">
+            <div className="flex items-center gap-2 flex-wrap">
+             <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">
                 <img src={checkList} alt="test" />
                 {data.apartmentSize ?? "N/A"}
               </span>
-              <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
+             <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">
                 <img src={checkList} alt="" /> {data.bedType ?? "N/A"}
               </span>
-              <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
+             <span className="flex items-center gap-1 text-[13px] font-medium w-[48%] md:w-auto">
                 <img src={checkList} alt="" /> {data.maxAdults ?? "N/A"}
               </span>
             </div>

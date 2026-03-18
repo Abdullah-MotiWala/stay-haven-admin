@@ -145,7 +145,7 @@ const [mainImage, setMainImage] = useState(null);
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="flex items-center gap-1  text-[13px] fount-medium  rounded-md text-sm">
           <img src={gests} alt="test" />
           {data.apartmentSize ?? "N/A"}
@@ -153,7 +153,7 @@ const [mainImage, setMainImage] = useState(null);
         <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
           <img src={gests} alt="" /> {data.bedType ?? "N/A"}
         </span>
-        <span className="flex items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
+        <span className="flex whitespace-nowrap overflow-hidden text-ellipsis items-center gap-1 text-[13px] fount-medium  rounded-md text-sm">
           <img src={gests} alt="" /> {data.maxAdults ?? "N/A"}
         </span>
       </div>
@@ -175,14 +175,16 @@ const [mainImage, setMainImage] = useState(null);
                 .map((item, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 text-xs md:text-sm font-medium text-extradark"
-                  >
+                    className="flex items-center gap-3 text-xs md:text-sm font-medium text-extradark overflow-hidden"
+                    >
                     <img
                       src={tick}
                       alt=""
                       className="h-5 w-5 bg-lightGreen p-1 rounded-full"
                     />
-                    {item.title}
+                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                      {item.title}
+                    </span>
                   </div>
                 ))
             ) : (
