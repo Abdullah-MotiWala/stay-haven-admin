@@ -71,7 +71,10 @@ const ChatWindow = () => {
             };
             const res = await createMessages(payload);
             if (res.data.success) {
-                // setChatHistory((prev) => [...prev, res.data.data]);
+                setChatHistory((prev) => {
+                    if (prev.find(m => m.id === res.data.data.id)) return prev;
+                    return [...prev, res.data.data];
+                });
                 setMessage(""); 
             }
         } catch (error) {

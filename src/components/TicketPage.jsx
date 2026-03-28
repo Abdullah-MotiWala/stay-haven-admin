@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import Api from '../network/axiosClients';
 import TicketTable from "./ticketTable";
 
 const TicketsPage = () => {
@@ -12,7 +12,8 @@ const TicketsPage = () => {
     try {
       setLoading(true);
       // Backend controller 'getAll' query params accept karta hai
-      const response = await axios.get("http://api.stayhaven.pk/api/tickets", {
+      // const response = await Api.get("http://api.stayhaven.pk/api/tickets", {
+      const response = await Api.get("tickets", {
         params: { 
           search: searchTerm, 
           status: statusFilter 
