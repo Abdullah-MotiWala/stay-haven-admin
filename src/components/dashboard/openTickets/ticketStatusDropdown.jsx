@@ -18,15 +18,17 @@ const TicketStatusDropdown = ({ value, onChange }) => {
   return (
     <Dropdown
       trigger={["click"]}
+      overlayClassName="custom-dropdown"
       menu={{
         items,
         onClick: ({ key }) => onChange(key),
       }}
+     
     >
-      <div className="status-pill">
-        <span className="status-text">{getLabel()}</span>
-        <div className="status-arrow">
-          <ChevronDown size={24} />
+      <div className="status-pill cursor-pointer flex items-center gap-1 bg-gray-200 rounded">
+        <span className="status-text pl-0">{getLabel()}</span>
+        <div className="status-arrow bg-transparent">
+          <ChevronDown size={16} />
         </div>
       </div>
     </Dropdown>

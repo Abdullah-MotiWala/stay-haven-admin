@@ -161,13 +161,14 @@ const HotelForm = () => {
 
   return (
     <>
-      <Form
+        <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
         className="min-h-screen w-full md:p-8 font-sans"
       >
-
+ 
+        {/* Back Button */}
         <div>
           <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(-1)}>
             <img src={arrowImg} alt="arrowImg" />
@@ -175,24 +176,40 @@ const HotelForm = () => {
           </div>
           <hr className="-mt-4" />
         </div>
-
+ 
+        {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{isEditMode ? "Edit Hotel" : "Add Hotel"}</h1>
           <p className="text-lg text-darkGray font-medium">
             {isEditMode ? "Edit hotel details and amenities" : "Add hotel details and amenities"}
           </p>
         </div>
-
+ 
         <div className="bg-white rounded-[24px] shadow-sm border border-gray-100">
+          {/* Card Header */}
           <div className="px-6 py-4 mb-6">
             <h2 className="text-lg font-semibold text-black">Hotel Profile</h2>
             <hr />
           </div>
-          <div className="p-6 px-36 pb-14">
-            <div className="flex justify-between mb-10">
-              <div className="flex items-center gap-20">
-                <div className="relative w-[330px] h-[152px]">
-                  <img src={imagePreview} className="w-full h-full rounded-[16px] object-cover border" alt="hotel" />
+ 
+          {/* Card Body — was px-36, now responsive */}
+          <div className="p-4 sm:p-6 lg:px-36 pb-14">
+ 
+            {/* Image Upload + Hotel ID Row */}
+            {/* 
+              FIX: Was `flex justify-between` which caused overflow on small screens.
+              Now stacks vertically on mobile, goes side-by-side on large screens.
+            */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
+ 
+              {/* Image Upload */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                <div className="relative w-full sm:w-[260px] lg:w-[330px] h-[152px] flex-shrink-0">
+                  <img
+                    src={imagePreview}
+                    className="w-full h-full rounded-[16px] object-cover border"
+                    alt="hotel"
+                  />
                   <label
                     htmlFor="image-upload"
                     className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-[16px] opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10"
@@ -216,9 +233,10 @@ const HotelForm = () => {
                   <p className="text-xs text-gray-400 mt-2">Max size: 5MB | Format: JPG, PNG, GIF</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <span className="text-black font-semibold underline">Hotel ID</span>
+ 
+              {/* Hotel ID */}
+              <div className="flex items-center gap-4 flex-shrink-0">
+                <span className="text-black font-semibold underline whitespace-nowrap">Hotel ID</span>
                 <div className="w-24 text-center border py-3 rounded-md bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none">
                   <span className="select-none">
                     {isEditMode ? hotel.hotelId : lastId?.nextNumericId}
@@ -226,7 +244,8 @@ const HotelForm = () => {
                 </div>
               </div>
             </div>
-
+ 
+            {/* Form Fields Grid */}
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Hotel Name</label>
@@ -234,7 +253,7 @@ const HotelForm = () => {
                   <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter hotel name" />
                 </Form.Item>
               </div>
-
+ 
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">City</label>
                 <Form.Item name="city" rules={[{ required: true, message: "City is required" }]}>
@@ -245,28 +264,28 @@ const HotelForm = () => {
                   </Select>
                 </Form.Item>
               </div>
-
+ 
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Hotel Location</label>
                 <Form.Item name="address" rules={[{ required: true, message: "Address is required" }]}>
                   <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter address" />
                 </Form.Item>
               </div>
-
+ 
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Hotel Email</label>
                 <Form.Item name="email" rules={[{ required: true }, { type: "email", message: "Invalid email" }]}>
                   <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter email" />
                 </Form.Item>
               </div>
-
+ 
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Cancellation Policy</label>
                 <Form.Item name="cancellation_policy" rules={[{ required: true, message: "Cancellation policy is required" }]}>
                   <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter cancellation policy" />
                 </Form.Item>
               </div>
-
+ 
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Status</label>
                 <Form.Item name="isActive">
@@ -278,39 +297,80 @@ const HotelForm = () => {
                 </Form.Item>
               </div>
             </div>
-
+ 
+            {/* 
+              AMENITIES SECTION
+              FIX: Checkbox items were merging/overlapping because grid gap was too small
+              and Checkbox.Group had no proper item sizing.
+              
+              Solution:
+              - Each checkbox wrapped in a styled card-like container
+              - `min-w-0` prevents flex children from overflowing
+              - Responsive grid: 1 col mobile → 2 col sm → 3 col md → 4 col lg
+              - Label truncation with `truncate` for long text
+            */}
             <h3 className="font-semibold mb-4">Amenities Included</h3>
-            <Form.Item name="amenities" className="w-full" rules={[{ required: true, message: "Please select at least one amenity" }]}>
-              <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                {amenitiesList.map((a) => (
-                  <div key={a.id} className="w-full">
-                    <Checkbox value={a.id} className="w-full flex items-center">
-                      <span className={`block w-full text-sm font-medium ${selectedAmenities.includes(a.id) ? "text-blue" : "text-lightText"}`}>
+            <Form.Item
+              name="amenities"
+              className="w-full"
+              rules={[{ required: true, message: "Please select at least one amenity" }]}
+            >
+              <Checkbox.Group className="w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
+                 {(Array.isArray(amenitiesList) ? amenitiesList : []).map((a) => (
+                    <label
+                      key={a.id}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all min-w-0
+                       `}
+                    >
+                      <Checkbox value={a.id} className="flex-shrink-0" />
+                      <span
+                        className={`text-sm font-medium truncate min-w-0
+                          ${selectedAmenities.includes(a.id) ? "text-blue" : "text-lightText"}`}
+                      >
                         {a.title}
                       </span>
-                    </Checkbox>
-                  </div>
-                ))}
+                    </label>
+                  ))}
+                </div>
               </Checkbox.Group>
             </Form.Item>
-
-            <h3 className="font-semibold mb-4">Rooms Included</h3>
-            <Form.Item name="rooms" className="w-full" rules={[{ required: true, message: "Please select at least one option" }]}>
-              <Checkbox.Group className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
-                {roomsList.map((r) => (
-                  <div key={r.id} className="w-full">
-                    <Checkbox value={r.id} className="w-full flex items-center">
-                      <span className={`block w-full text-sm font-medium ${selectedRooms.includes(r.id) ? "text-blue" : "text-lightText"}`}>
+ 
+            {/* 
+              ROOMS SECTION
+              Same fix as amenities above
+            */}
+            <h3 className="font-semibold mb-4 mt-6">Rooms Included</h3>
+            <Form.Item
+              name="rooms"
+              className="w-full"
+              rules={[{ required: true, message: "Please select at least one option" }]}
+            >
+              <Checkbox.Group className="w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
+                  {roomsList.map((r) => (
+                    <label
+                      key={r.id}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl  cursor-pointer transition-all min-w-0
+                       `}
+                    >
+                      <Checkbox value={r.id} className="flex-shrink-0" />
+                      <span
+                        className={`text-sm font-medium truncate min-w-0
+                          ${selectedRooms.includes(r.id) ? "text-blue" : "text-lightText"}`}
+                      >
                         {r.title}
                       </span>
-                    </Checkbox>
-                  </div>
-                ))}
+                    </label>
+                  ))}
+                </div>
               </Checkbox.Group>
             </Form.Item>
+ 
           </div>
         </div>
-
+ 
+        {/* Action Buttons */}
         <div className="flex justify-end gap-4 mt-6">
           <button
             type="button"
@@ -328,7 +388,7 @@ const HotelForm = () => {
           </button>
         </div>
       </Form>
-
+ 
       {isModalOpen && (
         <SuccessModal
           open={true}
@@ -343,5 +403,4 @@ const HotelForm = () => {
     </>
   );
 };
-
 export default HotelForm;

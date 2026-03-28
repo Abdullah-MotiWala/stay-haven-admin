@@ -265,11 +265,21 @@ const HotelDirectory = ({
           </div>
         );
 
+      // case "roomType":
+      //   const typeLabel = typeof row.roomType === 'object' ? row.roomType?.title : row.roomType;
+      //   return (
+      //     <span
+      //       className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center
+      // ${getRoomTypeStyle(typeLabel)}`}
+      //     >
+      //       {typeLabel ?? "N/A"}
+      //     </span>
+      //   );
       case "roomType":
         const typeLabel = typeof row.roomType === 'object' ? row.roomType?.title : row.roomType;
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center
+            className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center whitespace-nowrap
       ${getRoomTypeStyle(typeLabel)}`}
           >
             {typeLabel ?? "N/A"}
@@ -301,27 +311,27 @@ const HotelDirectory = ({
       //       {status}
       //     </span>
       //   );
-      case "status":
-        const status = getRowStatus(row);
+     case "status":
+  const status = getRowStatus(row);
 
-        if (onStatusToggle) {
-          return (
-            <button
-              onClick={() => onStatusToggle(row.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer ${getStatusStyle(status)}`}
-            >
-              {status}
-            </button>
-          );
-        }
+  if (onStatusToggle) {
+    return (
+      <button
+        onClick={() => onStatusToggle(row.id)}
+        className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap ${getStatusStyle(status)}`}
+      >
+        {status}
+      </button>
+    );
+  }
 
-        return (
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(status)}`}
-          >
-            {status}
-          </span>
-        );
+  return (
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusStyle(status)}`}
+    >
+      {status}
+    </span>
+  );
 
       case "actions":
         return (

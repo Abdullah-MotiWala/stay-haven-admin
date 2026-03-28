@@ -256,7 +256,7 @@ const AddNewRoom = () => {
               <h2 className="text-lg font-semibold text-black">Room Details</h2>
               <hr />
             </div>
-            <div className="p-6 px-36 pb-14">
+            <div className="p-6 px-16 md:px-36 lg:px-36 pb-14">
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Room Name</label>

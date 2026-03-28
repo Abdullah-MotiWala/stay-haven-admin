@@ -39,6 +39,11 @@ const typeStyles = {
     dot: "bg-red",
     title: "text-red",
   },
+  Alert: {
+    bg: "bg-maxLightRed",
+    dot: "bg-red",
+    title: "text-red",
+  },
   Info: {
     bg: "bg-maxLightBlue",
     dot: "bg-mainBlue",
@@ -83,7 +88,7 @@ const NotificationsAlerts = ({ notifications }) => {
               className={`flex items-start justify-between px-6 py-4 ${style?.bg}`}
             >
               <div className="flex gap-4">
-                <span className={`mt-1 w-3 h-3 rounded-full ${style?.dot}`} />
+                <span className={`mt-1 w-5 h-3 rounded-full ${style?.dot}`} />
                 <div className="flex flex-col gap-0 m-0">
                   <p className={`font-semibold text-sm m-0 ${style?.title}`}>
                     {item.title}

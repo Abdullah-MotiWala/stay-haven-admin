@@ -229,7 +229,7 @@ const BookingAddComp = () => {
         ...prev,
         hotelName: !isApartment ? value : "",
         hotelId: selectedObj?.hotelId || selectedObj?.hotel?._id || selectedObj?.hotel?.id || "",
-        roomType: selectedObj?.type || selectedObj?.roomType.title || "",
+        roomType: selectedObj?.type || selectedObj?.roomType?.title || "",
         pricePerNight: selectedObj?.price || selectedObj?.pricePerNight || 0,
         // roomId: selectedObj?.id || "",
         apartmentId: selectedObj?.id || "",

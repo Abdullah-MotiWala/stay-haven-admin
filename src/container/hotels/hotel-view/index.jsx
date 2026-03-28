@@ -455,10 +455,8 @@ const HotelProfile = () => {
         <MatrixCard showShadow={false} icon={ShopOutlined} data={cardsData} />
       </div>
 
-      <div
-        className="grid mt-6 gap-6"
-        style={{ gridTemplateColumns: "40% 59%" }}
-      >
+   <div className="grid mt-6 gap-6 grid-cols-1 lg:grid-cols-[40%_59%]">
+        
         {/* <RoomOccupancyCard
           data={[
             { label: "One Bed Rooms", used: 18, total: 25 },

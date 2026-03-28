@@ -24,10 +24,14 @@ body,
 body {
   margin: 0;
   background-image: url("./assets/images/background.png");
-  background-size: cover; /* image full screen */
-  background-position: top right; /* center se show */
-  background-repeat: no-repeat; /* repeat band */
-  background-attachment: fixed; /* scroll par fixed */
+  background-size: cover;
+  /* image full screen */
+  background-position: top right;
+  /* center se show */
+  background-repeat: no-repeat;
+  /* repeat band */
+  background-attachment: fixed;
+  /* scroll par fixed */
 }
 
 /* Agar koi div green hai to usay bhi force dain */
@@ -66,9 +70,11 @@ div[style*="background: green"] {
   font-weight: 500;
   border-radius: 7px !important;
 }
+
 .sidebar-menu .ant-menu-item-selected img {
   filter: brightness(0) invert(1);
 }
+
 .editIconImg {
   filter: brightness(0) invert(1)
 }
@@ -91,10 +97,12 @@ div[style*="background: green"] {
   border: 1px solid;
   border-color: #8a8a8f;
 }
+
 a {
   text-decoration-line: none !important;
   text-decoration: none !important;
 }
+
 a :hover {
   text-decoration-line: none !important;
   text-decoration: none !important;
@@ -105,6 +113,7 @@ a :hover {
   background-color: #8b0002;
   border-color: #8b0002;
 }
+
 .ant-checkbox-checked .ant-checkbox-inner:hover {
   color: #000000;
   background-color: #8b0002;
@@ -152,7 +161,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: white;
   border: 2px;
   border-radius: 8px;
-  border-color:rgb(229 231 235 / 1) ↳ #e5e7eb (229 231 235 / var(--tw-border-opacity, 1));
+  border-color: rgb(229 231 235 / 1) ↳ #e5e7eb (229 231 235 / var(--tw-border-opacity, 1));
   ;
 }
 
@@ -183,9 +192,93 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .status-arrow {
   width: 38px;
   height: 100%;
-  background: #e6f0ff; /* 🔥 THIS is the missing part */
+  background: #e6f0ff;
+  /* 🔥 THIS is the missing part */
   display: flex;
   align-items: center;
   justify-content: center;
   color: #8b0002;
+}
+
+
+
+.red-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.red-scrollbar::-webkit-scrollbar-track {
+  background: #fff1f1;
+  border-radius: 10px;
+}
+
+.red-scrollbar::-webkit-scrollbar-thumb {
+  background: #ef4444;
+  border-radius: 10px;
+}
+
+.red-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}
+
+.red-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #ef4444 #fff1f1;
+}
+
+
+
+
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 4px 5px;        /* 🔥 reduce padding */
+  min-height: 32px;         /* 🔥 fixed small height */
+  border-radius: 999px;
+
+  font-size: 13px;          /* 🔥 slightly smaller text */
+  cursor: pointer;
+  width: max-content;
+}
+
+.status-text {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.status-arrow {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;         /* 🔥 thora gap kam */
+}
+.custom-dropdown .ant-dropdown-menu-item {
+  padding: 6px 10px;   /* 🔥 kam spacing */
+  font-size: 13px;
+}
+
+
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: transparent !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled):hover {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #8b0002 !important;
+  color: white !important;
+}
+@media (max-width: 640px) {
+  .custom-dropdown .ant-dropdown-menu {
+    min-width: 100px !important;
+  }
+
+  .custom-dropdown .ant-dropdown-menu-item {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
 }
