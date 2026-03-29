@@ -63,6 +63,11 @@ const menuItems = [
     label: <Link to="/admin/hosts">Hosts</Link>,
   },
   {
+    key: "/admin/hostels",
+    icon: <img src={roomIcon} className={iconStyle} alt="hostels" />,
+    label: <Link to="/admin/hostels">Hostels</Link>,
+  },
+  {
     key: "/admin/settings",
     icon: <img src={settingIcon} className={iconStyle} alt="settings" />,
     label: <Link to="/admin/settings">Settings</Link>,

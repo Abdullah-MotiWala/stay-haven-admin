@@ -52,9 +52,9 @@ const BookingPolicies = () => {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold ">Booking Policies</h3>
 
-      <div className="max-w-6xl mx-auto my-20 space-y-12">
+      <div className="max-w-6xl mx-auto my-6 space-y-6">
         {/* Check-in / Check-out Section */}
-        <div className=" bg-white rounded-3xl px-6 py-2 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
           <h3 className="text-lg font-semibold text-blue">Check-in / Check-out Times</h3>
           <hr />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -90,9 +90,9 @@ const BookingPolicies = () => {
         </div>
 
         {/* Cancellation Policy */}
-        <div className="max-w-6xl mx-auto my-20 space-y-24">
-          <div className="bg-white rounded-3xl px-6 py-2 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
             <h3 className="text-lg font-semibold text-blue">Cancellation Policy</h3>
+            <hr className="mb-4" />
             <Form.Item name="cancellationPolicy">
               <Input.TextArea
                 rows={4}
@@ -100,14 +100,12 @@ const BookingPolicies = () => {
                 className="rounded-xl border-lightSeconday p-4"
               />
             </Form.Item>
-          </div>
         </div>
 
         {/* Refund Policy */}
-        <div className="max-w-6xl mx-auto my-20 space-y-24">
-          <div className="bg-white rounded-3xl px-6 py-2 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
             <h3 className="text-lg font-semibold text-blue">Refund Policy</h3>
-            <hr />
+            <hr className="mb-4" />
             <Form.Item name="refundPolicy">
               <Input.TextArea
                 rows={4}
@@ -115,59 +113,42 @@ const BookingPolicies = () => {
                 className="rounded-xl border-lightSeconday p-4"
               />
             </Form.Item>
-          </div>
         </div>
 
         <Divider />
 
         {/* Rules & Policies Section */}
-        <section>
-          <h3 className="text-lg font-semibold mb-8">Add Room Rules & Policies</h3>
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+          <h3 className="text-lg font-semibold text-blue mb-4">Add Room Rules & Policies</h3>
+          <hr className="mb-6" />
           {loading ? (
             <Spin className="flex justify-center my-10" />
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                <Form.Item name="selectedFeatures">
-                  <Checkbox.Group className="w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10 ">
-                      {rulesPolicies.map((item) => (
-                        <div key={item.id} className="flex justify-between max-w-96">
-                          <p value={item.id} className="text-base text-lightSeconday px-2">
-                            {item.title}
-                          </p>
-                          <img
-                            src={deleteIcon}
-                            onClick={() => handleDelete(item.id)}
-                            className="bg-lightRed rounded-lg px-2 w-10 h-10   cursor-pointer"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </Checkbox.Group>
-                </Form.Item>
-              </div>
+              <Form.Item name="selectedFeatures">
+                <Checkbox.Group className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-6">
+                    {rulesPolicies.map((item) => (
+                      <div key={item.id} className="flex justify-between max-w-96">
+                        <p className="text-base text-lightSeconday px-2">{item.title}</p>
+                        <img src={deleteIcon} onClick={() => handleDelete(item.id)} className="bg-lightRed rounded-lg p-1.5 h-8 w-8 cursor-pointer hover:scale-110 transition-transform" />
+                      </div>
+                    ))}
+                  </div>
+                </Checkbox.Group>
+              </Form.Item>
 
-              <div className="mt-14">
+              <div className="mt-8">
                 <h3 className="text-lg text-extradark font-semibold">Add Custom Rules & Policies</h3>
-                <p className="text-lightText text-base font-normal">Add any additional rules or policies not listed above</p>
-                <Input
-                  className="w-full sm:w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                  placeholder="Enter Custom rule/policy"
-                  value={rulePolicyInput}
-                  onChange={(e) => setRulePolicyInput(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAdd(rulePolicyInput)}
-                  className=" mt-2 px-8 h-12 ml-6 text-lg py-2 bg-blue text-white rounded-md"
-                >
-                  Add in the above list
-                </button>
+                <p className="text-lightText text-base font-normal mb-4">Add any additional rules or policies not listed above</p>
+                <div className="flex flex-wrap gap-4">
+                  <Input className="w-full sm:w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium" placeholder="Enter Custom rule/policy" value={rulePolicyInput} onChange={(e) => setRulePolicyInput(e.target.value)} />
+                  <button type="button" onClick={() => handleAdd(rulePolicyInput)} className="px-8 h-12 text-lg bg-blue text-white rounded-md">Add in the above list</button>
+                </div>
               </div>
             </>
           )}
-        </section>
+        </div>
       </div>
     </div>
   );

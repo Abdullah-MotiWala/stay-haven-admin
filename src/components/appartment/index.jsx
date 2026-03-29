@@ -174,7 +174,7 @@ export default function Appartments() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <h2 className="font-semibold text-[#000000] text-lg">
-              All Appartments ({appartmentData?.data?.length})
+              All Appartments ({appartmentData?.meta?.totalItems ?? appartmentData?.data?.length ?? 0})
             </h2>
             <div className="flex justify-between items-center bg-white ">
               <div className="max-w-96">

@@ -1,163 +1,132 @@
-  import Breadcrumb from "../../components/Breadcrumb"
-  import MatrixCard from "../../components/MatrixCard";
-  // import { rooms, roomTypes } from "../../container/data/rooms";
-  import home1 from "../../assets/icons/home-1.png";
-  import home2 from "../../assets//icons/home-2.png";
-  import home3 from "../../assets/icons/home-3.png";
-  import home4 from "../../assets/icons/home-4.png";
-  import HotelDirectory from "../../components/Table";
-  import { getRecentBooking, getAllBooking , deleteBooking} from "../../services/booking";
-  import { getAllApartment } from "../../services/apartment"
-  import { useState, useEffect, useMemo } from "react";
-  import { openNotification } from "../../network/notification";
-  import {} from "../../services/booking"
-  const Booking = () => {
-    const [activeType, setActiveType] = useState("Room Bookings");
-    const [recentBookings, setRecentBookings] = useState([]);
-    const [apartment, setApartment] = useState([]);
+import Breadcrumb from "../../components/Breadcrumb"
+import MatrixCard from "../../components/MatrixCard";
+import home1 from "../../assets/icons/home-1.png";
+import home2 from "../../assets//icons/home-2.png";
+import home3 from "../../assets/icons/home-3.png";
+import home4 from "../../assets/icons/home-4.png";
+import HotelDirectory from "../../components/Table";
+import { getAllBooking, deleteBooking, getStats } from "../../services/booking";
+import { useState, useEffect, useMemo } from "react";
+import { openNotification } from "../../network/notification";
+import { Pagination, Select } from "antd";
 
-    const roomTypes = [
-      "Room Bookings",
-      "Apartment Bookings",
-    ];
-    const roomColumns = [
-      { key: "bookingId", label: "Booking ID", type: "text" },
-      { key: "guestName", label: "Guest Name", type: "text" },
-      { key: "roomType", label: "Room Type", type: "roomType" },
-      { key: "roomNumber", label: "Room Number", type: "text" },
-      { key: "duration", label: "Duration", type: "text" },
-      { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
-      { key: "status", label: "Status", type: "status" },
-      { key: "action", label: "Action", type: "actions" },
-    ];
-    const apartmentColumns = [
-      { key: "bookingId", label: "Booking ID", type: "text" },
-      { key: "guestName", label: "Guest Name", type: "text" },
-      { key: "apartmentName", label: "Apartment Name", type: "text" }, // Example change
-      { key: "apartmentNumber", label: "Apartment Number", type: "text" }, // Example change
-      { key: "hotelName", label: "Hotel Name", type: "text" }, // Example change
+const entriesPerPageOptions = [10, 20, 30, 40];
 
-      { key: "duration", label: "Duration", type: "text" },
-      { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
-      { key: "status", label: "Status", type: "status" },
-      { key: "action", label: "Action", type: "actions" },
-    ];
+const Booking = () => {
+  const [activeType, setActiveType] = useState("Room Bookings");
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-    const cardsData = [
-      {
-        title: "Total Bookings",
-        value: "02",
-        bg: "#F3F7EE",
-        iconBg: "#D1E1BC",
-        image: home1,
-        trend: "+12%",
-        trendText: "vs last week",
-        showTrend: false,
-      },
-      {
-        title: "Today's Check-ins",
-        value: "24",
-        bg: "#EFF9FF",
-        iconBg: "#C7DAE7",
-        image: home2,
-      },
-      {
-        title: "Today's Check-outs",
-        value: "05",
-        bg: "#F7EFFF",
-        iconBg: "#DED0EC",
-        image: home3,
-      },
-      {
-        title: "Cancelled Booking",
-        value: "10",
-        bg: "#F3F4FB",
-        iconBg: "#CBCEE7",
-        image: home4,
-      }]
-    const handleDelete = async (id) => {
-      if (window.confirm("Are you want to delete this hotel?")) {
-        try {
-          await deleteBooking(id);
-          setRecentBookings(recentBookings.filter((hotel) => hotel.id !== id));
-          openNotification("success", "Booking deleted successfully");
-        } catch (err) {
-          console.error("Any Problem in deleteing", err);
-          openNotification("error", "Internal Server Error");
-        }
+  const roomTypes = ["Room Bookings", "Apartment Bookings"];
+
+  const roomColumns = [
+    { key: "bookingId", label: "Booking ID", type: "text" },
+    { key: "guestName", label: "Guest Name", type: "text" },
+    { key: "roomType", label: "Room Type", type: "roomType" },
+    { key: "roomNumber", label: "Room Number", type: "text" },
+    { key: "duration", label: "Duration", type: "text" },
+    { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
+    { key: "status", label: "Status", type: "status" },
+    { key: "action", label: "Action", type: "actions" },
+  ];
+
+  const apartmentColumns = [
+    { key: "bookingId", label: "Booking ID", type: "text" },
+    { key: "guestName", label: "Guest Name", type: "text" },
+    { key: "apartmentName", label: "Apartment Name", type: "text" },
+    { key: "apartmentNumber", label: "Apartment Number", type: "text" },
+    { key: "hotelName", label: "Hotel Name", type: "text" },
+    { key: "duration", label: "Duration", type: "text" },
+    { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
+    { key: "status", label: "Status", type: "status" },
+    { key: "action", label: "Action", type: "actions" },
+  ];
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getStats();
+        setStats(res?.data?.data);
+      } catch (err) {
+        console.error("Failed to load stats:", err);
       }
     };
-    useEffect(() => {
-      const fetchRecentBookings = async () => {
-        try {
-          const res = await getAllBooking();
-          console.log(res.data, "asdadsaasdas2321413");
-          setRecentBookings(res.data.data);
-          console.log(recentBookings, "recentBookings")
-        } catch (err) {
-          console.error("Failed to load stats:", err);
-          openNotification("error", "Failed to load stats");
-        }
-      };
+    fetchStats();
+  }, []);
 
-      fetchRecentBookings();
-    }, [])
-
-    useEffect(() => {
-      const fetchApartment = async () => {
-        try {
-          const res = await getAllApartment();
-          console.log(res.data, "apartment data");
-          setApartment(res.data);
-          // console.log(apartment, "Apartment")
-        } catch (err) {
-          console.error("Failed to load stats:", err);
-          openNotification("error", "Failed to load stats");
-        }
-      };
-
-      fetchApartment();
-    }, [])
-    const filteredBookings = useMemo(() => {
-      if (activeType === "Apartment Bookings") {
-        return recentBookings.filter((booking) => booking.isApartment === true);
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        setLoading(true);
+        const res = await getAllBooking(currentPage, itemsPerPage);
+        setRecentBookings(res.data?.data || []);
+        setTotal(res.data?.meta?.totalItems || res.data?.meta?.total || 0);
+      } catch (err) {
+        console.error("Failed to load bookings:", err);
+        openNotification("error", "Failed to load bookings");
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchBookings();
+  }, [currentPage, itemsPerPage]);
 
-        if (activeType === "Room Bookings") {
-          return recentBookings.filter((booking) => !booking.isApartment);
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you want to delete this booking?")) {
+      try {
+        await deleteBooking(id);
+        setRecentBookings(recentBookings.filter((b) => b.id !== id));
+        openNotification("success", "Booking deleted successfully");
+      } catch (err) {
+        openNotification("error", "Internal Server Error");
       }
-      if (activeType === "Room Bookings") return recentBookings;
+    }
+  };
 
+  const filteredBookings = useMemo(() => {
+    if (activeType === "Apartment Bookings")
+      return recentBookings.filter((b) => b.isApartment === true);
+    if (activeType === "Room Bookings")
+      return recentBookings.filter((b) => !b.isApartment);
     return recentBookings;
-    }, [activeType, recentBookings]);
-    const currentColumns = activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
-    console.log(recentBookings, "filteredBookings")
-    return (<>
+  }, [activeType, recentBookings]);
+
+  const currentColumns = activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
+
+  const cardsData = [
+    { title: "Total Bookings", value: stats?.totalBookings ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
+    { title: "Today's Check-ins", value: stats?.todayCheckIns ?? "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Today's Check-outs", value: stats?.todayCheckOuts ?? "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
+    { title: "Cancelled Booking", value: stats?.cancelledBookings ?? "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
+  ];
+
+  const onPageChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setItemsPerPage(pageSize);
+  };
+
+  return (
+    <>
       <Breadcrumb title={"Booking"} />
       <MatrixCard data={cardsData} />
 
-      <div className="p-0 ml-3 gap-[2px] inline-flex   overflow-hidden rounded-lg">
-        {roomTypes.map((type, index) => (
+      <div className="p-0 ml-3 gap-[2px] inline-flex overflow-hidden rounded-lg">
+        {roomTypes.map((type) => (
           <button
             key={type}
-            onClick={() =>setActiveType(type)}
-            className={`
-              px-2 py-2 text-sm font-medium whitespace-nowrap
-              transition-colors duration-200 rounded-0 m-0 
-              
-              ${activeType === type
-                ? "bg-blue text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-              }
-              ${index === 0 ? "" : ""}
-              ${index === roomTypes.length - 1 ? "" : ""}
-            `}
+            onClick={() => { setActiveType(type); setCurrentPage(1); }}
+            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 ${
+              activeType === type ? "bg-blue text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
           >
             {type}
           </button>
         ))}
       </div>
-
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
@@ -174,7 +143,28 @@
           activeType={activeType}
           onDelete={handleDelete}
         />
+
+        <div className="mt-4 flex justify-between items-center">
+          <div>
+            <Select
+              defaultValue={10}
+              className="text-black"
+              onChange={(value) => { setItemsPerPage(value); setCurrentPage(1); }}
+              options={entriesPerPageOptions.map((o) => ({ label: o, value: o }))}
+            />
+            <span className="text-lightSeconday ml-4">Entries per page</span>
+          </div>
+          <Pagination
+            current={currentPage}
+            total={total}
+            pageSize={itemsPerPage}
+            onChange={onPageChange}
+            className="flex justify-end"
+          />
+        </div>
       </div>
-    </>)
-  }
-  export default Booking;
+    </>
+  );
+};
+
+export default Booking;

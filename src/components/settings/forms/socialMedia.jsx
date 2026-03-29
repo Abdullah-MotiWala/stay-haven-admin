@@ -62,7 +62,10 @@ const SocialMedia = ({ onCurrenciesFetched, setGlobalSymbol }) => {
             {loading ? (
                 <div className="flex justify-center my-20"><Spin title="Loading Options..." /></div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto my-20">
+                <div className="bg-white rounded-3xl px-6 py-6 max-w-6xl mx-auto my-6">
+                  <h3 className="text-lg font-semibold text-blue mb-4">Account Details</h3>
+                  <hr className="mb-6" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="w-full">
                         <label className="text-base text-lightSeconday font-medium">
                             Name
@@ -183,6 +186,7 @@ const SocialMedia = ({ onCurrenciesFetched, setGlobalSymbol }) => {
                             />
                         </Form.Item>
                     </div>
+                </div>
                 </div>
             )}
         </div>

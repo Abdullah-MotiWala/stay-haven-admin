@@ -8,11 +8,23 @@ export const getAllRooms = async (
   sort = "asc",
   activeType = "All Rooms",
 ) => {
-  // return Api.get(`/rooms?page=${currentPage}&limit=${itemsPerPage}`);
   return Api.get(
     `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}`,
   );
 };
+
+export const getAllHostels = async (
+  currentPage = 1,
+  itemsPerPage = 10,
+  status = "",
+  search = "",
+  sort = "asc",
+) => {
+  return Api.get(
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&isHostel=true&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}`,
+  );
+};
+
 export const createRoom = async (data) => {
   return Api.post("rooms", data);
 };

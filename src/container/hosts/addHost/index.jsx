@@ -29,7 +29,7 @@ const HostForm = () => {
             setFetching(true);
             try {
                 const res = await getUserById(id);
-                const host = res.data;
+                const host = res.data?.data || res.data;
                 form.setFieldsValue({
                     name: host.name,
                     email: host.email,

@@ -31,8 +31,8 @@ const HostsListing = () => {
                     page: currentPage,
                     limit: itemsPerPage,
                 });
-                setHosts(res.data || res.data?.data || []);
-                setTotal(res.data?.total || 0);
+                setHosts(res.data?.data || []);
+                setTotal(res.data?.meta?.totalItems || res.data?.meta?.total || 0);
                 setRefresh(false);
             } catch (err) {
                 console.error("Data fetch error", err);
@@ -102,7 +102,7 @@ const HostsListing = () => {
                     </div>
                 ) : (
                     <Table
-                        data={hosts.data}
+                        data={hosts}
                         onDelete={handleDelete}
                         title="Hosts Directory"
                         columns={columns}

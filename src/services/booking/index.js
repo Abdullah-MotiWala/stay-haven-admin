@@ -1,7 +1,7 @@
 import Api from "../../network/axiosClients";
 
-export const getAllBooking = async () => {
-    return Api.get("bookings");
+export const getAllBooking = async (page = 1, limit = 10) => {
+    return Api.get("bookings", { params: { page, limit } });
 };
 export const createBooking = async (data) => {
     return Api.post("bookings", data);

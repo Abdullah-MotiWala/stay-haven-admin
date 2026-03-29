@@ -14,7 +14,7 @@ const PricingAndTaxes = ({ symbol }) => {
   return (
     <div className="space-y-8">
       <h3 className="text-lg font-semibold">Pricing & Taxes</h3>
-      <div className="max-w-6xl mx-auto my-20 space-y-12">
+      <div className="max-w-6xl mx-auto my-6 space-y-6">
         
         {/* Tax Details Card */}
         <div className={cardClass}>

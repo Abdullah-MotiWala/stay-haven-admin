@@ -58,50 +58,50 @@ const Amenities = () => {
     <div>
       <h3 className="text-lg font-semibold mb-4">Amenities</h3>
 
-      <div className="max-w-6xl mx-auto my-20">
-        <h3 className="text-lg font-semibold mb-8">
-          Select all amenities available at your hotel
-        </h3>
+      <div className="max-w-6xl mx-auto my-6 space-y-6">
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+          <h3 className="text-lg font-semibold text-blue mb-4">
+            Select all amenities available at your hotel
+          </h3>
+          <hr className="mb-6" />
+          {loading ? <Spin tip="Loading Amenities..." /> : (
+            <Form.Item name="selectedFeatures">
+              <Checkbox.Group className="w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-24 gap-y-6">
+                  {amenities.map((item) => (
+                    <div key={item.id} className="flex justify-between max-w-64">
+                      <p className="text-base text-lightSeconday px-2">{item.title}</p>
+                      <img
+                        src={deleteIcon}
+                        alt="delete"
+                        onClick={() => handleDelete(item.id)}
+                        className="bg-lightRed rounded-lg p-1.5 h-8 w-8 cursor-pointer hover:scale-110 transition-transform"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Checkbox.Group>
+            </Form.Item>
+          )}
+        </div>
 
-        {loading ? <Spin tip="Loading Amenities..." /> : (
-          <Form.Item name="selectedFeatures">
-            <Checkbox.Group className="w-full">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-24 gap-y-10 ">
-                {amenities.map((item) => (
-                  <div key={item.id} className="flex justify-between max-w-64">
-                    <p value={item.id} className="text-base text-lightSeconday px-2">
-                      {item.title}
-                    </p>
-                    
-                    <img
-                      src={deleteIcon}
-                      alt="delete"
-                      onClick={() => handleDelete(item.id)} 
-                      className="bg-lightRed rounded-lg p-1.5 h-8 w-8 cursor-pointer hover:scale-110 transition-transform"
-                    />
-                  </div>
-                ))}
-              </div>
-            </Checkbox.Group>
-          </Form.Item>
-        )}
-
-        <div className="mt-14">
-          <h3 className="text-lg text-extradark font-semibold">Add Custom Amenity</h3>
-          <p className="text-lightText text-base font-normal">Add any additional amenities not listed above</p>
+        <div className="bg-white rounded-3xl px-6 py-6 border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+          <h3 className="text-lg text-blue font-semibold mb-1">Add Custom Amenity</h3>
+          <hr className="mb-4" />
+          <p className="text-lightText text-base font-normal mb-4">Add any additional amenities not listed above</p>
           <div className="flex flex-wrap gap-4">
             <Input
               className="w-96 h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
               placeholder="Enter Custom Amenity"
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
-              onPressEnter={handleAddCustom} 
+              onPressEnter={handleAddCustom}
             />
             <button
-              type="button" 
+              type="button"
               disabled={actionLoading}
               className={`px-8 h-12 bg-blue text-white rounded-md font-semibold ${actionLoading ? 'opacity-50' : ''}`}
-              onClick={handleAddCustom} 
+              onClick={handleAddCustom}
             >
               {actionLoading ? "Adding..." : "Add in the above list"}
             </button>
