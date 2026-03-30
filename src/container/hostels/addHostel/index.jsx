@@ -232,7 +232,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Select Hotel</label>
                                     <Form.Item name="hotel">
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {hotelsList.map((h) => <Option key={h.id} value={h.id}>{h.name}</Option>)}
                                         </Select>
                                     </Form.Item>
@@ -240,7 +240,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Bed Type</label>
                                     <Form.Item name="bedType" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Bed Type" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {[["single bed", "Single Bed"], ["queen bed", "Queen Bed"], ["king bed", "King Bed"], ["bunk bed", "Bunk Bed"], ["dormitory", "Dormitory"]].map(([v, l]) => <Option key={v} value={v}>{l}</Option>)}
                                         </Select>
                                     </Form.Item>
@@ -248,7 +248,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Room Size</label>
                                     <Form.Item name="roomSize" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Room Size" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {["e.g. 25 m²", "e.g. 30 m²", "e.g. 35 m²", "e.g. 50 m²"].map((v) => <Option key={v} value={v}>{v}</Option>)}
                                         </Select>
                                     </Form.Item>
@@ -256,7 +256,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Max Guests</label>
                                     <Form.Item name="guests" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Guests" showSearch  optionFilterProp="children">
                                             {["1","2","3","4","5","6","8","10","12","20"].map((v) => <Option key={v} value={v}>{v} Guests</Option>)}
                                         </Select>
                                     </Form.Item>
@@ -264,19 +264,12 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Children</label>
                                     <Form.Item name="childrens" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Children" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {["0","1","2","3","4","5"].map((v) => <Option key={v} value={v}>{v}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>
-                                <div>
-                                    <label className="text-base text-lightSeconday font-medium">Max Infants</label>
-                                    <Form.Item name="maxinfants">
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                                            {["0","1","2","3"].map((v) => <Option key={v} value={v}>{v}</Option>)}
-                                        </Select>
-                                    </Form.Item>
-                                </div>
+                               
                             </div>
 
                             <div className="mb-6">
@@ -297,7 +290,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Status</label>
                                     <Form.Item name="status" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {[["available","Available"],["occupied","Occupied"],["maintenance","Maintenance"],["inactive","Inactive"]].map(([v,l]) => <Option key={v} value={v}>{l}</Option>)}
                                         </Select>
                                     </Form.Item>

@@ -261,7 +261,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Room Name</label>
                   <Form.Item preserve={true} name="name">
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Room Name" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {[{ label: "Deluxe", value: "Deluxe" }, { label: "Standard", value: "Standard" }].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
@@ -279,7 +279,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Select Hotel</label>
                   <Form.Item preserve={true} name="hotel">
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {hotelsList?.map((item) => (
                         <Option key={item.id} value={item.id}>{item.name}</Option>
                       ))}
@@ -290,7 +290,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Room Type</label>
                   <Form.Item preserve={true} name="type" rules={[{ required: true, message: "Room Type is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Room Type" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {roomTypesList.map((item) => (
                         <Option key={item.id} value={item.id}>{item.title}</Option>
                       ))}
@@ -301,7 +301,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Bed Type</label>
                   <Form.Item preserve={true} name="bedType" rules={[{ required: true, message: "Bed Type is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Bed Type" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {[{ label: "Single Bed", value: "single bed" }, { label: "Queen Bed", value: "queen bed" }, { label: "King Bed", value: "king bed" }].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
@@ -312,7 +312,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Room Size</label>
                   <Form.Item preserve={true} name="roomSize" rules={[{ required: true, message: "Room Size is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Room Size" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {[{ label: "e.g. 25 m²", value: "e.g. 25 m²" }, { label: "e.g. 30 m²", value: "e.g. 30 m²" }, { label: "e.g. 35 m²", value: "e.g. 35 m²" }].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
@@ -323,7 +323,9 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Guest Adults</label>
                   <Form.Item preserve={true} name="guests" rules={[{ required: true, message: "Guest Adults is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Guests" showSearch filterOption={(input, option) =>
+                      String(option?.children ?? "").toLowerCase().includes(input.toLowerCase())
+                    }>
                       {["1", "2", "3", "4", "5", "6", "7", "8"].map((v) => (
                         <Option key={v} value={v}>{v} Guests</Option>
                       ))}
@@ -334,7 +336,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Childrens</label>
                   <Form.Item preserve={true} name="childrens" rules={[{ required: true, message: "Children is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Children" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {["0", "1", "2", "3", "4", "5", "6", "7", "8"].map((v) => (
                         <Option key={v} value={v}>{v}</Option>
                       ))}
@@ -347,7 +349,9 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Max in fants</label>
                   <Form.Item preserve={true} name="maxinfants" rules={[{ required: true, message: "maxinfants is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Infants" showSearch filterOption={(input, option) =>
+                      String(option?.children ?? "").toLowerCase().includes(input.toLowerCase())
+                    }>
                       {["0", "1", "2", "3", "4", "5", "6"].map((v) => (
                         <Option key={v} value={v}>{v} Maxinfants</Option>
                       ))}
@@ -372,7 +376,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Status</label>
                   <Form.Item preserve={true} name="status" rules={[{ required: true, message: "Status is required" }]}>
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {[{ label: "Active", value: "available" }, { label: "In Active", value: "inactive" }, { label: "Maintenance", value: "maintenance" }, { label: "Occupied", value: "occupied" }].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
@@ -389,28 +393,58 @@ const AddNewRoom = () => {
             </div>
             <div className="p-[8%] pt-10">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div className="flex flex-col gap-4">
-                  <label className="text-[15px] font-semibold text-gray-900">Upload Room (Main) image</label>
-                  {!mainImagePreview ? (
-                    <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                      <div className="flex justify-center mt-4">
-                        <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
-                        <p className="text-sm text-gray-700 font-medium text-center px-4">
-                          Drop your image here or <span className="text-blue underline">Browse</span>
-                        </p>
+                <Form.Item
+                  name="mainImageUpload"
+                  validateTrigger="none"
+                  rules={[
+                    {
+                      validator: (_, value) => {
+                        if (mainImagePreview) return Promise.resolve();
+                        return Promise.reject(new Error("Main image is required"));
+                      },
+                    },
+                  ]}
+                >
+                  <div className="flex flex-col gap-4">
+                    <label className="text-[15px] font-semibold text-gray-900">
+                      Upload Room (Main) image
+                    </label>
+                    {!mainImagePreview ? (
+                      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                        <div className="flex justify-center mt-4">
+                          <img src={cloudimg} alt="" className="w-6 h-6 text-gray-700" />
+                          <p className="text-sm text-gray-700 font-medium text-center px-4">
+                            Drop your image here or{" "}
+                            <span className="text-blue underline">Browse</span>
+                          </p>
+                        </div>
+                        <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 1 MB</p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleMainImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
                       </div>
-                      <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 1 MB</p>
-                      <input type="file" accept="image/*" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-                    </div>
-                  ) : (
-                    <div className="relative w-full">
-                      <img src={mainImagePreview} alt="Main Preview" className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200" />
-                      <button type="button" onClick={removeMainImage} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      <div className="relative w-full group">
+                        <img
+                          src={mainImagePreview}
+                          alt="Main Preview"
+                          className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200"
+                        />
+                        {/* ✅ Black overlay + centered trash icon — same as appartment style */}
+                        <div
+                          className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={removeMainImage}
+                        >
+                          <Trash2 size={40} className="text-white" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Form.Item>
+
 
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>

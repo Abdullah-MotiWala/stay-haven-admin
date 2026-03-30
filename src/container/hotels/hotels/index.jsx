@@ -173,6 +173,7 @@ const HotelsListing = () => {
         <div className="mt-4 flex justify-between">
           <div>
             <Select
+              placeholder="Select Entries"
               defaultValue={10}
               // style={{ paddingLeft: 10, paddingRight: 10, }}
               className="text-black "
@@ -181,6 +182,7 @@ const HotelsListing = () => {
                 label: option,
                 value: option,
               }))}
+              showSearch
             />
             <span className="text-lightSeconday ml-4">Entries per page</span>
           </div>

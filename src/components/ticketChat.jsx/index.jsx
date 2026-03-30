@@ -16,9 +16,25 @@ const ChatWindow = () => {
     const [connected, setConnected] = useState(socket.connected);
     const scrollRef = useRef(null);
     const typingTimeoutRef = useRef(null);
+    const messageKeysRef = useRef(new Set());
     const adminId = getAdminId();
     const currentUser = getLoggedInUser();
     const currentUserId = currentUser?.id;
+
+    const messageKey = (m) => {
+        const sender = m.senderId || m.sender?.id || "";
+        const time = new Date(m.createdAt || m.createdAt || "").toISOString();
+        return `${m.id || ""}||${sender}||${m.content || ""}||${time}`;
+    };
+
+    const addMessageIfNew = (messageToAdd) => {
+        setChatHistory(prev => {
+            const key = messageKey(messageToAdd);
+            if (messageKeysRef.current.has(key)) return prev;
+            messageKeysRef.current.add(key);
+            return [...prev, messageToAdd];
+        });
+    };
 
     // Auto scroll on new messages
     useEffect(() => {
@@ -45,8 +61,18 @@ const ChatWindow = () => {
                 const msgRes = await getMessages(ticketId);
                 console.log("Messages response:", msgRes);
                 const msgs = msgRes?.data?.data || msgRes?.data || [];
-                if (Array.isArray(msgs)) setChatHistory(msgs);
-                else console.warn("Unexpected messages format:", msgs);
+                if (Array.isArray(msgs)) {
+                    messageKeysRef.current.clear();
+                    const unique = [];
+                    msgs.forEach((m) => {
+                        const key = messageKey(m);
+                        if (!messageKeysRef.current.has(key)) {
+                            messageKeysRef.current.add(key);
+                            unique.push(m);
+                        }
+                    });
+                    setChatHistory(unique);
+                } else console.warn("Unexpected messages format:", msgs);
             } catch (err) {
                 console.error("HTTP message history failed:", err.message);
             }
@@ -64,16 +90,22 @@ const ChatWindow = () => {
         };
 
         const onHistory = ({ messages }) => {
-            if (messages?.length > 0) setChatHistory(messages);
+            if (messages?.length > 0) {
+                messageKeysRef.current.clear();
+                const uniqueMessages = [];
+                messages.forEach((m) => {
+                    const key = messageKey(m);
+                    if (!messageKeysRef.current.has(key)) {
+                        messageKeysRef.current.add(key);
+                        uniqueMessages.push(m);
+                    }
+                });
+                setChatHistory(uniqueMessages);
+            }
         };
 
         const onNewMessage = (msg) => {
-            setChatHistory((prev) => {
-                // Remove temp message with same content if exists, then add real one
-                const filtered = prev.filter(m => !(m.id?.startsWith('temp-') && m.content === msg.content && m.senderId === msg.senderId));
-                if (filtered.find(m => m.id === msg.id)) return filtered;
-                return [...filtered, msg];
-            });
+            addMessageIfNew(msg);
         };
 
         const onTyping = ({ userName, userType }) => {
@@ -136,7 +168,16 @@ const ChatWindow = () => {
                 isAdminMessage: true,
             });
             if (res.data.success) {
-                setChatHistory(prev => prev.map(m => m.id === tempId ? res.data.data : m));
+                const serverMsg = res.data.data;
+                setChatHistory(prev => {
+                    const withoutTemp = prev.filter(m => m.id !== tempId);
+                    if (withoutTemp.some(m => m.id === serverMsg.id)) return withoutTemp;
+                    const key = messageKey(serverMsg);
+                    if (!messageKeysRef.current.has(key)) {
+                        messageKeysRef.current.add(key);
+                    }
+                    return [...withoutTemp, serverMsg];
+                });
                 // Socket se emit karo taake dusre users ko real-time mile
                 socket.emit("send_ticket_message", { ticketId, content });
             } else {
@@ -189,7 +230,7 @@ const ChatWindow = () => {
                 <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-400'}`} title={connected ? 'Connected' : 'Disconnected'} />
             </div>
 
-            <div className="bg-white rounded-[24px] shadow-sm border border-[#F1F5F9] p-6">
+            <div className="bg-white rounded-[24px] shadow-sm border border-[#F1F5F9] p-6 h-[calc(100vh-140px)] flex flex-col">
                 <div className="flex justify-between items-start mb-6">
                     <div>
                         <p className="text-black font-bold text-[12px] uppercase tracking-wider">
@@ -208,9 +249,9 @@ const ChatWindow = () => {
                     </button>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-1 min-h-0">
                     {/* LEFT: Chat */}
-                    <div className="flex-[1.5] border border-[#F1F5F9] rounded-[24px] overflow-hidden flex flex-col bg-white">
+                    <div className="flex-[1.5] border border-[#F1F5F9] rounded-[24px] overflow-hidden flex flex-col bg-white min-h-0">
                         <div className="p-4 border-b border-[#F8FAFC] flex items-center gap-3 bg-white">
                             <img src="https://i.pravatar.cc/150?u=admin" className="w-10 h-10 rounded-full object-cover" alt="admin" />
                             <div>
@@ -222,7 +263,7 @@ const ChatWindow = () => {
                         </div>
 
                         {/* Messages */}
-                        <div className="p-4 h-[400px] overflow-y-auto space-y-4 bg-white custom-scrollbar">
+                        <div className="p-4 overflow-y-auto space-y-4 bg-white custom-scrollbar flex-1 min-h-0">
                             {chatHistory.length === 0 && (
                                 <div className="flex justify-center items-center h-full text-[#9CA3AF] text-sm">
                                     No messages yet
@@ -318,3 +359,4 @@ const DetailRow = ({ label, value }) => (
 );
 
 export default ChatWindow;
+

@@ -279,7 +279,7 @@ const HotelDirectory = ({
         const typeLabel = typeof row.roomType === 'object' ? row.roomType?.title : row.roomType;
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center whitespace-nowrap
+            className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center text-center justify-center whitespace-nowrap
       ${getRoomTypeStyle(typeLabel)}`}
           >
             {typeLabel ?? "N/A"}
@@ -296,7 +296,7 @@ const HotelDirectory = ({
 
       case "dateRange":
         return (
-          <span className="text-sm text-gray-900">{row.checkInOut ?? "-"}</span>
+          <span className="text-sm text-gray-900 text-center">{row.checkInOut ?? "-"}</span>
         );
 
       // case "status":
@@ -311,27 +311,27 @@ const HotelDirectory = ({
       //       {status}
       //     </span>
       //   );
-     case "status":
-  const status = getRowStatus(row);
+      case "status":
+        const status = getRowStatus(row);
 
-  if (onStatusToggle) {
-    return (
-      <button
-        onClick={() => onStatusToggle(row.id)}
-        className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap ${getStatusStyle(status)}`}
-      >
-        {status}
-      </button>
-    );
-  }
+        if (onStatusToggle) {
+          return (
+            <button
+              onClick={() => onStatusToggle(row.id)}
+              className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap ${getStatusStyle(status)}`}
+            >
+              {status}
+            </button>
+          );
+        }
 
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusStyle(status)}`}
-    >
-      {status}
-    </span>
-  );
+        return (
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusStyle(status)}`}
+          >
+            {status}
+          </span>
+        );
 
       case "actions":
         return (
@@ -476,6 +476,7 @@ const HotelDirectory = ({
                       suffixIcon={
                         <ChevronDown size={18} className="text-gray-900" />
                       }
+                      showSearch
                     >
                       <Option value="">Select Room</Option>
                       {roomTypes.length > 0 ? (
@@ -503,6 +504,7 @@ const HotelDirectory = ({
                   suffixIcon={
                     <ChevronDown size={18} className="text-gray-900" />
                   }
+                  showSearch
                 >
                   <Option value="">Select Hotel</Option>
                   {uniqueHotels.map((hotel) => (
@@ -524,6 +526,7 @@ const HotelDirectory = ({
                     suffixIcon={
                       <ChevronDown size={18} className="text-gray-900" />
                     }
+                    showSearch
                   >
                     <Option value="">Sort by Duration</Option>
                     <Option value="24h">24 Hours</Option>
@@ -543,6 +546,7 @@ const HotelDirectory = ({
                   suffixIcon={
                     <ChevronDown size={18} className="text-gray-900" />
                   }
+                  showSearch
                 >
                   <Option value="">Sort by Status</Option>
                   {hoteloptions ? (
@@ -707,18 +711,17 @@ const HotelDirectory = ({
 
                         {/* ACTION DROPDOWN */}
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-28 top-1/1 -translate-y-1/2 w-28 bg-white border rounded-lg shadow-lg z-50">
-                            <button
-                              onClick={() => {
-                                setRowActionOpen(null);
-                                navigate(`${path}/${row.id}`, {
-                                  state: { lastId },
-                                });
-                              }}
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                            >
-                              View
-                            </button>
+                          <div className="absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-lg z-50">                            <button
+                            onClick={() => {
+                              setRowActionOpen(null);
+                              navigate(`${path}/${row.id}`, {
+                                state: { lastId },
+                              });
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                          >
+                            View
+                          </button>
                             <button
                               onClick={() => {
                                 setRowActionOpen(null);

@@ -39,7 +39,7 @@ const TicketsPage = () => {
   }, [searchTerm, statusFilter]);
 
   return (
-    <div className=" min-h-screen">
+    <div className="h-screen">
       <TicketTable 
         tickets={tickets} 
         setSearchTerm={setSearchTerm} 

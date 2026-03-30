@@ -8,6 +8,7 @@ import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
 import { Form, Input, Select, Checkbox } from "antd";
 import { uploadSingleMedia } from "../../../services/uploads";
+import {getSettingsApi} from "../../../services/setting";
 
 const HotelForm = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const HotelForm = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(DEFAULT_IMAGE);
   const [uploading, setUploading] = useState(false);
+  const [settingsPolicy, setSettingsPolicy] = useState("");
 
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
@@ -34,13 +36,38 @@ const HotelForm = () => {
     const fetchLastId = async () => {
       try {
         const res = await lastHotelId();
-        setLastId(res?.data);
+        setLastId(res?.data?.data || res?.data);
       } catch {
         openNotification("error", "Failed to load hotel ID");
       }
     };
     fetchLastId();
   }, []);
+        // console.log("Last hotel ID:", lastId);
+
+
+ useEffect(() => {
+  const fetchSettings = async () => {
+    try {
+      const res = await getSettingsApi();
+      const data = res?.data?.data;
+
+      const policy = data?.cancellationPolicy || "";
+      setSettingsPolicy(policy);
+
+      if (!isEditMode) {
+        form.setFieldsValue({
+          cancellation_policy: policy,
+        });
+      }
+
+    } catch {
+      openNotification("error", "Failed to load settings");
+    }
+  };
+
+  fetchSettings();
+}, [form, isEditMode]);
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -239,7 +266,7 @@ const HotelForm = () => {
                 <span className="text-black font-semibold underline whitespace-nowrap">Hotel ID</span>
                 <div className="w-24 text-center border py-3 rounded-md bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none">
                   <span className="select-none">
-                    {isEditMode ? hotel.hotelId : lastId?.nextNumericId}
+                    {isEditMode ? hotel.hotelId : lastId?.displayId}
                   </span>
                 </div>
               </div>
@@ -257,7 +284,7 @@ const HotelForm = () => {
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">City</label>
                 <Form.Item name="city" rules={[{ required: true, message: "City is required" }]}>
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select City" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                     <Option value="Karachi">Karachi</Option>
                     <Option value="Lahore">Lahore</Option>
                     <Option value="Islamabad">Islamabad</Option>
@@ -282,14 +309,15 @@ const HotelForm = () => {
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Cancellation Policy</label>
                 <Form.Item name="cancellation_policy" rules={[{ required: true, message: "Cancellation policy is required" }]}>
-                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter cancellation policy" />
+                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"  placeholder="Enter cancellation policy"
+  disabled />
                 </Form.Item>
               </div>
  
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">Status</label>
                 <Form.Item name="isActive">
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch>
                     <Option value="active">Active</Option>
                     <Option value="inactive">Inactive</Option>
                     <Option value="maintenance">Maintenance</Option>

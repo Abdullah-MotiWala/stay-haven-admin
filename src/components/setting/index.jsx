@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronDown, Save } from 'lucide-react';
 import { useNavigate, useParams } from "react-router-dom";
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 const SettingsPage = () => {
   const navigate = useNavigate();
@@ -79,11 +82,10 @@ const SettingsPage = () => {
             <div className="flex flex-col gap-3">
               <label className="text-[11px] font-extrabold text-[#1E40AF] uppercase tracking-widest ml-1">Default Currency</label>
               <div className="relative group">
-                <select className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[16px] py-4 px-5 text-[14px] font-bold text-[#1F2937] appearance-none focus:bg-white focus:border-[#2563EB] focus:ring-4 focus:ring-blue-50 outline-none transition-all cursor-pointer">
-                  <option>US Dollars $ - (USD)</option>
-                  <option>PKR - Rupee</option>
-                </select>
-                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-[#7C8DB5] group-focus-within:text-[#2563EB]" size={20} />
+                <Select className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[16px] py-4 px-5 text-[14px] font-bold text-[#1F2937] focus:bg-white focus:border-[#2563EB] focus:ring-4 focus:ring-blue-50 outline-none transition-all cursor-pointer" placeholder="Select Currency" showSearch>
+                  <Option value="USD">US Dollars $ - (USD)</Option>
+                  <Option value="PKR">PKR - Rupee</Option>
+                </Select>
               </div>
             </div>
 
@@ -91,11 +93,10 @@ const SettingsPage = () => {
             <div className="flex flex-col gap-3">
               <label className="text-[11px] font-extrabold text-[#1E40AF] uppercase tracking-widest ml-1">Timezone</label>
               <div className="relative group">
-                <select className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[16px] py-4 px-5 text-[14px] font-bold text-[#1F2937] appearance-none focus:bg-white focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100/20 outline-none transition-all cursor-pointer">
-                  <option>(GMT+5:00) Asia/Karachi (Pakistan Time)</option>
-                  <option>(GMT+0:00) UTC</option>
-                </select>
-                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-[#7C8DB5]" size={20} />
+                <Select className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[16px] py-4 px-5 text-[14px] font-bold text-[#1F2937] focus:bg-white focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100/20 outline-none transition-all cursor-pointer" placeholder="Select Timezone" showSearch>
+                  <Option value="Asia/Karachi">(GMT+5:00) Asia/Karachi (Pakistan Time)</Option>
+                  <Option value="UTC">(GMT+0:00) UTC</Option>
+                </Select>
               </div>
             </div>
 

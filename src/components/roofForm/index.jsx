@@ -1,6 +1,9 @@
 import React from 'react';
 // import FormInput from '../../container/dashboard/room-from'; // Logic Import
 import { HiOutlineCloudUpload, HiOutlineDocumentText, HiOutlineEye, HiOutlineTrash } from 'react-icons/hi';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 // --- Sub-Components ---
 const FormInp = ({ label, type = "text", options = [], placeholder, value, onChange }) => (
@@ -8,10 +11,9 @@ const FormInp = ({ label, type = "text", options = [], placeholder, value, onCha
     <label className="text-[12px] font-bold text-gray-500 uppercase tracking-tight ml-1">{label}</label>
     <div className="relative">
       {type === "select" ? (
-        <select className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-600 bg-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-          <option value="">{placeholder}</option>
-          {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <Select className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-600 bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer" placeholder={placeholder} showSearch value={value} onChange={onChange}>
+          {options.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+        </Select>
       ) : type === "textarea" ? (
         <textarea rows="3" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder={placeholder} />
       ) : (

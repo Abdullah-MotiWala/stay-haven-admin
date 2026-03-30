@@ -50,7 +50,7 @@ const AddNewAppartment = () => {
   const [hostImageFile, setHostImageFile] = useState(null);
   const [hostImagePreview, setHostImagePreview] = useState(DEFAULT_IMAGE);
   const [mainImageFile, setMainImageFile] = useState(null);
-  const [mainImagePreview, setMainImagePreview] = useState(DEFAULT_IMAGE);
+  const [mainImagePreview, setMainImagePreview] = useState();
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [galleryPreviews, setGalleryPreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -115,7 +115,7 @@ const AddNewAppartment = () => {
           phoneNumber: appartment.host?.phone,
           // featureIds: appartment.featureIds || [],
           facility: appartment.features?.map((a) => a.id) || [],
-          policy:appartment.features?.map((a) => a.id) || [],
+          policy: appartment.features?.map((a) => a.id) || [],
           amenities: appartment.features?.map((r) => r.id) || [],
           features: appartment.features?.map((r) => r.id) || [],
           maxinfants: appartment.maxInfants || 0,
@@ -179,31 +179,46 @@ const AddNewAppartment = () => {
   };
 
   const handleMainImageChange = (e) => {
-    const file = e.target.files[0];
-    console.log("Selected main image:", file);
-
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        openNotification("error", "Main image size should be less than 5MB");
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        openNotification("error", "Please select an image file");
-        return;
-      }
-
-      setMainImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setMainImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const file = e.target.files[0];
+  console.log("Selected main image:", file);
+ 
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      openNotification("error", "Main image size should be less than 5MB");
+      return;
     }
-  };
-  const removeMainImage = () => {
-    setMainImage(null);
-    setMainImagePreview(null);
+ 
+    if (!file.type.startsWith('image/')) {
+      openNotification("error", "Please select an image file");
+      return;
+    }
+ 
+    setMainImageFile(file);
+ 
+    // ✅ FIX: Form field value set karo taake validator pass ho aur error clear ho
+    form.setFieldValue("mainImageUpload", file.name);
+    form.validateFields(["mainImageUpload"]); // error turant clear karo
+ 
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setMainImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+};
+ 
+// removeMainImage ko bhi update karo — form field reset karo
+const removeMainImage = () => {
+  setMainImageFile(null);
+  setMainImagePreview(null);
+  // ✅ FIX: Image remove hone par field clear karo taake validator dobara kaam kare
+  form.setFieldValue("mainImageUpload", undefined);
+};
+ 
+
+  const removeHostImage = () => {
+    setHostImageFile(null);
+    setHostImagePreview(DEFAULT_IMAGE);
   };
 
   // Upload main image
@@ -462,7 +477,7 @@ const AddNewAppartment = () => {
       description: values.description,
       pricePerNight: Number(values.pricePerNight),
       status: values.status,
-      featureIds: [...values.features, ...values.amenities, ...values.facility , ...values.policy],
+      featureIds: [...values.features, ...values.amenities, ...values.facility, ...values.policy],
       hostName: values.hostname,
       hostEmail: values.email,
       hostPhone: values.phoneNumber,
@@ -582,7 +597,7 @@ const AddNewAppartment = () => {
                       },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Type" showSearch>
                       {[
                         { label: "Deluxe", value: "Deluxe" },
                         { label: "Standard", value: "Standard" },
@@ -636,6 +651,8 @@ const AddNewAppartment = () => {
                       placeholder="Select a hotel"
                       // OnChange check karne ke liye (Debugging)
                       onChange={(val) => console.log("Selected Value:", val)}
+                      filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+                      showSearch
                     >
                       {Array.isArray(hotelsList) && hotelsList.map((item) => (
                         <Select.Option key={item.id} value={item.id}>
@@ -662,7 +679,7 @@ const AddNewAppartment = () => {
                       },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select appartment type">
                       {roomTypesList?.map((item) => (
                         <Option key={item.id} value={item.id}>
                           {item.title}
@@ -684,7 +701,7 @@ const AddNewAppartment = () => {
                       { required: true, message: "Bed Type is required" },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select bed type">
                       {[
                         { label: "Single Bed", value: "single bed" },
                         { label: "Queen Bed", value: "queen bed" },
@@ -713,7 +730,7 @@ const AddNewAppartment = () => {
                       },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select appartment size">
                       {[
                         { label: "e.g. 25 m²", value: "e.g. 25 m²" },
                         { label: "e.g. 30 m²", value: "e.g. 30 m²" },
@@ -737,7 +754,7 @@ const AddNewAppartment = () => {
                     label=""
                     rules={[{ required: true, message: "guest is required" }]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select number of guests">
                       {[
                         { label: "1 Guests", value: "1" },
                         { label: "2 Guests", value: "2" },
@@ -768,7 +785,7 @@ const AddNewAppartment = () => {
                       { required: true, message: "childern is required" },
                     ]}
                   >
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select number of childrens">
                       {[
                         { label: "1 Children", value: "1" },
                         { label: "2 Childrens", value: "2" },
@@ -876,7 +893,7 @@ const AddNewAppartment = () => {
                         { required: true, message: "Status is required" },
                       ]}
                     >
-                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
+                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} placeholder="Select status" >
                         {[
                           { label: "Active", value: "available" },
                           { label: "In Active", value: "inactive" },
@@ -910,83 +927,75 @@ const AddNewAppartment = () => {
 
             <div className="p-[8%] pt-10">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
                 {/* LEFT: Main Image Section */}
-                <div className="flex flex-col gap-4">
-                  <label className="text-[15px] font-semibold text-gray-900">
-                    Upload Appartment (Main) image
-                  </label>
-                  {!mainImagePreview ? (
-                    <div className="relative  group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                      <div className="flex justify-center mt-4">
-                        {/* <CloudUpload className="w-6 h-6 text-gray-700" /> */}
+                <Form.Item
+                  name="mainImageUpload"
+                  // ✅ FIX: validateTrigger="none" — automatic validation band, sirf onNext pe chalegi
+                  validateTrigger="none"
+                  rules={[
+                    {
+                      validator: (_, value) => {
+                        if (mainImagePreview) return Promise.resolve();
+                        return Promise.reject(new Error("Main image is required"));
+                      },
+                    },
+                  ]}
+                >
+                  <div className="flex flex-col gap-4">
+                    <label className="text-[15px] font-semibold text-gray-900">
+                      Upload Appartment (Main) image
+                    </label>
+                    {!mainImagePreview ? (
+                      <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                        <div className="flex justify-center mt-4">
+                          <img
+                            src={cloudimg}
+                            alt=""
+                            className="w-6 h-6 text-gray-700"
+                          />
+                          <p className="text-sm text-gray-700 font-medium text-center px-4">
+                            Drop your image here or{" "}
+                            <span className="text-blue underline">Browse</span>
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-400">
+                            Only JPG/PNG Files under 1 MB
+                          </p>
+                          <input
+                            type="file"
+                            onChange={handleMainImageChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="relative w-full group">
                         <img
-                          src={cloudimg}
-                          alt=""
-                          className="w-6 h-6 text-gray-700"
+                          src={mainImagePreview}
+                          alt="Main Preview"
+                          className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200"
                         />
-                        <p className="text-sm text-gray-700 font-medium text-center px-4">
-                          Drop your image here or{" "}
-                          <span className="text-blue underline">Browse</span>
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-[11px] text-gray-400">
-                          Only JPG/PNG Files under 1 MB
-                        </p>
-                        <input
-                          type="file"
-                          onChange={handleMainImageChange}
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
-                      </div>
-
-                    </div>
-                  ) : (
-                    <div className="relative w-full">
-                      <img src={mainImagePreview} alt="Main Preview" className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200" />
-                      <button type="button" onClick={removeMainImage} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Main Image File Info Card */}
-                  {/* {mainImage && (
-                      <div className=" max-h-full h-[30%] flex items-center justify-between p-10  pt-2 pb-2 rounded-lg ">
-                        <div className="flex items-center gap-3  overflow-hidden">
-                          <div className="bg-[#DBEAFE] p-2 rounded-lg shrink-0">
-                            <FileText className="w-6 h-6 text-blue" />
-                          </div>
-                          <div className="truncate">
-                            <p className="text-[13px] font-semibold text-gray-800 truncate mb-0">
-                              {mainImage.name}
-                            </p>
-                            <p className="text-[11px] text-gray-400 mb-0">
-                              {mainImage.date}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2 shrink-0 ml-2">
-                          <button className="p-1.5 bg-[#DBEAFE] text-blue rounded-md hover:bg-blue-200 transition-colors">
-                            <img src={eye} alt="" />
-                          </button>
-                          <button
-                            onClick={() => setMainImage(null)}
-                            className="p-1.5 bg-[#FEE2E2] text-red-500 rounded-md hover:bg-red-200 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                        <div
+                          className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={removeMainImage}
+                        >
+                          <Trash2 size={40} className="text-white" />
                         </div>
                       </div>
-                    )} */}
-                </div>
+                    )}
+                  </div>
+                </Form.Item>
 
                 {/* RIGHT: Gallery Section */}
                 <div className="flex flex-col gap-4">
-                  <label className="text-[15px] font-semibold text-gray-900">
-                    Gallery (Optional) - Max 5 images
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="text-[15px] font-semibold text-dark">
+                      Gallery (Optional) - Max 5 images
+                    </label>
+                   
+                  </div>
                   <div className="relative group w-full h-[100px] border-2 border-dashed border-[#3B82F6] rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
                     <div className="flex justify-center mt-4">
                       <img
@@ -998,14 +1007,13 @@ const AddNewAppartment = () => {
                         Click to upload multiple images
                       </p>
                     </div>
-
                     <div>
                       <p className="text-[11px] text-gray-400">
                         Only JPG/PNG Files under 1 MB each
                       </p>
                       <input
                         type="file"
-                        multiple  // 👈 YEH IMPORTANT HAI
+                        multiple
                         accept="image/*"
                         onChange={handleGalleryChange}
                         className="absolute inset-0 opacity-0 cursor-pointer"
@@ -1040,9 +1048,11 @@ const AddNewAppartment = () => {
                     {galleryFiles.length}/5 images selected
                   </p>
                 </div>
+
               </div>
             </div>
           </div>
+
 
           <div className="flex justify-end gap-4 mt-6">
             <button
@@ -1099,10 +1109,10 @@ const AddNewAppartment = () => {
           <div>
             <div>
               {[
-                { title: "Room Features", name: "features", list: featuresList, selected: selectedFeatures, label: "Select Room Features" },
-                { title: "Ameneties", name: "amenities", list: amenitiesList, selected: selectedAmenities, label: "Select Ameneties" },
+
+
                 { title: "Policy", name: "policy", list: policyList, selected: selectedPolicy, label: "Select Policy" },
-                { title: "Room Facilities", name: "facility", list: facilityList, selected: selectedFacility, label: "Select Room Facilities" },
+
               ].map(({ title, name, list, selected, label }) => (
                 <div key={name} className="bg-white rounded-2xl shadow-sm border border-lightSeconday mb-4">
                   <div className="px-6 py-4">
@@ -1296,52 +1306,79 @@ const AddNewAppartment = () => {
                     </p>
                   </div>
                 </div> */}
-                <div className="flex items-center gap-10 mb-14 ">
-                  <div className="relative inline-block">
-                    {/* ✅ Pure Avatar ko label mein wrap kar diya taake click karne par input trigger ho */}
-                    <label htmlFor="host-image-upload" className="cursor-pointer">
-                      <Avatar
-                        size={120}
-                        src={hostImagePreview !== DEFAULT_IMAGE ? hostImagePreview : "https://ui-avatars.com/api/?name=Host+Image"}
-                        className="hover:opacity-80 transition-opacity" // Optional: click feel dene ke liye
-                      />
-                    </label>
+                <Form.Item
+                  name="hostImageUpload"
+                  rules={[
+                    {
+                      validator: (_, value) => {
+                        if (hostImagePreview !== DEFAULT_IMAGE) return Promise.resolve();
+                        return Promise.reject(new Error("Host image is required"));
+                      },
+                    },
+                  ]}
+                >
+                  <div className="flex items-center gap-10 mb-14 ">
+                    <div className="relative inline-block group">
+                      {/* ✅ Pure Avatar ko label mein wrap kar diya taake click karne par input trigger ho */}
+                      {hostImagePreview !== DEFAULT_IMAGE ? (
+                        <div className="relative">
+                          <Avatar
+                            size={120}
+                            src={hostImagePreview}
+                            className="cursor-pointer transition-opacity"
+                          />
+                          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-full flex items-center justify-center cursor-pointer" onClick={removeHostImage}>
+                            <Trash2 size={30} className="text-white" />
+                          </div>
+                        </div>
+                      ) : (
+                        <label htmlFor="host-image-upload" className="cursor-pointer">
+                          <Avatar
+                            size={120}
+                            src="https://ui-avatars.com/api/?name=Host+Image"
+                            className="hover:opacity-80 transition-opacity"
+                          />
+                        </label>
+                      )}
 
-                    <input
-                      id="host-image-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleHostImageChange}
-                      className="hidden"
-                      style={{ display: "none" }}
-                    />
-
-                    {/* ✅ Agar aap edit icon bhi wapis lana chahen to label ko yahan bhi use kar sakte hain */}
-                    <label
-                      htmlFor="host-image-upload"
-                      className="absolute bottom-2 right-2 bg-blue rounded-full flex items-center justify-center cursor-pointer p-2 hover:bg-blue-700 transition-colors shadow-lg"
-                    >
-                      <img
-                        src={editIcon}
-                        alt="Edit Icon"
-                        className="w-4 h-4"
+                      <input
+                        id="host-image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleHostImageChange}
+                        className="hidden"
+                        style={{ display: "none" }}
                       />
-                    </label>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-blue line-clamp-0">
-                      Upload Profile image
-                    </h2>
-                    <p className="text-lightSeconday">
-                      Make sure face is clear
-                    </p>
-                    {hostImageFile && (
-                      <p className="text-xs text-green-600 mt-1">
-                        ✓ {hostImageFile.name} selected
+
+                      {/* ✅ Agar aap edit icon bhi wapis lana chahen to label ko yahan bhi use kar sakte hain */}
+                      {hostImagePreview === DEFAULT_IMAGE && (
+                        <label
+                          htmlFor="host-image-upload"
+                          className="absolute bottom-2 right-2 bg-blue rounded-full flex items-center justify-center cursor-pointer p-2 hover:bg-blue-700 transition-colors shadow-lg"
+                        >
+                          <img
+                            src={editIcon}
+                            alt="Edit Icon"
+                            className="w-4 h-4"
+                          />
+                        </label>
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-blue line-clamp-0">
+                        Upload Profile image
+                      </h2>
+                      <p className="text-lightSeconday">
+                        Make sure face is clear
                       </p>
-                    )}
+                      {hostImageFile && (
+                        <p className="text-xs text-green-600 mt-1">
+                          ✓ {hostImageFile.name} selected
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </Form.Item>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="w-full ">

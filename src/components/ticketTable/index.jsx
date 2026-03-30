@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
+import { Select } from "antd";
 
 const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => { 
   const navigate = useNavigate(); 
+  const { Option } = Select;
 
   return (
       <div className="max-w-8xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
@@ -27,15 +29,17 @@ const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => {
               </span>
             </div>
             
-            <select 
-              onChange={(e) => setStatusFilter(e.target.value)} // Connect to TicketsPage state
+            <Select 
+              placeholder="Select Status"
+              onChange={(val) => setStatusFilter(val)} // Connect to TicketsPage state
               className="flex items-center border-[#E9E9E9] border-2 px-4 py-2 bg-gray-100 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all outline-none"
+              showSearch
             >
-              <option value="All Tickets">All Tickets</option>
-              <option value="Open">Open</option>
-              <option value="Closed">Closed</option>
-              <option value="Pending">Pending</option>
-            </select>
+              <Option value="All Tickets">All Tickets</Option>
+              <Option value="Open">Open</Option>
+              <Option value="Closed">Closed</Option>
+              <Option value="Pending">Pending</Option>
+            </Select>
           </div>
 
           <div className="overflow-x-auto">

@@ -119,7 +119,7 @@ const Booking = () => {
           <button
             key={type}
             onClick={() => { setActiveType(type); setCurrentPage(1); }}
-            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 ${
+            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0  ${
               activeType === type ? "bg-blue text-white" : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -147,10 +147,12 @@ const Booking = () => {
         <div className="mt-4 flex justify-between items-center">
           <div>
             <Select
+              placeholder="Select Entries"
               defaultValue={10}
               className="text-black"
               onChange={(value) => { setItemsPerPage(value); setCurrentPage(1); }}
               options={entriesPerPageOptions.map((o) => ({ label: o, value: o }))}
+              showSearch
             />
             <span className="text-lightSeconday ml-4">Entries per page</span>
           </div>

@@ -534,6 +534,7 @@ const BookingAddComp = () => {
                     suffixIcon={
                       <ChevronDown size={18} className="text-gray-400" />
                     }
+                    showSearch
                   >
                     <Option value={0}>
                       0 Maxinfants
@@ -592,6 +593,7 @@ const BookingAddComp = () => {
                       suffixIcon={
                         <ChevronDown size={18} className="text-gray-400" />
                       }
+                      showSearch
                     >
                       {getHotelOptions().map((name, i) => (
                         <Option key={i} value={name}>
@@ -620,6 +622,7 @@ const BookingAddComp = () => {
                       suffixIcon={
                         <ChevronDown size={18} className="text-dark" />
                       }
+                      showSearch
                     >
                       {getTypeOptions().map((type, i) => (
                         <Option key={i} value={type}>
@@ -652,6 +655,7 @@ const BookingAddComp = () => {
                       suffixIcon={
                         <ChevronDown size={18} className="text-dark" />
                       }
+                      showSearch
                     >
                       {getNumberOptions().map((num, i) => (
                         <Option key={i} value={num}>
@@ -668,7 +672,8 @@ const BookingAddComp = () => {
                     </label>
                     <Select
                       className="w-full h-12 border border-lightSeconday  rounded-lg font-medium"
-                      value={formData.numGuests || "01 Adult"}
+                      placeholder="Select Guests"
+                      value={formData.numGuests || undefined}
                       onChange={(val) =>
                         handleChange({
                           target: { name: "numGuests", value: val },
@@ -677,6 +682,7 @@ const BookingAddComp = () => {
                       suffixIcon={
                         <ChevronDown size={18} className="text-dark" />
                       }
+                      showSearch
                     >
                       <Option value="01 Adult">01 Adult</Option>
                       <Option value="02 Adults">02 Adults</Option>
@@ -799,7 +805,8 @@ const BookingAddComp = () => {
                     </label>
                     <Select
                       className="w-full h-[58px] custom-antd-select"
-                      value={formData.paymentMethod || "Card"}
+                      placeholder="Select Payment Method"
+                      value={formData.paymentMethod || undefined}
                       onChange={(val) =>
                         handleChange({
                           target: { name: "paymentMethod", value: val },
@@ -808,6 +815,7 @@ const BookingAddComp = () => {
                       suffixIcon={
                         <ChevronDown size={18} className="text-dark bg-white" />
                       }
+                      showSearch
                     >
                       <Option value="Card">Credit Card</Option>
                       <Option value="Bank">Bank</Option>
