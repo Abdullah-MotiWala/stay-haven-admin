@@ -138,17 +138,17 @@ const SocialMedia = ({ onCurrenciesFetched, setGlobalSymbol }) => {
                         <label className="text-base flex text-lightSeconday font-medium">
                             <img src={instagram} alt="x" className="inline w-6 h-6 mx-1" />
                             Instagram
-
                         </label>
                         <Form.Item
                             name="instagram"
-                            rules={[{ required: true, message: 'Please instagram Profile url' }]}
+                            rules={[
+                                { required: false },
+                                { type: 'url', message: 'Please enter a valid URL' }
+                            ]}
                         >
                             <Input
-                                placeholder="Enter phone number"
+                                placeholder="Enter Instagram profile url (e.g. https://instagram.com/username)"
                                 className="w-full h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                                showSearch
-                                optionFilterProp="label"
                             />
                         </Form.Item>
                     </div>
@@ -175,14 +175,15 @@ const SocialMedia = ({ onCurrenciesFetched, setGlobalSymbol }) => {
                             <img src={X} alt="x" className="inline w-6 h-6 mx-1" /> 
                         </label>
                         <Form.Item
-                            name="phone"
-                            rules={[{ required: true, message: 'Please enter X Profile url' }]}
+                            name="twitter"
+                            rules={[
+                                { required: false },
+                                { type: 'url', message: 'Please enter a valid URL' }
+                            ]}
                         >
                             <Input
-                                placeholder="Enter X profile url"
+                                placeholder="Enter X profile url (e.g. https://x.com/username)"
                                 className="w-full h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                                showSearch
-                                optionFilterProp="label"
                             />
                         </Form.Item>
                     </div>
