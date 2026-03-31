@@ -55,7 +55,13 @@ const Stay_Details = [
   
   {
     label: "Total Members",
-    value: bookingData.stayDetails?.totalMembers || "-",
+    value: (() => {
+      const adults = bookingData.stayDetails?.adults || 0;
+      const children = bookingData.stayDetails?.children || 0;
+      const infants = bookingData.stayDetails?.infants || 0;
+      const total = adults + children + infants;
+      return total > 0 ? `${total} (${adults} Adults, ${children} Children${infants > 0 ? `, ${infants} Infants` : ''})` : "-";
+    })(),
   },
   {
     label: "Hotel Name",

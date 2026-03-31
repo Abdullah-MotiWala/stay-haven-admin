@@ -53,7 +53,8 @@ const HotelDirectory = ({
     return data.filter((item) => {
       const matchesSearch =
         !searchTerm ||
-        item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
+        item.guestName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.bookingId?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRoom =
         !filters.roomType || item.roomType === filters.roomType;
       const matchesHotel =

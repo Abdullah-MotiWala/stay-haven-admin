@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import socket from '../../services/socket';
 import arrowImg from "../../assets/icons/arrow.png";
 import { Paperclip, Send, ChevronDown } from 'lucide-react';
-import { getAdminId, getTicket, getMessages, getLoggedInUser, updateTicketStatus, createMessages } from '../../services/chat/index.js';
+import { getAdminId, getTicket, getMessages, getLoggedInUser, updateTicketStatus } from '../../services/chat/index.js';
 import { openNotification } from "../../network/notification";
 
 const ChatWindow = () => {
@@ -105,7 +105,22 @@ const ChatWindow = () => {
         };
 
         const onNewMessage = (msg) => {
-            addMessageIfNew(msg);
+            setChatHistory(prev => {
+                // Replace temp message if content matches, otherwise add if new
+                const tempIndex = prev.findIndex(m =>
+                    String(m.id).startsWith("temp-") && m.content === msg.content && m.isAdmin === msg.isAdmin
+                );
+                if (tempIndex !== -1) {
+                    const updated = [...prev];
+                    updated[tempIndex] = msg;
+                    messageKeysRef.current.add(messageKey(msg));
+                    return updated;
+                }
+                const key = messageKey(msg);
+                if (messageKeysRef.current.has(key)) return prev;
+                messageKeysRef.current.add(key);
+                return [...prev, msg];
+            });
         };
 
         const onTyping = ({ userName, userType }) => {
@@ -143,11 +158,16 @@ const ChatWindow = () => {
         };
     }, [ticketId]);
 
-    const sendMessage = async () => {
+    const sendMessage = () => {
         if (!message.trim() || !currentUserId) return;
+        if (!socket.connected) {
+            openNotification("error", "Connection lost. Please refresh.");
+            return;
+        }
         const content = message.trim();
         const tempId = `temp-${Date.now()}`;
-        const tempMsg = {
+        // Optimistic update
+        setChatHistory(prev => [...prev, {
             id: tempId,
             ticketId,
             content,
@@ -155,40 +175,11 @@ const ChatWindow = () => {
             senderName: currentUser?.name,
             senderType: "admin",
             isAdmin: true,
+            isAdminMessage: true,
             createdAt: new Date().toISOString(),
-        };
-        setChatHistory(prev => [...prev, tempMsg]);
+        }]);
         setMessage("");
-
-        try {
-            const res = await createMessages({
-                ticketId,
-                senderId: currentUserId,
-                content,
-                isAdminMessage: true,
-            });
-            if (res.data.success) {
-                const serverMsg = res.data.data;
-                setChatHistory(prev => {
-                    const withoutTemp = prev.filter(m => m.id !== tempId);
-                    if (withoutTemp.some(m => m.id === serverMsg.id)) return withoutTemp;
-                    const key = messageKey(serverMsg);
-                    if (!messageKeysRef.current.has(key)) {
-                        messageKeysRef.current.add(key);
-                    }
-                    return [...withoutTemp, serverMsg];
-                });
-                // Socket se emit karo taake dusre users ko real-time mile
-                socket.emit("send_ticket_message", { ticketId, content });
-            } else {
-                setChatHistory(prev => prev.filter(m => m.id !== tempId));
-                openNotification("error", "Message send failed");
-            }
-        } catch (err) {
-            console.error("Send failed:", err);
-            setChatHistory(prev => prev.filter(m => m.id !== tempId));
-            openNotification("error", "Message send failed");
-        }
+        socket.emit("send_ticket_message", { ticketId, content });
     };
 
     const handleTyping = (e) => {
