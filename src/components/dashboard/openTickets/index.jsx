@@ -10,7 +10,7 @@
 
 
 
-// const items = [
+// const dddddddddddddddddddddddddddddddddddddddddddddddd/*  */ = [
 //   { key: "open", label: "Open" },
 //   { key: "in_progress", label: "In Progress" },
 //   { key: "closed", label: "Closed" },
@@ -88,7 +88,7 @@
 //               </div>
 //             </div>
 
-//             <div className="flex justify-between items-start">
+//             <div className="flex justify-between dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-start">
 //               <div>
 //                 <div className="flex gap-4">
 //                   <img
@@ -108,7 +108,7 @@
 //                 </p>
 //               </div>
 
-//               <div className="flex flex-col items-end gap-3 min-w-[140px]">
+//               <div className="flex flex-col dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-end gap-3 min-w-[140px]">
 //                 {/* 🔹 DATE */}
 //                 {/* <div className="text-right"> */}
 //                 {/* 🔹 STATUS DROPDOWN */}
@@ -141,7 +141,7 @@ import Client2 from '../../../assets/images/client2.png'
 
 const { Option } = Select;
 
-const items = [
+const dddddddddddddddddddddddddddddddddddddddddddddddd/*  */ = [
   { key: "open", label: "Open" },
   { key: "in_progress", label: "In Progress" },
   { key: "closed", label: "Closed" },
@@ -152,13 +152,13 @@ const OpenTickets = ({ OpenTickets: ticketsData }) => {
   return (
     <Card
       title="Open Tickets"
-      right={
-        <Select
-          size="small"
-          defaultValue="week"
-          options={[{ label: "This week", value: "week" }]}
-        />
-      }
+      // right={
+      //   <Select
+      //     size="small"
+      //     defaultValue="week"
+      //     options={[{ label: "This week", value: "week" }]}
+      //   />
+      // }
     >
       <style>{`
         .red-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -178,7 +178,7 @@ const OpenTickets = ({ OpenTickets: ticketsData }) => {
             className="bg-white rounded-2xl border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)] px-4 py-4"
           >
             {/* Top Row: Ticket ID + Status */}
-            <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+            <div className="flex flex-wrap justify-between dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-center gap-2 mb-4">
               <span className="inline-block bg-lightGrays font-normal text-sm px-3 py-1 rounded-lg">
                 Ticket ID: {ticket.id.substring(0, 8).toUpperCase()}
               </span>
@@ -189,10 +189,10 @@ const OpenTickets = ({ OpenTickets: ticketsData }) => {
             </div>
 
             {/* Bottom Row: Avatar+Name LEFT, Date RIGHT */}
-            <div className="flex flex-wrap justify-between items-start gap-3">
+            <div className="flex flex-wrap justify-between dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-start gap-3">
               {/* Left: Avatar + Name + Description */}
               <div className="flex flex-col gap-2 flex-1 min-w-0">
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-3 dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-center">
                   <img
                     src={Client2}
                     alt=""
@@ -213,7 +213,7 @@ const OpenTickets = ({ OpenTickets: ticketsData }) => {
               </div>
 
               {/* Right: Date */}
-              <div className="flex flex-col items-end gap-0 flex-shrink-0">
+              <div className="flex flex-col dddddddddddddddddddddddddddddddddddddddddddddddd/*  */-end gap-0 flex-shrink-0">
                 <p className="text-sm text-blue font-medium m-0">
                   Ticket Date
                 </p>

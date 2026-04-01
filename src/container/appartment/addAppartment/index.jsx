@@ -810,29 +810,19 @@ const removeMainImage = () => {
                 <div className="w-full ">
                   <div className="w-full">
                     <label className="text-base text-lightSeconday font-medium">
-                      Maxinfants
+                      Max Infants
                     </label>
                     <Form.Item
                       preserve={true}
                       name="maxinfants"
                       label=""
                       rules={[
-                        { required: true, message: "maxinfants is required" },
+                        { required: true, message: "Max Infants is required" },
                       ]}
                     >
-                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                        {[
-                          { label: "1 Maxinfants", value: "1" },
-                          { label: "2 Maxinfants", value: "2" },
-                          { label: "3 Maxinfants", value: "3" },
-                          { label: "4 Maxinfants", value: "4" },
-                          { label: "5 Maxinfants", value: "5" },
-                          { label: "6 Maxinfants", value: "6" },
-
-                        ].map((item) => (
-                          <Option key={item.value} value={item.value}>
-                            {item.label}
-                          </Option>
+                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Infants">
+                        {["0","1","2","3","4","5","6"].map((v) => (
+                          <Option key={v} value={v}>{v} {v === "0" ? "Infants" : v === "1" ? "Infant" : "Infants"}</Option>
                         ))}
                       </Select>
                     </Form.Item>
