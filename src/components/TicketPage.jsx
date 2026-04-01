@@ -19,8 +19,11 @@ const TicketsPage = () => {
           status: statusFilter 
         }
       });
-      if (response.data.success) {
-        setTickets(response.data.data);
+      const data = response.data?.data;
+      if (Array.isArray(data)) {
+        setTickets(data);
+      } else if (response.data?.success !== false) {
+        setTickets(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
       console.error("Fetch Problem:", error);

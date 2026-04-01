@@ -69,7 +69,6 @@ const HostelListing = () => {
         { key: "status", label: "Status", type: "status" },
         { key: "actions", label: "Actions", type: "actions" },
     ];
-
     const onPageChange = (page, pageSize) => {
         setCurrentPage(page);
         setItemsPerPage(pageSize);

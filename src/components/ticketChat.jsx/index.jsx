@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import socket from '../../services/socket';
-import arrowImg from "../../assets/icons/arrow.png";
-import { Paperclip, Send, ChevronDown } from 'lucide-react';
-import { getAdminId, getTicket, getMessages, getLoggedInUser, updateTicketStatus, createMessages } from '../../services/chat/index.js';
+import { ArrowLeft, Send, ChevronDown, ChevronUp } from 'lucide-react';
+import { getTicket, getMessages, getLoggedInUser, updateTicketStatus, createMessages } from '../../services/chat/index.js';
 import { openNotification } from "../../network/notification";
 
 const ChatWindow = () => {
@@ -14,77 +13,86 @@ const ChatWindow = () => {
     const [ticketData, setTicketData] = useState(null);
     const [typingUser, setTypingUser] = useState(null);
     const [connected, setConnected] = useState(socket.connected);
+    const [detailsOpen, setDetailsOpen] = useState(false);
     const scrollRef = useRef(null);
     const typingTimeoutRef = useRef(null);
-    const adminId = getAdminId();
+    const messageKeysRef = useRef(new Set());
     const currentUser = getLoggedInUser();
     const currentUserId = currentUser?.id;
 
-    // Auto scroll on new messages
+    const messageKey = (m) => {
+        const sender = m.senderId || m.sender?.id || "";
+        const time = new Date(m.createdAt || "").toISOString();
+        return `${m.id || ""}||${sender}||${m.content || ""}||${time}`;
+    };
+
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [chatHistory, typingUser]);
 
     useEffect(() => {
         if (!ticketId) return;
+        if (!socket.connected) socket.connect();
 
-        // Connect socket with fresh token (only if not already connected)
-        if (!socket.connected) {
-            socket.connect();
-        }
-
-        // Fetch ticket details + message history via HTTP
         const loadInitialData = async () => {
             try {
                 const ticketRes = await getTicket(ticketId);
                 if (ticketRes.data.success) setTicketData(ticketRes.data.data);
-            } catch (err) {
-                console.error("Ticket fetch failed:", err.message);
-            }
+            } catch (err) { console.error("Ticket fetch failed:", err.message); }
             try {
                 const msgRes = await getMessages(ticketId);
-                console.log("Messages response:", msgRes);
                 const msgs = msgRes?.data?.data || msgRes?.data || [];
-                if (Array.isArray(msgs)) setChatHistory(msgs);
-                else console.warn("Unexpected messages format:", msgs);
-            } catch (err) {
-                console.error("HTTP message history failed:", err.message);
-            }
+                if (Array.isArray(msgs)) {
+                    messageKeysRef.current.clear();
+                    const unique = [];
+                    msgs.forEach((m) => {
+                        const key = messageKey(m);
+                        if (!messageKeysRef.current.has(key)) { messageKeysRef.current.add(key); unique.push(m); }
+                    });
+                    setChatHistory(unique);
+                }
+            } catch (err) { console.error("HTTP message history failed:", err.message); }
         };
         loadInitialData();
 
-        // Socket event listeners
         const onConnect = () => setConnected(true);
         const onDisconnect = () => setConnected(false);
-
-        const onJoined = ({ ticketId: tid, memberCount }) => {
-            console.log(`Joined ticket room: ${tid}, members: ${memberCount}`);
-            // Request message history after joining
-            socket.emit("get_ticket_messages", ticketId);
-        };
-
+        const onJoined = () => socket.emit("get_ticket_messages", ticketId);
         const onHistory = ({ messages }) => {
-            if (messages?.length > 0) setChatHistory(messages);
+            if (messages?.length > 0) {
+                messageKeysRef.current.clear();
+                const unique = [];
+                messages.forEach((m) => {
+                    const key = messageKey(m);
+                    if (!messageKeysRef.current.has(key)) { messageKeysRef.current.add(key); unique.push(m); }
+                });
+                setChatHistory(unique);
+            }
         };
-
         const onNewMessage = (msg) => {
-            setChatHistory((prev) => {
-                // Remove temp message with same content if exists, then add real one
-                const filtered = prev.filter(m => !(m.id?.startsWith('temp-') && m.content === msg.content && m.senderId === msg.senderId));
-                if (filtered.find(m => m.id === msg.id)) return filtered;
-                return [...filtered, msg];
+            setChatHistory(prev => {
+                const tempIndex = prev.findIndex(m =>
+                    String(m.id).startsWith("temp-") && m.content === msg.content && m.isAdmin === msg.isAdmin
+                );
+                if (tempIndex !== -1) {
+                    const updated = [...prev];
+                    updated[tempIndex] = msg;
+                    messageKeysRef.current.add(messageKey(msg));
+                    return updated;
+                }
+                const key = messageKey(msg);
+                if (messageKeysRef.current.has(key)) return prev;
+                messageKeysRef.current.add(key);
+                return [...prev, msg];
             });
         };
-
         const onTyping = ({ userName, userType }) => {
             setTypingUser(userName || userType || "Someone");
             clearTimeout(typingTimeoutRef.current);
             typingTimeoutRef.current = setTimeout(() => setTypingUser(null), 2500);
         };
-
         const onError = ({ message: errMsg }) => {
             console.error("Socket ticket error:", errMsg);
-            openNotification("error", errMsg || "Socket error");
         };
 
         socket.on("connect", onConnect);
@@ -94,8 +102,6 @@ const ChatWindow = () => {
         socket.on("receive_ticket_message", onNewMessage);
         socket.on("user_typing_ticket", onTyping);
         socket.on("ticket_error", onError);
-
-        // Join the ticket room
         socket.emit("join_ticket", ticketId);
 
         return () => {
@@ -115,36 +121,23 @@ const ChatWindow = () => {
         if (!message.trim() || !currentUserId) return;
         const content = message.trim();
         const tempId = `temp-${Date.now()}`;
-        const tempMsg = {
-            id: tempId,
-            ticketId,
-            content,
-            senderId: currentUserId,
-            senderName: currentUser?.name,
-            senderType: "admin",
-            isAdmin: true,
+        setChatHistory(prev => [...prev, {
+            id: tempId, ticketId, content,
+            senderId: currentUserId, senderName: currentUser?.name,
+            senderType: "admin", isAdmin: true, isAdminMessage: true,
             createdAt: new Date().toISOString(),
-        };
-        setChatHistory(prev => [...prev, tempMsg]);
+        }]);
         setMessage("");
-
         try {
-            const res = await createMessages({
-                ticketId,
-                senderId: currentUserId,
-                content,
-                isAdminMessage: true,
-            });
+            const res = await createMessages({ ticketId, senderId: currentUserId, content, isAdminMessage: true });
             if (res.data.success) {
                 setChatHistory(prev => prev.map(m => m.id === tempId ? res.data.data : m));
-                // Socket se emit karo taake dusre users ko real-time mile
                 socket.emit("send_ticket_message", { ticketId, content });
             } else {
                 setChatHistory(prev => prev.filter(m => m.id !== tempId));
                 openNotification("error", "Message send failed");
             }
-        } catch (err) {
-            console.error("Send failed:", err);
+        } catch {
             setChatHistory(prev => prev.filter(m => m.id !== tempId));
             openNotification("error", "Message send failed");
         }
@@ -160,161 +153,188 @@ const ChatWindow = () => {
             const res = await updateTicketStatus(ticketId, "Closed");
             if (res.data.success) {
                 setTicketData(prev => ({ ...prev, status: "Closed" }));
-                openNotification("success", "Resolved", "Ticket has been closed successfully!");
-                socket.emit("ticket_status_changed", { ticketId, status: "Closed" });
+                openNotification("success", "Ticket has been closed successfully!");
             }
-        } catch (err) {
-            console.error("Failed to resolve ticket:", err);
+        } catch {
             openNotification("error", "Could not update status");
         }
     };
 
+    const getStatusStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            case "open": return "bg-yellow-100 text-yellow-700";
+            case "closed": return "bg-green-100 text-green-700";
+            case "pending": return "bg-blue-100 text-blue-700";
+            default: return "bg-gray-100 text-gray-600";
+        }
+    };
+
+    const formatTime = (d) => {
+        if (!d) return "";
+        return new Date(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+
     return (
-        <div className="min-h-screen p-5 font-sans">
-            {/* Navigation */}
-            <div className="flex items-center gap-2 mb-4 cursor-pointer group" onClick={() => navigate(-1)}>
-                <img src={arrowImg} alt="back" className="w-4 h-4" />
-                <span className="text-[#7C8DB5] font-bold text-xs">Back</span>
-            </div>
-
+        <div className="flex flex-col bg-gray-50" style={{ height: "100vh" }}>
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-                <h1 className="text-[22px] font-semibold text-[#1F2937]">
-                    Ticket View - #{ticketId?.substring(0, 7).toUpperCase()}
-                </h1>
-                <span className="bg-[#93E9A4] text-[#107326] px-4 py-1 rounded-[10px] text-[12px] font-bold">
-                    {ticketData?.status || "Loading..."}
-                </span>
-                {/* Connection indicator */}
-                <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-400'}`} title={connected ? 'Connected' : 'Disconnected'} />
-            </div>
-
-            <div className="bg-white rounded-[24px] shadow-sm border border-[#F1F5F9] p-6">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <p className="text-black font-bold text-[12px] uppercase tracking-wider">
-                            Ticket ID <span className='text-blue'>#{ticketId?.substring(0, 7)}</span>
-                        </p>
-                        <h2 className="text-[24px] font-semibold text-[#1F2937]">
-                            {ticketData?.subject || "Fetching subject..."}
-                        </h2>
+            <div className="bg-white border-b px-5 py-3 flex items-center justify-between flex-shrink-0 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-gray-100 transition">
+                        <ArrowLeft size={18} className="text-gray-600" />
+                    </button>
+                    <div className="w-9 h-9 rounded-full bg-blue flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {(ticketData?.user?.name || "U")[0].toUpperCase()}
                     </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-gray-900 m-0 text-sm">
+                                {ticketData?.subject || "Support Ticket"}
+                            </h3>
+                            {ticketData?.status && (
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getStatusStyle(ticketData.status)}`}>
+                                    {ticketData.status}
+                                </span>
+                            )}
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${connected ? 'bg-green-500' : 'bg-red-400'}`} />
+                        </div>
+                        <p className="text-xs text-gray-400 m-0">
+                            #{ticketId?.substring(0, 7).toUpperCase()}
+                            {ticketData?.user?.name && ` · ${ticketData.user.name}`}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setDetailsOpen(p => !p)}
+                        className="flex items-center gap-1 text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition"
+                    >
+                        {detailsOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        {detailsOpen ? "Hide" : "Details"}
+                    </button>
                     <button
                         onClick={handleResolve}
                         disabled={ticketData?.status === "Closed"}
-                        className="px-5 py-2 border-[1.5px] border-blue text-blue font-bold rounded-3xl text-[12px] hover:bg-blue hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-1.5 border border-blue text-blue font-bold rounded-full text-xs hover:bg-blue hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        Mark as Resolved
+                        Mark Resolved
                     </button>
                 </div>
+            </div>
 
-                <div className="flex gap-4">
-                    {/* LEFT: Chat */}
-                    <div className="flex-[1.5] border border-[#F1F5F9] rounded-[24px] overflow-hidden flex flex-col bg-white">
-                        <div className="p-4 border-b border-[#F8FAFC] flex items-center gap-3 bg-white">
-                            <img src="https://i.pravatar.cc/150?u=admin" className="w-10 h-10 rounded-full object-cover" alt="admin" />
-                            <div>
-                                <h4 className="font-semibold text-[#1F2937] text-md">Admin Portal</h4>
-                                <p className="text-[#7C8DB5] text-[10px] font-bold uppercase tracking-widest">
-                                    ID#{adminId?.substring(0, 6)}
-                                </p>
-                            </div>
+            {/* Collapsible Details */}
+            {detailsOpen && ticketData && (
+                <div className="bg-white border-b px-5 py-4 flex-shrink-0">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs max-w-4xl">
+                        <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase">Ticket</p>
+                            <p className="font-medium text-gray-800 m-0">#{ticketId?.substring(0, 7).toUpperCase()}</p>
+                            <p className="text-gray-500 m-0">{ticketData.subject}</p>
                         </div>
-
-                        {/* Messages */}
-                        <div className="p-4 h-[400px] overflow-y-auto space-y-4 bg-white custom-scrollbar">
-                            {chatHistory.length === 0 && (
-                                <div className="flex justify-center items-center h-full text-[#9CA3AF] text-sm">
-                                    No messages yet
-                                </div>
-                            )}
-                            {chatHistory.map((msg, index) => {
-                                const isMe = msg.senderId === currentUserId || msg.sender?.id === currentUserId;
-                                return (
-                                    <div key={msg.id || index} className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} max-w-[65%]`}>
-                                        <div className={`px-3 py-2 rounded-[12px] w-fit min-w-[120px] shadow-sm ${
-                                            isMe
-                                                ? 'bg-blue text-white rounded-tr-none'
-                                                : 'bg-[#F8FAFC] text-[#4B5563] rounded-tl-none border border-[#F1F5F9]'
-                                        }`}>
-                                            <p className={`text-[13px] leading-tight font-medium ${isMe ? 'text-white' : 'text-[#4B5563]'}`}>
-                                                {msg.content}
-                                            </p>
-                                            <div className={`flex justify-end items-center gap-1 mt-1 text-[8px] font-bold opacity-80 ${isMe ? 'text-blue-100' : 'text-[#9CA3AF]'}`}>
-                                                <span>
-                                                    {new Date(msg.createdAt).toLocaleTimeString('en-US', {
-                                                        hour: '2-digit', minute: '2-digit', hour12: true
-                                                    })}
-                                                </span>
-                                                {isMe && <span>✓✓</span>}
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-
-                            {/* Typing indicator */}
-                            {typingUser && (
-                                <div className="flex items-start max-w-[65%]">
-                                    <div className="px-3 py-2 rounded-[12px] bg-[#F8FAFC] border border-[#F1F5F9] text-[#9CA3AF] text-[11px] italic">
-                                        {typingUser} is typing...
-                                    </div>
-                                </div>
-                            )}
-                            <div ref={scrollRef} />
+                        <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase">User</p>
+                            <p className="font-medium text-gray-800 m-0">{ticketData.user?.name || "—"}</p>
+                            <p className="text-gray-400 m-0 truncate">{ticketData.user?.email || "—"}</p>
                         </div>
-
-                        {/* Input */}
-                        <div className="p-4 bg-white border-t border-[#F8FAFC]">
-                            <div className="flex items-center gap-3 bg-[#F8FAFC] p-1.5 pl-4 rounded-full border border-[#F1F5F9]">
-                                <Paperclip className="text-black cursor-pointer" size={18} />
-                                <input
-                                    type="text"
-                                    className="flex-1 bg-transparent border-none focus:ring-0 outline-none text-black text-[13px] font-medium py-1.5"
-                                    placeholder="Type a message here ..."
-                                    value={message}
-                                    onChange={handleTyping}
-                                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                                />
-                                <button onClick={sendMessage} className="bg-blue p-2.5 rounded-full text-white">
-                                    <Send size={16} fill="currentColor" />
-                                </button>
-                            </div>
+                        <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase">Status</p>
+                            <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${getStatusStyle(ticketData.status)}`}>
+                                {ticketData.status}
+                            </span>
+                            <p className="text-gray-400 m-0">Dept: {ticketData.department || "General Support"}</p>
                         </div>
-                    </div>
-
-                    {/* RIGHT: Ticket Details */}
-                    <div className="flex-1">
-                        <div className="bg-white border border-[#F1F5F9] rounded-[24px] p-6 shadow-sm">
-                            <div className="flex justify-between items-center mb-2">
-                                <h3 className="text-sm font-semibold text-[#1F2937]">Ticket Details</h3>
-                                <ChevronDown className="text-blue" size={16} />
-                            </div>
-                            <hr className="mb-4" />
-                            <div className="space-y-4">
-                                <DetailRow label="Created on" value={ticketData?.createdAt ? new Date(ticketData.createdAt).toLocaleDateString('en-GB') : "---"} />
-                                <DetailRow label="Status" value={ticketData?.status || "---"} />
-                                <DetailRow label="Department" value={ticketData?.department || "General Support"} />
-                                <DetailRow
-                                    label="Last Updated"
-                                    value={ticketData?.updatedAt
-                                        ? new Date(ticketData.updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                                        : "---"}
-                                />
-                            </div>
+                        <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase">Dates</p>
+                            <p className="text-gray-600 m-0">Created: {ticketData.createdAt ? new Date(ticketData.createdAt).toLocaleDateString('en-GB') : "—"}</p>
+                            <p className="text-gray-600 m-0">Updated: {ticketData.updatedAt ? formatTime(ticketData.updatedAt) : "—"}</p>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-5">
+                <div className="max-w-2xl mx-auto space-y-3">
+                    {chatHistory.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                            <p className="font-medium text-gray-500">No messages yet</p>
+                            <p className="text-sm">Start the conversation with the user</p>
+                        </div>
+                    ) : (
+                        chatHistory.map((msg, index) => {
+                            const isMe = msg.senderId === currentUserId || msg.sender?.id === currentUserId;
+                            const isTemp = String(msg.id).startsWith("temp-");
+                            return (
+                                <div key={msg.id || index} className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
+                                    {!isMe && (
+                                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-xs font-bold flex-shrink-0">
+                                            {(ticketData?.user?.name || "U")[0].toUpperCase()}
+                                        </div>
+                                    )}
+                                    <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm ${isMe ? "bg-blue text-white rounded-br-sm" : "bg-white text-gray-800 border border-gray-100 rounded-bl-sm"}`}>
+                                        <p className={`text-sm leading-relaxed break-words m-0 ${isMe ? "text-white" : "text-gray-800"}`}>
+                                            {msg.content}
+                                        </p>
+                                        <div className={`flex items-center justify-end gap-1 mt-1 ${isMe ? "text-white/60" : "text-gray-400"}`}>
+                                            <span className="text-[10px]">{formatTime(msg.createdAt)}</span>
+                                            {isMe && <span className="text-[11px]">{isTemp ? "✓" : "✓✓"}</span>}
+                                        </div>
+                                    </div>
+                                    {isMe && (
+                                        <div className="w-8 h-8 rounded-full bg-blue flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                            {(currentUser?.name || "A")[0].toUpperCase()}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
+                    {typingUser && (
+                        <div className="flex items-end gap-2 justify-start">
+                            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-xs font-bold flex-shrink-0">
+                                {(ticketData?.user?.name || "U")[0].toUpperCase()}
+                            </div>
+                            <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm">
+                                <div className="flex gap-1 items-center h-4">
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={scrollRef} />
+                </div>
             </div>
+
+            {/* Input */}
+            {ticketData?.status !== "Closed" ? (
+                <div className="bg-white border-t px-4 py-3 flex-shrink-0">
+                    <div className="max-w-2xl mx-auto flex gap-2 items-end">
+                        <textarea
+                            value={message}
+                            onChange={handleTyping}
+                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                            placeholder="Type a message here..."
+                            rows={1}
+                            className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-2.5 text-sm outline-none focus:border-blue transition-colors"
+                            style={{ maxHeight: 120, overflowY: "auto" }}
+                        />
+                        <button
+                            onClick={sendMessage}
+                            disabled={!message.trim()}
+                            className="w-11 h-11 rounded-full bg-blue flex items-center justify-center text-white hover:opacity-90 transition disabled:opacity-40 flex-shrink-0"
+                        >
+                            <Send size={17} />
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="bg-gray-100 border-t px-4 py-3 text-center text-sm text-gray-500 flex-shrink-0">
+                    This ticket is closed.
+                </div>
+            )}
         </div>
     );
 };
-
-const DetailRow = ({ label, value }) => (
-    <div className="flex justify-between items-center border-b border-[#F8FAFC] pb-2 last:border-0">
-        <span className="text-[#7C8DB5] font-bold text-[11px] uppercase tracking-tight">{label}</span>
-        <span className="text-[#1F2937] font-bold text-[12px]">{value}</span>
-    </div>
-);
 
 export default ChatWindow;
