@@ -120,6 +120,7 @@ const ChatWindow = () => {
     }, [ticketId]);
 
     const sendMessage = () => {
+    const sendMessage = () => {
         if (!message.trim() || !currentUserId) return;
         if (!socket.connected) { openNotification("error", "Connection lost. Please refresh."); return; }
         const content = message.trim();
@@ -130,7 +131,9 @@ const ChatWindow = () => {
             senderType: "admin", isAdmin: true, isAdminMessage: true,
             createdAt: new Date().toISOString(),
         }]);
+        }]);
         setMessage("");
+        socket.emit("send_ticket_message", { ticketId, content });
         socket.emit("send_ticket_message", { ticketId, content });
     };
 

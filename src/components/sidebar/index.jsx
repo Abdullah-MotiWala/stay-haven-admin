@@ -73,6 +73,11 @@ const menuItems = [
     label: <Link to="/admin/contact-messages">Contact Messages</Link>,
   },
   {
+    key: "/admin/contact-messages",
+    icon: <CustomerServiceOutlined className={iconStyle} />,
+    label: <Link to="/admin/contact-messages">Contact Messages</Link>,
+  },
+  {
     key: "/admin/settings",
     icon: <img src={settingIcon} className={iconStyle} alt="settings" />,
     label: <Link to="/admin/settings">Settings</Link>,
