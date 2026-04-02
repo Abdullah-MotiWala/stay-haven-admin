@@ -13,8 +13,8 @@ export const getToken = () => {
 };
 
 // autoConnect: false - manually connect karenge taake token ready ho
-const socket = io("http://localhost:3000", {
-// const socket = io("https://api.stayhaven.pk", {
+// const socket = io("http://localhost:3000", {
+const socket = io("https://api.stayhaven.pk", {
     auth: (cb) => cb({ token: getToken() }),
     autoConnect: false,
     reconnection: true,

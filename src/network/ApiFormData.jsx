@@ -11,8 +11,8 @@ const Status = {
 };
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000/api/",
-    // baseURL: "https://api.stayhaven.pk/api/",
+    // baseURL: "http://localhost:3000/api/",
+    baseURL: "https://api.stayhaven.pk/api/",
     headers: {
         Accept: "application/json",
         "Content-Type": "multipart/form-data", // 👈 important
