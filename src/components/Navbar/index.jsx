@@ -9,7 +9,7 @@ import search from "../../assets/icons/search.svg";
 
 import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
 import { Button, Dropdown, Input, Modal } from "antd";
-import { LogoutOutlined, SearchOutlined } from "@ant-design/icons";
+import { LogoutOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 
 const Navbar = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -31,6 +31,15 @@ const Navbar = () => {
   };
 
   const userMenuItems = [
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: "My Profile",
+      onClick: () => navigate("/admin/profile"),
+    },
+    {
+      type: "divider",
+    },
     {
       key: "logout",
       icon: <LogoutOutlined />,

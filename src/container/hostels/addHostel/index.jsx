@@ -32,6 +32,7 @@ const AddHostel = () => {
     const [facilityList, setFacilityList] = useState([]);
     const [hotelsList, setHotelsList] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
+    const [roomTypesList, setRoomTypesList] = useState([]);
     const [mainImage, setMainImage] = useState(null);
     const [mainImagePreview, setMainImagePreview] = useState(null);
     const [gallery, setGallery] = useState([]);
@@ -57,17 +58,18 @@ const AddHostel = () => {
     useEffect(() => {
         const fetchFeatures = async () => {
             try {
-                const [amenityRes, featuresRes, facilityRes, policyRes] = await Promise.all([
+                const [amenityRes, featuresRes, facilityRes, policyRes, roomTypeRes] = await Promise.all([
                     getAllFeature("AMENITY"),
                     getAllFeature("ROOM_FEATURE"),
                     getAllFeature("ROOM_FACILITY"),
                     getAllFeature("POLICY"),
+                    getAllFeature("ROOM_TYPE"),
                 ]);
                 setAmenitiesList(amenityRes.data.data || []);
                 setFeaturesList(featuresRes.data.data || []);
                 setFacilityList(facilityRes.data.data || []);
                 setPolicyList(policyRes.data.data || []);
-            } catch {
+                setRoomTypesList(roomTypeRes.data.data || []);            } catch {
                 openNotification("error", "Failed to load features");
             }
         };
@@ -156,6 +158,7 @@ const AddHostel = () => {
                 roomName: values.hostelName,
                 roomNumber: values.roomNumber,
                 hotelId: values.hotel,
+                roomTypeId: values.roomTypeId,
                 bedType: values.bedType,
                 roomSize: values.roomSize,
                 maxAdults: Number(values.guests),
@@ -234,6 +237,14 @@ const AddHostel = () => {
                                     <Form.Item name="hotel">
                                         <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                                             {hotelsList.map((h) => <Option key={h.id} value={h.id}>{h.name}</Option>)}
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div>
+                                    <label className="text-base text-lightSeconday font-medium">Hostel Type</label>
+                                    <Form.Item name="roomTypeId" rules={[{ required: true, message: "Hostel Type is required" }]}>
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hostel Type" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
+                                            {roomTypesList.map((t) => <Option key={t.id} value={t.id}>{t.title}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>

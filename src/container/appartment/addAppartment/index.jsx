@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getHotelNamesList } from "../../../services/hotel";
+import { getHotelNamesList, getHotelById } from "../../../services/hotel";
 import { DEFAULT_IMAGE, STETPS_FIELDS } from "../../../shared/constant";
 
 import arrowImg from "../../../assets/icons/arrow.png";
@@ -86,6 +86,17 @@ const AddNewAppartment = () => {
         const appartment = res.data.data;
         console.log(appartment, "appartmentappartment");
 
+        // Load room types for this hotel
+        if (appartment.hotel?.id) {
+          try {
+            const hotelRes = await getHotelById(appartment.hotel.id);
+            const hotelFeatures = hotelRes?.data?.data?.features || hotelRes?.data?.features || [];
+            setRoomTypesList(hotelFeatures.filter(f => f.type === "ROOM_TYPE"));
+          } catch (e) {
+            console.error("Failed to load hotel room types", e);
+          }
+        }
+
         // Set main image preview if exists
         if (appartment.mainImage) {
           setMainImagePreview(appartment.mainImage);
@@ -99,7 +110,7 @@ const AddNewAppartment = () => {
         form.setFieldsValue({
           name: appartment.apartmentName || "",
           appartmentNumber: appartment.apartmentNumber || "",
-          type: appartment.roomType?.id || appartment.typeId,
+          type: appartment.roomType?.id || appartment.typeId || undefined,
           bedType: appartment.bedType || "",
           roomSize: appartment.appartmentSize || "",
           maxAdults: appartment.maxAdults || 1,
@@ -520,24 +531,23 @@ const removeMainImage = () => {
         res = await createAppartment(payload);
       }
 
+      if (res?.data?.success === false) {
+        openNotification("error", res?.data?.message || "Failed to save apartment");
+        return;
+      }
+
       if (res?.status !== 200 && res?.status !== 201) {
-        throw new Error("API failed");
+        throw new Error(res?.data?.message || "API failed");
       }
 
       openNotification(
         "success",
-        isEditMode
-          ? "Apartment updated successfully"
-          : "Apartment created successfully",
+        isEditMode ? "Apartment updated successfully" : "Apartment created successfully",
       );
-
       setIsModalOpen(true);
     } catch (err) {
       console.error(err);
-      openNotification(
-        "error",
-        err?.response?.data?.message || "Internal Server Error",
-      );
+      openNotification("error", err?.response?.data?.message || err?.message || "Internal Server Error");
     } finally {
       setLoading(false);
     }
@@ -649,8 +659,18 @@ const removeMainImage = () => {
                     <Select
                       className="w-full h-12 border border-lightSeconday rounded-md font-medium"
                       placeholder="Select a hotel"
-                      // OnChange check karne ke liye (Debugging)
-                      onChange={(val) => console.log("Selected Value:", val)}
+                      onChange={async (val) => {
+                        console.log("Selected Value:", val);
+                        form.setFieldValue("type", undefined);
+                        try {
+                          const res = await getHotelById(val);
+                          const hotelFeatures = res?.data?.data?.features || res?.data?.features || [];
+                          const roomTypes = hotelFeatures.filter(f => f.type === "ROOM_TYPE");
+                          setRoomTypesList(roomTypes);
+                        } catch (e) {
+                          console.error("Failed to load hotel room types", e);
+                        }
+                      }}
                       filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
                       showSearch
                     >
@@ -810,29 +830,19 @@ const removeMainImage = () => {
                 <div className="w-full ">
                   <div className="w-full">
                     <label className="text-base text-lightSeconday font-medium">
-                      Maxinfants
+                      Max Infants
                     </label>
                     <Form.Item
                       preserve={true}
                       name="maxinfants"
                       label=""
                       rules={[
-                        { required: true, message: "maxinfants is required" },
+                        { required: true, message: "Max Infants is required" },
                       ]}
                     >
-                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium">
-                        {[
-                          { label: "1 Maxinfants", value: "1" },
-                          { label: "2 Maxinfants", value: "2" },
-                          { label: "3 Maxinfants", value: "3" },
-                          { label: "4 Maxinfants", value: "4" },
-                          { label: "5 Maxinfants", value: "5" },
-                          { label: "6 Maxinfants", value: "6" },
-
-                        ].map((item) => (
-                          <Option key={item.value} value={item.value}>
-                            {item.label}
-                          </Option>
+                      <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Infants">
+                        {["0","1","2","3","4","5","6"].map((v) => (
+                          <Option key={v} value={v}>{v} {v === "0" ? "Infants" : v === "1" ? "Infant" : "Infants"}</Option>
                         ))}
                       </Select>
                     </Form.Item>

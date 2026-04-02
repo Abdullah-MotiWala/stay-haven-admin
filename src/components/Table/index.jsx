@@ -53,7 +53,8 @@ const HotelDirectory = ({
     return data.filter((item) => {
       const matchesSearch =
         !searchTerm ||
-        item.guestName?.toLowerCase().includes(searchTerm.toLowerCase());
+        item.guestName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.bookingId?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRoom =
         !filters.roomType || item.roomType === filters.roomType;
       const matchesHotel =
@@ -139,25 +140,32 @@ const HotelDirectory = ({
   // ];
 
   const getStatusStyle = (status) => {
-    switch (status) {
-      case "Booked":
+    switch (status?.toLowerCase()) {
+      case "booked":
         return "bg-lightYellow text-black";
-      case "Checked-In":
+      case "checked-in":
+      case "checkin":
         return "bg-lightGreenOne text-darkGreen";
-      case "Checked-Out":
+      case "checked-out":
+      case "checkout":
         return "bg-shadeGreen text-black";
       case "maintenance":
         return "bg-lightYellow text-lightSeconday";
-      case "Draft":
+      case "draft":
         return "bg-lightBrown text-lightSeconday";
-      case "Inactive":
+      case "inactive":
+      case "deactivate":
         return "bg-lightBlue text-blue";
-      case "Active":
+      case "active":
+      case "available":
         return "bg-lightGreenOne text-darkGreen";
-      case "Inactive  || DeActive ":
-        return "bg-lightRed text-red";
-      case "Delete":
+      case "occupied":
+        return "bg-lightYellow text-black";
+      case "delete":
         return "bg-red-100 text-red-600";
+      case "cancelled":
+      case "canceled":
+        return "bg-lightRed text-red";
       default:
         return "bg-gray-100 text-gray-600";
     }
@@ -179,11 +187,13 @@ const HotelDirectory = ({
       return deriveBookingStatus(row.checkInOut);
     }
     if (row.isDeleted) return "Deleted";
-    if (row.status === "active") return "Active";
-    if (row.status === "deactivate" || row.status === "inactive")
-      return "Inactive";
-    if (row.status === "draft") return "Draft";
-    if (row.status === "maintenance") return "Maintenance";
+    const s = row.status?.toLowerCase();
+    if (s === "active") return "Active";
+    if (s === "available") return "Available";
+    if (s === "occupied") return "Occupied";
+    if (s === "maintenance") return "Maintenance";
+    if (s === "deactivate" || s === "inactive") return "Inactive";
+    if (s === "draft") return "Draft";
     return row.status;
   };
 
@@ -243,7 +253,7 @@ const HotelDirectory = ({
   const renderCell = (row, col, index) => {
     switch (col.type) {
       case "text":
-        return row[col.key] ?? "-";
+        return row[col.key] ?? "—";
 
       case "number":
         return row[col.key] ?? 0;
@@ -647,10 +657,9 @@ const HotelDirectory = ({
                 <th
                   key={col.key}
                   className={`
-    p-4 text-xs font-semibold uppercase tracking-wide text-blue
-    border-b border-t  border-l border-dashed border-gray-200
-    ${col.type === "status" ? "text-center" : ""}
-    ${col.type === "actions" ? "text-right" : ""}
+    px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue
+    border-b border-t border-l border-dashed border-gray-200
+    ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}
   `}
                 >
                   {col.label}
@@ -699,41 +708,39 @@ const HotelDirectory = ({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={`px-2 py-4 text-sm border-b border-t border-l border-dashed 
-    ${col.type === "status" || col.type === "text" || col.type === "number" ? "text-center" : "text-left"}
-    ${col.type === "actions" ? "!text-center relative" : ""}
+                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed 
+    ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}
   `}
                       >
-                        <div className={`flex items-center ${(col.type === "status" || col.type === "text" || col.type === "number" || col.type === "actions") ? "justify-center" : "justify-start"
-                          }`}>
+                        <div className={`flex items-center ${
+                          col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"
+                        }`}>
                           {renderCell(enrichedRow, col, index)}
                         </div>
 
                         {/* ACTION DROPDOWN */}
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-lg z-50">                            <button
-                            onClick={() => {
-                              setRowActionOpen(null);
-                              navigate(`${path}/${row.id}`, {
-                                state: { lastId },
-                              });
-                            }}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                          >
-                            View
-                          </button>
+                          <div className="absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-lg z-50">
+                            {view && (
+                              <button
+                                onClick={() => {
+                                  setRowActionOpen(null);
+                                  navigate(`${path}/${row.id}`, { state: { lastId } });
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                              >
+                                View
+                              </button>
+                            )}
                             <button
                               onClick={() => {
                                 setRowActionOpen(null);
-                                navigate(`${targetPath}/${row.id}`, {
-                                  state: { lastId },
-                                });
+                                navigate(`${targetPath}/${row.id}`, { state: { lastId } });
                               }}
                               className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                             >
                               Edit
                             </button>
-
                             <button
                               onClick={() => onDelete(row.id)}
                               className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"

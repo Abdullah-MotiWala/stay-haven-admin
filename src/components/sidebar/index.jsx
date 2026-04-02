@@ -48,6 +48,11 @@ const menuItems = [
     label: <Link to="/admin/appartments">Appartments</Link>,
   },
   {
+    key: "/admin/hostels",
+    icon: <img src={roomIcon} className={iconStyle} alt="hostels" />,
+    label: <Link to="/admin/hostels">Hostels</Link>,
+  },
+  {
     key: "/admin/bookings",
     icon: <img src={bookingIcon} className={iconStyle} alt="bookings" />,
     label: <Link to="/admin/bookings">Bookings</Link>,
@@ -63,9 +68,9 @@ const menuItems = [
     label: <Link to="/admin/hosts">Hosts</Link>,
   },
   {
-    key: "/admin/hostels",
-    icon: <img src={roomIcon} className={iconStyle} alt="hostels" />,
-    label: <Link to="/admin/hostels">Hostels</Link>,
+    key: "/admin/contact-messages",
+    icon: <CustomerServiceOutlined className={iconStyle} />,
+    label: <Link to="/admin/contact-messages">Contact Messages</Link>,
   },
   {
     key: "/admin/settings",

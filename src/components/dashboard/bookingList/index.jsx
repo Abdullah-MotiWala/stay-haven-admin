@@ -91,7 +91,6 @@ const BookingList = ({ recentBookings }) => {
           columns={columns}
           filter={false}
           view={true}
-         
         />
         <div className="mt-4 flex justify-between">
           <div>

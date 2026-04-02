@@ -60,7 +60,7 @@ const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => {
                   tickets.map((ticket, index) => (
                     <tr key={ticket.id || index} className="hover:bg-gray-50/50 border-b border-dashed border-gray-300">
                       <td className="px-6 py-5 text-md font-medium text-dark">{ticket.ticketId}</td>
-                      <td className="px-6 py-5 text-md font-medium text-dark">{ticket.userName}</td>
+                      <td className="px-6 py-5 text-md font-medium text-dark">{ticket.userName || ticket.user?.name || "—"}</td>
                       <td className="px-6 py-5 text-md font-medium text-dark max-w-xs truncate">{ticket.subject}</td>
                       <td className="px-6 py-5 text-md font-medium text-dark">{ticket.dateCreated}</td>
                       <td className="px-6 py-5">
