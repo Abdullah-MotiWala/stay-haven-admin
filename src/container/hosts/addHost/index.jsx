@@ -201,17 +201,6 @@ const HostForm = () => {
                                 </Form.Item>
                             </div>
 
-                            <div className="w-full">
-                                <label className="text-base text-lightSeconday font-medium">Max in fants</label>
-                                <Form.Item preserve={true} name="maxinfants" rules={[{ required: true, message: "maxinfants is required" }]}>
-                                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Infants" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-                                        {["0", "1", "2", "3", "4", "5", "6"].map((v) => (
-                                            <Option key={v} value={v}>{v} Maxinfants</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            </div>
-
                         </div>
                     </div>
                 </div>

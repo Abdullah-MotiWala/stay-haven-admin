@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getHotelNamesList } from "../../../services/hotel";
+import { getHotelNamesList, getHotelById } from "../../../services/hotel";
 import { DEFAULT_IMAGE, STETPS_FIELDS } from "../../../shared/constant";
 
 import arrowImg from "../../../assets/icons/arrow.png";
@@ -86,6 +86,17 @@ const AddNewAppartment = () => {
         const appartment = res.data.data;
         console.log(appartment, "appartmentappartment");
 
+        // Load room types for this hotel
+        if (appartment.hotel?.id) {
+          try {
+            const hotelRes = await getHotelById(appartment.hotel.id);
+            const hotelFeatures = hotelRes?.data?.data?.features || hotelRes?.data?.features || [];
+            setRoomTypesList(hotelFeatures.filter(f => f.type === "ROOM_TYPE"));
+          } catch (e) {
+            console.error("Failed to load hotel room types", e);
+          }
+        }
+
         // Set main image preview if exists
         if (appartment.mainImage) {
           setMainImagePreview(appartment.mainImage);
@@ -99,7 +110,7 @@ const AddNewAppartment = () => {
         form.setFieldsValue({
           name: appartment.apartmentName || "",
           appartmentNumber: appartment.apartmentNumber || "",
-          type: appartment.roomType?.id || appartment.typeId,
+          type: appartment.roomType?.id || appartment.typeId || undefined,
           bedType: appartment.bedType || "",
           roomSize: appartment.appartmentSize || "",
           maxAdults: appartment.maxAdults || 1,
@@ -520,24 +531,23 @@ const removeMainImage = () => {
         res = await createAppartment(payload);
       }
 
+      if (res?.data?.success === false) {
+        openNotification("error", res?.data?.message || "Failed to save apartment");
+        return;
+      }
+
       if (res?.status !== 200 && res?.status !== 201) {
-        throw new Error("API failed");
+        throw new Error(res?.data?.message || "API failed");
       }
 
       openNotification(
         "success",
-        isEditMode
-          ? "Apartment updated successfully"
-          : "Apartment created successfully",
+        isEditMode ? "Apartment updated successfully" : "Apartment created successfully",
       );
-
       setIsModalOpen(true);
     } catch (err) {
       console.error(err);
-      openNotification(
-        "error",
-        err?.response?.data?.message || "Internal Server Error",
-      );
+      openNotification("error", err?.response?.data?.message || err?.message || "Internal Server Error");
     } finally {
       setLoading(false);
     }
@@ -649,8 +659,18 @@ const removeMainImage = () => {
                     <Select
                       className="w-full h-12 border border-lightSeconday rounded-md font-medium"
                       placeholder="Select a hotel"
-                      // OnChange check karne ke liye (Debugging)
-                      onChange={(val) => console.log("Selected Value:", val)}
+                      onChange={async (val) => {
+                        console.log("Selected Value:", val);
+                        form.setFieldValue("type", undefined);
+                        try {
+                          const res = await getHotelById(val);
+                          const hotelFeatures = res?.data?.data?.features || res?.data?.features || [];
+                          const roomTypes = hotelFeatures.filter(f => f.type === "ROOM_TYPE");
+                          setRoomTypesList(roomTypes);
+                        } catch (e) {
+                          console.error("Failed to load hotel room types", e);
+                        }
+                      }}
                       filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
                       showSearch
                     >

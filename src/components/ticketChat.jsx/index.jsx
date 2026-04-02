@@ -2,7 +2,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import socket from '../../services/socket';
 import { ArrowLeft, Send, ChevronDown, ChevronUp } from 'lucide-react';
-import { getTicket, getMessages, getLoggedInUser, updateTicketStatus, createMessages } from '../../services/chat/index.js';
+import { getTicket, getMessages, getLoggedInUser, updateTicketStatus } from '../../services/chat/index.js';
 import { openNotification } from "../../network/notification";
 
 const ChatWindow = () => {
@@ -38,7 +38,9 @@ const ChatWindow = () => {
             try {
                 const ticketRes = await getTicket(ticketId);
                 if (ticketRes.data.success) setTicketData(ticketRes.data.data);
-            } catch (err) { console.error("Ticket fetch failed:", err.message); }
+            } catch (err) {
+                console.error("Ticket fetch failed:", err.message);
+            }
             try {
                 const msgRes = await getMessages(ticketId);
                 const msgs = msgRes?.data?.data || msgRes?.data || [];
@@ -47,12 +49,18 @@ const ChatWindow = () => {
                     const unique = [];
                     msgs.forEach((m) => {
                         const key = messageKey(m);
-                        if (!messageKeysRef.current.has(key)) { messageKeysRef.current.add(key); unique.push(m); }
+                        if (!messageKeysRef.current.has(key)) {
+                            messageKeysRef.current.add(key);
+                            unique.push(m);
+                        }
                     });
                     setChatHistory(unique);
                 }
-            } catch (err) { console.error("HTTP message history failed:", err.message); }
+            } catch (err) {
+                console.error("HTTP message history failed:", err.message);
+            }
         };
+
         loadInitialData();
 
         const onConnect = () => setConnected(true);
@@ -64,7 +72,10 @@ const ChatWindow = () => {
                 const unique = [];
                 messages.forEach((m) => {
                     const key = messageKey(m);
-                    if (!messageKeysRef.current.has(key)) { messageKeysRef.current.add(key); unique.push(m); }
+                    if (!messageKeysRef.current.has(key)) {
+                        messageKeysRef.current.add(key);
+                        unique.push(m);
+                    }
                 });
                 setChatHistory(unique);
             }
@@ -72,7 +83,9 @@ const ChatWindow = () => {
         const onNewMessage = (msg) => {
             setChatHistory(prev => {
                 const tempIndex = prev.findIndex(m =>
-                    String(m.id).startsWith("temp-") && m.content === msg.content && m.isAdmin === msg.isAdmin
+                    String(m.id).startsWith("temp-") &&
+                    m.content === msg.content &&
+                    m.isAdmin === msg.isAdmin
                 );
                 if (tempIndex !== -1) {
                     const updated = [...prev];
@@ -126,25 +139,18 @@ const ChatWindow = () => {
         const content = message.trim();
         const tempId = `temp-${Date.now()}`;
         setChatHistory(prev => [...prev, {
-            id: tempId, ticketId, content,
-            senderId: currentUserId, senderName: currentUser?.name,
-            senderType: "admin", isAdmin: true, isAdminMessage: true,
+            id: tempId,
+            ticketId,
+            content,
+            senderId: currentUserId,
+            senderName: currentUser?.name,
+            senderType: "admin",
+            isAdmin: true,
+            isAdminMessage: true,
             createdAt: new Date().toISOString(),
         }]);
         setMessage("");
-        try {
-            const res = await createMessages({ ticketId, senderId: currentUserId, content, isAdminMessage: true });
-            if (res.data.success) {
-                setChatHistory(prev => prev.map(m => m.id === tempId ? res.data.data : m));
-                socket.emit("send_ticket_message", { ticketId, content });
-            } else {
-                setChatHistory(prev => prev.filter(m => m.id !== tempId));
-                openNotification("error", "Message send failed");
-            }
-        } catch {
-            setChatHistory(prev => prev.filter(m => m.id !== tempId));
-            openNotification("error", "Message send failed");
-        }
+        socket.emit("send_ticket_message", { ticketId, content });
     };
 
     const handleTyping = (e) => {
@@ -159,7 +165,7 @@ const ChatWindow = () => {
                 setTicketData(prev => ({ ...prev, status: "Closed" }));
                 openNotification("success", "Ticket has been closed successfully!");
             }
-        } catch {
+        } catch (err) {
             openNotification("error", "Could not update status");
         }
     };
@@ -175,12 +181,14 @@ const ChatWindow = () => {
 
     const formatTime = (d) => {
         if (!d) return "";
-        return new Date(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return new Date(d).toLocaleTimeString('en-US', {
+            hour: '2-digit', minute: '2-digit', hour12: true,
+        });
     };
 
     return (
         <div className="flex flex-col bg-gray-50" style={{ height: "100vh" }}>
-            {/* Header */}
+
             <div className="bg-white border-b px-5 py-3 flex items-center justify-between flex-shrink-0 shadow-sm">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-gray-100 transition">
@@ -225,7 +233,6 @@ const ChatWindow = () => {
                 </div>
             </div>
 
-            {/* Collapsible Details */}
             {detailsOpen && ticketData && (
                 <div className="bg-white border-b px-5 py-4 flex-shrink-0">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs max-w-4xl">
@@ -248,14 +255,21 @@ const ChatWindow = () => {
                         </div>
                         <div className="bg-gray-50 rounded-xl p-3 space-y-1">
                             <p className="text-[10px] font-semibold text-gray-400 uppercase">Dates</p>
-                            <p className="text-gray-600 m-0">Created: {ticketData.createdAt ? new Date(ticketData.createdAt).toLocaleDateString('en-GB') : "—"}</p>
-                            <p className="text-gray-600 m-0">Updated: {ticketData.updatedAt ? formatTime(ticketData.updatedAt) : "—"}</p>
+                            <p className="text-gray-600 m-0">
+                                Created: {ticketData.createdAt
+                                    ? new Date(ticketData.createdAt).toLocaleDateString('en-GB')
+                                    : "—"}
+                            </p>
+                            <p className="text-gray-600 m-0">
+                                Updated: {ticketData.updatedAt
+                                    ? new Date(ticketData.updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                                    : "—"}
+                            </p>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-5">
                 <div className="max-w-2xl mx-auto space-y-3">
                     {chatHistory.length === 0 ? (
@@ -268,13 +282,20 @@ const ChatWindow = () => {
                             const isMe = msg.senderId === currentUserId || msg.sender?.id === currentUserId;
                             const isTemp = String(msg.id).startsWith("temp-");
                             return (
-                                <div key={msg.id || index} className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
+                                <div
+                                    key={msg.id || index}
+                                    className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}
+                                >
                                     {!isMe && (
                                         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-xs font-bold flex-shrink-0">
                                             {(ticketData?.user?.name || "U")[0].toUpperCase()}
                                         </div>
                                     )}
-                                    <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm ${isMe ? "bg-blue text-white rounded-br-sm" : "bg-white text-gray-800 border border-gray-100 rounded-bl-sm"}`}>
+                                    <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm ${
+                                        isMe
+                                            ? "bg-blue text-white rounded-br-sm"
+                                            : "bg-white text-gray-800 border border-gray-100 rounded-bl-sm"
+                                    }`}>
                                         <p className={`text-sm leading-relaxed break-words m-0 ${isMe ? "text-white" : "text-gray-800"}`}>
                                             {msg.content}
                                         </p>
@@ -292,6 +313,7 @@ const ChatWindow = () => {
                             );
                         })
                     )}
+
                     {typingUser && (
                         <div className="flex items-end gap-2 justify-start">
                             <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-xs font-bold flex-shrink-0">
@@ -310,14 +332,18 @@ const ChatWindow = () => {
                 </div>
             </div>
 
-            {/* Input */}
             {ticketData?.status !== "Closed" ? (
                 <div className="bg-white border-t px-4 py-3 flex-shrink-0">
                     <div className="max-w-2xl mx-auto flex gap-2 items-end">
                         <textarea
                             value={message}
                             onChange={handleTyping}
-                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    sendMessage();
+                                }
+                            }}
                             placeholder="Type a message here..."
                             rows={1}
                             className="flex-1 resize-none border border-gray-200 rounded-2xl px-4 py-2.5 text-sm outline-none focus:border-blue transition-colors"
@@ -342,4 +368,3 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
-
