@@ -210,6 +210,15 @@ const OpenTickets = ({ OpenTickets: ticketsData }) => {
                 <p className="text-sm font-medium text-extradark m-0 break-words">
                   {ticket.description}
                 </p>
+                {ticket.attachments?.length > 0 && (
+                  <div className="flex gap-1 flex-wrap mt-1">
+                    {ticket.attachments.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                        <img src={url} alt="attachment" className="w-12 h-12 rounded-lg object-cover border border-gray-200 hover:opacity-80 transition" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Right: Date */}

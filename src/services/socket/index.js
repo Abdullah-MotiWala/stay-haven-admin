@@ -12,9 +12,9 @@ export const getToken = () => {
     }
 };
 
-// autoConnect: false - manually connect karenge taake token ready ho
-// const socket = io("http://localhost:3000", {
-const socket = io("https://api.stayhaven.pk", {
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "https://api.stayhaven.pk";
+
+const socket = io(SOCKET_URL, {
     auth: (cb) => cb({ token: getToken() }),
     autoConnect: false,
     reconnection: true,
