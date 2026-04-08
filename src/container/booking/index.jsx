@@ -57,10 +57,11 @@ const Booking = () => {
     }
   };
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (type, page, limit) => {
     try {
       setLoading(true);
-      const res = await getAllBooking(currentPage, itemsPerPage);
+      const isApartment = (type ?? activeType) === "Apartment Bookings";
+      const res = await getAllBooking(page ?? currentPage, limit ?? itemsPerPage, isApartment);
       setRecentBookings(res.data?.data || []);
       setTotal(res.data?.meta?.totalItems || res.data?.meta?.total || 0);
     } catch (err) {
@@ -71,42 +72,42 @@ const Booking = () => {
     }
   };
 
-  // ── Refetch jab bhi page pe wapas aao (location change se trigger) ──
+  // Stats sirf ek baar
   useEffect(() => {
     fetchStats();
   }, []);
 
+  // Tab change → page 1 se start, naya fetch
   useEffect(() => {
-    fetchBookings();
-  }, [currentPage, itemsPerPage, location.key]); // ← location.key add kiya
+    setCurrentPage(1);
+    fetchBookings(activeType, 1, itemsPerPage);
+  }, [activeType]);
+
+  // Page / limit / location change
+  useEffect(() => {
+    fetchBookings(activeType, currentPage, itemsPerPage);
+  }, [currentPage, itemsPerPage, location.key]);
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this booking?")) {
       try {
         await deleteBooking(id);
         openNotification("success", "Booking deleted successfully");
-        fetchBookings(); // immediately refetch
+        fetchBookings(activeType, currentPage, itemsPerPage);
       } catch (err) {
         openNotification("error", "Internal Server Error");
       }
     }
   };
 
-  const filteredBookings = useMemo(() => {
-    if (activeType === "Apartment Bookings")
-      return recentBookings.filter((b) => b.isApartment === true);
-    if (activeType === "Room Bookings")
-      return recentBookings.filter((b) => !b.isApartment);
-    return recentBookings;
-  }, [activeType, recentBookings]);
-
-  const currentColumns = activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
+  const currentColumns =
+    activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
 
   const cardsData = [
-    { title: "Total Bookings",      value: stats?.totalBookings    ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
-    { title: "Today's Check-ins",   value: stats?.todayCheckIns    ?? "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
-    { title: "Today's Check-outs",  value: stats?.todayCheckOuts   ?? "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
-    { title: "Cancelled Booking",   value: stats?.cancelledBookings ?? "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
+    { title: "Total Bookings",     value: stats?.totalBookings     ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
+    { title: "Today's Check-ins",  value: stats?.todayCheckIns     ?? "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Today's Check-outs", value: stats?.todayCheckOuts    ?? "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
+    { title: "Cancelled Booking",  value: stats?.cancelledBookings ?? "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
   ];
 
   const onPageChange = (page, pageSize) => {
@@ -123,9 +124,11 @@ const Booking = () => {
         {roomTypes.map((type) => (
           <button
             key={type}
-            onClick={() => { setActiveType(type); setCurrentPage(1); }}
+            onClick={() => setActiveType(type)}
             className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0 ${
-              activeType === type ? "bg-blue text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+              activeType === type
+                ? "bg-blue text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
             {type}
@@ -135,7 +138,7 @@ const Booking = () => {
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
-          data={filteredBookings}
+          data={recentBookings}
           title="All Bookings"
           columns={currentColumns}
           filter={true}
@@ -155,7 +158,10 @@ const Booking = () => {
               placeholder="Select Entries"
               defaultValue={10}
               className="text-black"
-              onChange={(value) => { setItemsPerPage(value); setCurrentPage(1); }}
+              onChange={(value) => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
               options={entriesPerPageOptions.map((o) => ({ label: o, value: o }))}
               showSearch
             />

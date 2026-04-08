@@ -20,7 +20,7 @@ const BookingComp = (props) => {
 
     const isCheckedIn  = normalizedStatus === "checked-in"  || normalizedStatus === "checkin";
     const isCancelled  = normalizedStatus === "cancelled"   || normalizedStatus === "canceled";
-    const isCompleted  = normalizedStatus === "completed"   || normalizedStatus === "complete" || normalizedStatus === "checked-out";
+    const isCompleted  = normalizedStatus === "completed"   || normalizedStatus === "complete" || normalizedStatus === "Checked-Out";
 
     // ✅ Button disable rules:
     // Check In  → disable jab: already checked-in, cancelled, ya completed
@@ -54,6 +54,7 @@ const BookingComp = (props) => {
             case "completed":
             case "complete":
             case "checked-out":
+            case "checked-Out":
                 return "bg-shadeGreen text-darkGreen";
             case "reserved":
                 return "bg-statusBlue text-darkBlue";
@@ -165,7 +166,7 @@ const BookingComp = (props) => {
                     <button
                         type="button"
                         disabled={checkOutDisabled}
-                        onClick={() => handleStatusUpdate("Checked-out")}
+                        onClick={() => handleStatusUpdate("Checked-Out")}
                         className={`border-1 border-darkgrayline bg-myWhite px-10 text-lightSeconday rounded-md py-4 font-medium transition-all
                             ${checkOutDisabled ? disabledClass : "hover:bg-gray-50"}`}
                     >
