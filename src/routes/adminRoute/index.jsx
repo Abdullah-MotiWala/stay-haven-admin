@@ -16,12 +16,13 @@ import ChatWindow from "../../components/ticketChat.jsx";
 import TicketsPage from "../../components/TicketPage.jsx";
 import SettingParent from "../../container/settings";
 import Hosts from "../../container/hosts";
-import AddHost from "../../container/hosts/addHost";
+import HostView from "../../container/hosts/hostView";
 import HostelListing from "../../container/hostels";
 import AddHostel from "../../container/hostels/addHostel";
 import HotelBookingDashboard from "../../container/dashboard";
 import ContactMessages from "../../container/contact";
 import AdminProfile from "../../container/profile";
+import AddHost from "../../container/hosts/addHost";
 
 export const AdminRoute = [
   {
@@ -35,6 +36,7 @@ export const AdminRoute = [
           { path: "hosts", element: <Hosts /> },
           { path: "hosts/add", element: <AddHost /> },
           { path: "hosts/edit/:id", element: <AddHost /> },
+          { path: "hosts/view/:id", element: <HostView /> },
           { path: "hotels", element: <Hotels /> },
           { path: "hotel/add", element: <AddHotel /> },
           { path: "hotel/edit/:id", element: <AddHotel /> },

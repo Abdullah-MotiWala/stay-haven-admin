@@ -28,7 +28,10 @@ const HotelDirectory = ({
   roomTypes = [],
   onStatusToggle,
   hoteloptions = false,
-  editpath
+  editpath,
+  viewpath,
+  onRowClick,
+  extraActions = []
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -720,12 +723,21 @@ const HotelDirectory = ({
 
                         {/* ACTION DROPDOWN */}
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-lg z-50">
+                          <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+                            {extraActions.map((action) => (
+                              <button
+                                key={action.label}
+                                onClick={() => { setRowActionOpen(null); action.onClick(row); }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium"
+                              >
+                                {action.label}
+                              </button>
+                            ))}
                             {view && (
                               <button
                                 onClick={() => {
                                   setRowActionOpen(null);
-                                  navigate(`${path}/${row.id}`, { state: { lastId } });
+                                  navigate(`${viewpath || path}/${row.id}`, { state: { lastId } });
                                 }}
                                 className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                               >
