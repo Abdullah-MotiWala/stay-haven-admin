@@ -7,9 +7,11 @@ export const getAllRooms = async (
   search = "",
   sort = "asc",
   activeType = "All Rooms",
+  hostId = null,
 ) => {
+  const hostParam = hostId ? `&hostId=${hostId}` : "";
   return Api.get(
-    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}`,
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
   );
 };
 
@@ -19,9 +21,11 @@ export const getAllHostels = async (
   status = "",
   search = "",
   sort = "asc",
+  hostId = null,
 ) => {
+  const hostParam = hostId ? `&hostId=${hostId}` : "";
   return Api.get(
-    `/rooms?page=${currentPage}&limit=${itemsPerPage}&isHostel=true&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}`,
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&isHostel=true&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}${hostParam}`,
   );
 };
 
@@ -42,4 +46,7 @@ export const deleteRoom = async (id, data) => {
 };
 export const getStats = async (data) => {
   return Api.get("rooms/stats", data);
+};
+export const updateRoomStatus = async (id, status) => {
+  return Api.patch(`rooms/${id}/status`, { status });
 };

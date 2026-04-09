@@ -7,9 +7,11 @@ export const getAllApartments = async (
   search = "",
   sort = "asc",
   activeType = "All",
+  hostId = null,
 ) => {
+  const hostParam = hostId ? `&hostId=${hostId}` : "";
   return Api.get(
-    `/apartments?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}`,
+    `/apartments?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
   );
 };
 export const createAppartment = async (data) => {
@@ -29,4 +31,7 @@ export const deleteAppartment = async (id, data) => {
 };
 export const getStats = async (data) => {
   return Api.get("apartments/stats", data);
+};
+export const updateApartmentStatus = async (id, status) => {
+  return Api.patch(`apartments/${id}/status`, { status });
 };

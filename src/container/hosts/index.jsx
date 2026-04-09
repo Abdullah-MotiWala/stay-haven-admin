@@ -109,6 +109,12 @@ const HostsListing = () => {
                         setRefresh={setRefresh}
                         path={`/admin/hosts/edit`}
                         onStatusToggle={handleStatusToggle}
+                        extraActions={[
+                            {
+                                label: "View Details",
+                                onClick: (row) => navigate(`/admin/hosts/view/${row.id}`),
+                            },
+                        ]}
                     />
 
                 )}
