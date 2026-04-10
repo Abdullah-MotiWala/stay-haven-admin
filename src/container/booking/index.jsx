@@ -28,6 +28,7 @@ const Booking = () => {
   const roomColumns = [
     { key: "bookingId",   label: "Booking ID",            type: "text" },
     { key: "guestName",   label: "Guest Name",            type: "text" },
+    { key: "hotelName",   label: "Hotel",                 type: "hotelCell" },
     { key: "roomType",    label: "Room Type",             type: "roomType" },
     { key: "roomNumber",  label: "Room Number",           type: "text" },
     { key: "duration",    label: "Duration",              type: "text" },

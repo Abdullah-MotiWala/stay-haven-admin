@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import socket from '../../services/socket';
 import { ArrowLeft, Send, ChevronDown, ChevronUp, Paperclip, X, FileText, Image } from 'lucide-react';
-import { getTicket, getMessages, getLoggedInUser, updateTicketStatus, createMessages } from '../../services/chat/index.js';
+import { getTicket, getMessages, getLoggedInUser, updateTicketStatus } from '../../services/chat/index.js';
 import { uploadSingleMedia } from '../../services/uploads/index.js';
 import { openNotification } from "../../network/notification";
 
@@ -92,17 +92,21 @@ const ChatWindow = () => {
         };
         const onNewMessage = (msg) => {
             setChatHistory(prev => {
+                // Temp message replace karo — content match se
                 const tempIndex = prev.findIndex(m =>
                     String(m.id).startsWith("temp-") &&
-                    m.content === msg.content &&
-                    m.isAdmin === msg.isAdmin
+                    m.content?.trim() === (msg.content || "").trim()
                 );
                 if (tempIndex !== -1) {
                     const updated = [...prev];
-                    updated[tempIndex] = msg;
+                    updated[tempIndex] = {
+                        ...msg,
+                        attachments: msg.attachments?.length ? msg.attachments : prev[tempIndex].attachments,
+                    };
                     messageKeysRef.current.add(messageKey(msg));
                     return updated;
                 }
+                // Duplicate check
                 const key = messageKey(msg);
                 if (messageKeysRef.current.has(key)) return prev;
                 messageKeysRef.current.add(key);
@@ -176,48 +180,41 @@ const ChatWindow = () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const sendMessage = async () => {
+    const sendMessage = () => {
         const hasText = message.trim();
         const hasAttachment = attachment?.url;
         if (!hasText && !hasAttachment) return;
         if (!currentUserId) return;
+        if (!socket.connected) {
+            openNotification("error", "Not connected. Please wait...");
+            return;
+        }
 
         const content = hasText ? message.trim() : "";
-        const attachmentUrl = hasAttachment ? attachment.url : null;
-        const attachments = attachmentUrl ? [attachmentUrl] : [];
+        const attachments = hasAttachment ? [attachment.url] : [];
         const tempId = `temp-${Date.now()}`;
 
         // Optimistic UI
         setChatHistory(prev => [...prev, {
             id: tempId, ticketId, content,
             attachments,
-            senderId: currentUserId, senderName: currentUser?.name,
-            senderType: "admin", isAdmin: true, isAdminMessage: true,
+            senderId: currentUserId,
+            senderName: currentUser?.name,
+            isAdmin: true,
+            isAdminMessage: true,
             createdAt: new Date().toISOString(),
         }]);
         setMessage("");
         setAttachment(null);
 
-        try {
-            // Use HTTP API — works regardless of socket state
-            const res = await createMessages({
-                ticketId,
-                senderId: currentUserId,
-                content: content || " ",
-                isAdminMessage: true,
-                attachments,
-            });
-            if (res?.data?.success) {
-                setChatHistory(prev => prev.map(m => m.id === tempId ? { ...res.data.data, attachments } : m));
-                // Backend broadcasts via socket to all room members — no need to emit again
-            } else {
-                setChatHistory(prev => prev.filter(m => m.id !== tempId));
-                openNotification("error", res?.data?.message || "Message send failed");
-            }
-        } catch (err) {
-            setChatHistory(prev => prev.filter(m => m.id !== tempId));
-            openNotification("error", "Message send failed");
-        }
+        // Send ONLY via socket — backend saves to DB and broadcasts
+        socket.emit("send_ticket_message", {
+            ticketId,
+            content: content || " ",
+            attachments,
+            senderId: currentUserId,
+            isAdminMessage: true,
+        });
     };
 
     const handleTyping = (e) => {

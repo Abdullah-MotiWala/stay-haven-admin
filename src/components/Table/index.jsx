@@ -193,6 +193,25 @@ const HotelDirectory = ({
 
   const renderCell = (row, col, index) => {
     switch (col.type) {
+      case "hotelCell":
+        return (
+          <div className="flex items-center gap-2">
+            <img
+              src={row.hotel?.imageUrl || DEFAULT_IMAGE}
+              className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
+              alt=""
+            />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-900 m-0 truncate">
+                {row.hotelName || row.hotel?.name || "—"}
+              </p>
+              {row.hotel?.city && (
+                <p className="text-xs text-gray-400 m-0">{row.hotel.city}</p>
+              )}
+            </div>
+          </div>
+        );
+
       case "text":   return row[col.key] ?? "—";
       case "number": return row[col.key] ?? 0;
 
