@@ -16,6 +16,6 @@ export const deleteUser = async (id) => {
     return Api.delete(`users/${id}`);
 };
 
-export const toggleUserStatus = async (id) => {
-    return Api.put(`users/${id}/status`);
+export const toggleUserStatus = async (id, reason = "") => {
+    return Api.put(`users/${id}/status`, reason ? { reason } : {});
 };

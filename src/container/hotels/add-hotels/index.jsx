@@ -8,7 +8,8 @@ import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
 import { Form, Input, Select, Checkbox } from "antd";
 import { uploadSingleMedia } from "../../../services/uploads";
-import {getSettingsApi} from "../../../services/setting";
+import { getSettingsApi } from "../../../services/setting";
+import { getAllUsers } from "../../../services/user";
 
 const HotelForm = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const HotelForm = () => {
   const [imagePreview, setImagePreview] = useState(DEFAULT_IMAGE);
   const [uploading, setUploading] = useState(false);
   const [settingsPolicy, setSettingsPolicy] = useState("");
+  const [hostsList, setHostsList] = useState([]);
 
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
@@ -87,6 +89,7 @@ const HotelForm = () => {
           email: hotelData.email || "",
           cancellation_policy: hotelData.cancellation_policy || "",
           isActive: hotelData.status || "active",
+          hostId: hotelData.hostId || hotelData.host?.id || undefined,
           amenities: hotelData.amenities?.map((a) => a.id) || [],
           rooms: hotelData.roomsIncluded?.map((r) => r.id) || [],
         });
@@ -98,6 +101,12 @@ const HotelForm = () => {
     };
     fetchHotel();
   }, [id, isEditMode, form]);
+
+  useEffect(() => {
+    getAllUsers({ type: "host", page: 1, limit: 100 })
+      .then((res) => setHostsList(res.data?.data || []))
+      .catch(() => openNotification("error", "Failed to load hosts"));
+  }, []);
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -162,6 +171,7 @@ const HotelForm = () => {
         email: values.email,
         cancellation_policy: values.cancellation_policy,
         status: values.isActive,
+        hostId: values.hostId,
         featureIds: [...(values.amenities || []), ...(values.rooms || [])],
         ...(imageUrl ? { imageUrl } : {}),
       };
@@ -322,6 +332,22 @@ const HotelForm = () => {
                     <Option value="inactive">Inactive</Option>
                     <Option value="maintenance">Maintenance</Option>
                   </Select>
+                </Form.Item>
+              </div>
+
+              <div className="w-full">
+                <label className="text-base text-lightSeconday font-medium">Assign Host</label>
+                <Form.Item name="hostId" rules={[{ required: true, message: "Please assign a host" }]}>
+                  <Select
+                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    placeholder="Select Host"
+                    showSearch
+                    optionFilterProp="label"
+                    options={hostsList.map((host) => ({
+                      label: `${host.name}${host.email ? ` (${host.email})` : ""}`,
+                      value: host.id,
+                    }))}
+                  />
                 </Form.Item>
               </div>
             </div>

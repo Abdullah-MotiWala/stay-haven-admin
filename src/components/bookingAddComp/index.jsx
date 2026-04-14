@@ -1,7 +1,7 @@
 import leftangle from "../../assets/icons/leftangle.png";
 import { ChevronDown, Info, Eye } from "lucide-react";
 import selection from "../../assets/icons/selection.png";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import tablecalender from "../../assets/icons/calendarIcon.png";
 import { createBooking, getById, updateBooking } from "../../services/booking";
@@ -47,15 +47,21 @@ const BOOKING_STATUSES = [
 const BookingAddComp = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromTab = location.state?.fromTab;
+  const backUrl = fromTab === "Apartment Bookings" ? "/admin/bookings?tab=apartment" : "/admin/bookings?tab=room";
   const isEditMode = Boolean(id);
   const [loading, setLoading] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [apartment, setApartment] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [pendingCheckInDoc, setPendingCheckInDoc] = useState({ documentType: "CNIC", documentNumber: "" });
 
   const [formData, setFormData] = useState({
     bookingType: "Room",
     guestName: "", phone: "", email: "", cnic: "",
+    documentType: "CNIC", documentNumber: "",
     hotelId: "", hotelName: "",
     roomId: "", apartmentId: "",
     roomType: "", roomNumber: "",
@@ -127,6 +133,8 @@ const BookingAddComp = () => {
           phone: booking.guestInfo?.phone || booking.guestPhone || booking.phone || "",
           email: booking.guestInfo?.email || booking.guestEmail || booking.email || "",
           cnic: booking.guestInfo?.idCard || booking.cnic || "",
+          documentType: booking.guestInfo?.documentType || booking.documentType || "CNIC",
+          documentNumber: booking.guestInfo?.documentNumber || booking.documentNumber || "",
           hotelId: booking.hotel?.id || booking.hotelId || "",
           hotelName,
           roomId: booking.room?.id || booking.roomId || "",
@@ -177,6 +185,11 @@ const BookingAddComp = () => {
       setFormData((prev) => ({ ...prev, bookingType: value, hotelName: "", hotelId: "", roomId: "", apartmentId: "", roomType: "", roomNumber: "", apartmentName: "", apartmentNumber: "", pricePerNight: 0 }));
       return;
     }
+    if (name === "status" && value === "Checked-In") {
+      setPendingCheckInDoc({ documentType: formData.documentType || "CNIC", documentNumber: formData.documentNumber || "" });
+      setShowCheckInModal(true);
+      return;
+    }
     if (name === "hotelName") {
       const src = isApartment ? apartment : rooms;
       const obj = src.find((item) => isApartment ? item.apartmentName === value : item.hotel?.name === value);
@@ -191,6 +204,21 @@ const BookingAddComp = () => {
       return;
     }
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckInModalConfirm = () => {
+    if (!pendingCheckInDoc.documentNumber.trim()) {
+      openNotification("error", "Please enter document number");
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      status: "Checked-In",
+      documentType: pendingCheckInDoc.documentType,
+      documentNumber: pendingCheckInDoc.documentNumber,
+    }));
+    setShowCheckInModal(false);
+    setPendingCheckInDoc({ documentType: "CNIC", documentNumber: "" });
   };
 
   const getHotelOptions = () => {
@@ -235,7 +263,7 @@ const BookingAddComp = () => {
         {/* ── Header: Back + Title + View button (edit mode only) ── */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
+            <button type="button" onClick={() => navigate(backUrl)} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm">
               <img src={leftangle} alt="back" className="w-3.5 h-3.5" /> Back
             </button>
             <div className="w-px h-4 bg-gray-200 mx-1" />
@@ -248,7 +276,7 @@ const BookingAddComp = () => {
           {isEditMode && (
             <button
               type="button"
-              onClick={() => navigate(`/admin/booking/${id}`)}
+              onClick={() => navigate(`/admin/booking/${id}`, { state: { fromTab } })}
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition"
             >
               <Eye size={15} />
@@ -280,7 +308,20 @@ const BookingAddComp = () => {
                 <div><label className={labelCls}>Guest Full Name</label><input type="text" name="guestName" value={formData.guestName} onChange={handleChange} required placeholder="Muhammad Ali Akbar" className={inputCls} /></div>
                 <div><label className={labelCls}>Phone Number</label><input type="text" name="phone" value={formData.phone} onChange={handleChange} required placeholder="0331-6326593" className={inputCls} /></div>
                 <div><label className={labelCls}>Email (Optional)</label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="mail@example.com" className={inputCls} /></div>
-                <div><label className={labelCls}>CNIC</label><input type="text" name="cnic" value={formData.cnic} onChange={handleChange} placeholder="34502-23454565-9" className={inputCls} /></div>
+                {/* <div><label className={labelCls}>CNIC</label><input type="text" name="cnic" value={formData.cnic} onChange={handleChange} placeholder="34502-23454565-9" className={inputCls} /></div> */}
+                <div>
+                  <label className={labelCls}>Document Type</label>
+                  <SelectWrap>
+                    <Select className="w-full h-full" variant="borderless" placeholder="Select Document Type"
+                      value={formData.documentType}
+                      onChange={(val) => handleChange({ target: { name: "documentType", value: val } })}
+                      suffixIcon={<ChevronDown size={16} className="text-gray-400" />}>
+                      <Option value="CNIC">CNIC</Option>
+                      <Option value="Passport">Passport</Option>
+                    </Select>
+                  </SelectWrap>
+                </div>
+                <div><label className={labelCls}>Document Number</label><input type="text" name="documentNumber" value={formData.documentNumber} onChange={handleChange} placeholder={formData.documentType === "CNIC" ? "42101-1234567-1" : "Enter document number"} className={inputCls} /></div>
                 <div className="md:col-span-2">
                   <label className={labelCls}>Max Infants</label>
                   <SelectWrap>
@@ -460,7 +501,7 @@ const BookingAddComp = () => {
 
         {/* Footer */}
         <div className="flex justify-end gap-3 mt-6">
-          <button type="button" onClick={() => navigate(-1)} className="px-8 py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all">Back</button>
+          <button type="button" onClick={() => navigate(backUrl)} className="px-8 py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all">Back</button>
           <button type="submit" disabled={loading} className="px-8 py-2.5 bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50">
             {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
           </button>
@@ -468,10 +509,63 @@ const BookingAddComp = () => {
       </form>
 
       {isModalOpen && (
-        <SuccessModal open onClose={() => navigate("/admin/bookings")}
+        <SuccessModal open onClose={() => navigate(backUrl)}
           title={isEditMode ? "Booking Updated Successfully!" : "Booking Saved Successfully!"}
           description="The booking has been saved successfully."
-          showButton buttonText="View Bookings" onButtonClick={() => navigate("/admin/bookings")} />
+          showButton buttonText="View Bookings" onButtonClick={() => navigate(backUrl)} />
+      )}
+
+      {showCheckInModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Guest Verification</h3>
+            <p className="text-sm text-gray-500 mb-6">Enter guest document details to complete check-in.</p>
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Document Type</label>
+                <SelectWrap>
+                  <Select className="w-full h-full" variant="borderless"
+                    value={pendingCheckInDoc.documentType}
+                    onChange={(val) => setPendingCheckInDoc((p) => ({ ...p, documentType: val }))}
+                    options={[
+                      { label: "CNIC", value: "CNIC" },
+                      { label: "Passport", value: "Passport" },
+                      { label: "Driving License", value: "Driving License" },
+                    ]}
+                  />
+                </SelectWrap>
+              </div>
+              <div>
+                <label className={labelCls}>Document Number</label>
+                <input
+                  type="text"
+                  className={inputCls}
+                  placeholder={pendingCheckInDoc.documentType === "CNIC" ? "e.g. 42101-1234567-1" : "Enter number"}
+                  value={pendingCheckInDoc.documentNumber}
+                  onChange={(e) => setPendingCheckInDoc((p) => ({ ...p, documentNumber: e.target.value }))}
+                  onKeyDown={(e) => e.key === "Enter" && handleCheckInModalConfirm()}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => { setShowCheckInModal(false); setPendingCheckInDoc({ documentType: "CNIC", documentNumber: "" }); }}
+                className="px-6 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCheckInModalConfirm}
+                disabled={!pendingCheckInDoc.documentNumber.trim()}
+                className="px-6 py-2 bg-blue text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              >
+                Confirm Check-In
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

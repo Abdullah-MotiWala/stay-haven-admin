@@ -9,13 +9,23 @@ import { getAllBooking, deleteBooking, getStats } from "../../services/booking";
 import { useState, useEffect, useMemo } from "react";
 import { openNotification } from "../../network/notification";
 import { Pagination, Select } from "antd";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const entriesPerPageOptions = [10, 20, 30, 40];
 
 const Booking = () => {
   const location = useLocation();
-  const [activeType, setActiveType] = useState("Room Bookings");
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Tab state URL se lo — back button pe restore hoga
+  const tabFromUrl = searchParams.get("tab") === "apartment" ? "Apartment Bookings" : "Room Bookings";
+  const [activeType, setActiveType] = useState(tabFromUrl);
+
+  // Back button pe URL change hone par tab sync karo
+  useEffect(() => {
+    setActiveType(tabFromUrl);
+  }, [searchParams.get("tab")]);
   const [recentBookings, setRecentBookings] = useState([]);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -104,11 +114,16 @@ const Booking = () => {
   const currentColumns =
     activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
 
+  const sc = stats?.statusCounts ?? {};
+  const checkedInCount  = (sc["Checked-In"]  ?? 0) + (sc["Checkin"]  ?? 0);
+  const checkedOutCount = (sc["Checked-Out"] ?? 0) + (sc["Checked-out"] ?? 0) + (sc["Checkout"] ?? 0) + (sc["Completed"] ?? 0);
+  const cancelledCount  = sc["Cancelled"] ?? sc["Canceled"] ?? 0;
+
   const cardsData = [
-    { title: "Total Bookings",     value: stats?.totalBookings     ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
-    { title: "Today's Check-ins",  value: stats?.todayCheckIns     ?? "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
-    { title: "Today's Check-outs", value: stats?.todayCheckOuts    ?? "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
-    { title: "Cancelled Booking",  value: stats?.cancelledBookings ?? "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
+    { title: "Total Bookings",     value: stats?.totalBookings ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
+    { title: "Today's Check-ins",  value: stats ? checkedInCount  : "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Today's Check-outs", value: stats ? checkedOutCount : "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
+    { title: "Cancelled Booking",  value: stats ? cancelledCount  : "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
   ];
 
   const onPageChange = (page, pageSize) => {
@@ -125,7 +140,10 @@ const Booking = () => {
         {roomTypes.map((type) => (
           <button
             key={type}
-            onClick={() => setActiveType(type)}
+            onClick={() => {
+              setActiveType(type);
+              setSearchParams({ tab: type === "Apartment Bookings" ? "apartment" : "room" });
+            }}
             className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0 ${
               activeType === type
                 ? "bg-blue text-white"

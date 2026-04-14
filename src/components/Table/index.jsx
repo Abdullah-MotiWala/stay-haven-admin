@@ -446,7 +446,7 @@ const HotelDirectory = ({
                               <button
                                 onClick={() => {
                                   setRowActionOpen(null);
-                                  navigate(`${viewpath || path}/${row.id}`, { state: { lastId } });
+                                  navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } });
                                 }}
                                 className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                               >
@@ -454,7 +454,7 @@ const HotelDirectory = ({
                               </button>
                             )}
                             <button
-                              onClick={() => { setRowActionOpen(null); navigate(`${targetPath}/${row.id}`, { state: { lastId } }); }}
+                              onClick={() => { setRowActionOpen(null); navigate(`${targetPath}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
                               className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                             >
                               Edit
