@@ -47,6 +47,6 @@ export const deleteRoom = async (id, data) => {
 export const getStats = async (data) => {
   return Api.get("rooms/stats", data);
 };
-export const updateRoomStatus = async (id, status) => {
-  return Api.patch(`rooms/${id}/status`, { status });
+export const updateRoomStatus = async (id, status, reason = "") => {
+  return Api.patch(`rooms/${id}/status`, { status, ...(reason ? { reason } : {}) });
 };

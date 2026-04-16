@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../../components/Navbar";
 import MatrixCard from "../../../components/MatrixCard";
 import Breadcrumb from "../../../components/Breadcrumb";
 import HotelDirectory from "../../../components/Table";
@@ -9,8 +8,7 @@ import {
   deleteHotel,
   getStats,
   lastHotelId,
-  getHotelsList,
-
+  hotelStatusUpdate,
 } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
@@ -18,7 +16,10 @@ import home3 from "../../../assets/icons/home-3.png";
 import home4 from "../../../assets/icons/home-4.png";
 import { openNotification } from "../../../network/notification";
 import { Pagination, Select } from "antd";
+import StatusReasonModal, { needsReason } from "../../../components/shared/statusReasonModal";
+
 const entriesPerPageOptions = [10, 20, 30, 40];
+
 const HotelsListing = () => {
   const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
@@ -28,15 +29,16 @@ const HotelsListing = () => {
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [reasonModal, setReasonModal] = useState({ open: false, hotelId: null, status: "" });
+  const [reason, setReason] = useState("");
+  const [statusLoading, setStatusLoading] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await getStats();
-        console.log(res.data, "HOTEL===");
         setStats(res.data.data);
       } catch (err) {
-        console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
       }
     };
@@ -47,23 +49,19 @@ const HotelsListing = () => {
     const fetchLastId = async () => {
       try {
         const res = await lastHotelId();
-        console.log(res?.data, "lastID===");
         setLastId(res?.data);
-      } catch (err) {
-        console.error("Failed to load stats:", err);
-        openNotification("error", "Failed to load stats");
+      } catch {
+        openNotification("error", "Failed to load hotel ID");
       }
     };
     fetchLastId();
   }, []);
 
   useEffect(() => {
-    console.log("UseEffect Run Times");
     const fetchData = async () => {
       try {
         setLoading(true);
         const res = await getAllHotels(currentPage, itemsPerPage);
-        console.log(res.data.data, "HOTELS===");
         setHotels(res.data || []);
         setRefresh(false);
       } catch (err) {
@@ -72,9 +70,31 @@ const HotelsListing = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [refresh, currentPage, itemsPerPage]);
+
+  const handleStatusToggle = (id, newStatus) => {
+    if (needsReason(newStatus)) {
+      setReasonModal({ open: true, hotelId: id, status: newStatus });
+    } else {
+      applyStatusUpdate(id, newStatus, "");
+    }
+  };
+
+  const applyStatusUpdate = async (id, status, reasonText) => {
+    setStatusLoading(true);
+    try {
+      await hotelStatusUpdate(id, { status, ...(reasonText ? { reason: reasonText } : {}) });
+      openNotification("success", "Hotel status updated");
+      setRefresh(true);
+    } catch {
+      openNotification("error", "Failed to update status");
+    } finally {
+      setStatusLoading(false);
+      setReasonModal({ open: false, hotelId: null, status: "" });
+      setReason("");
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
@@ -83,55 +103,27 @@ const HotelsListing = () => {
         setHotels(hotels.filter((hotel) => hotel.id !== id));
         openNotification("success", "Hotel deleted successfully");
       } catch (err) {
-        console.error("Any Problem in deleteing", err);
         openNotification("error", "Internal Server Error");
       }
     }
   };
 
   const cardsData = [
-    {
-      title: "Total Hotels",
-      value: stats?.totalHotels,
-      bg: "#F3F7EE",
-      iconBg: "#D1E1BC",
-      image: home1,
-      trend: `${stats?.growth?.isPositive ? '+' : '-'}${stats?.growth?.percentage ?? 0}%`,
-      trendText: "vs last week",
-      showTrend: true,
-    },
-    {
-      title: "Active Hotels",
-      value: stats?.activeHotels,
-      bg: "#EFF9FF",
-      iconBg: "#C7DAE7",
-      image: home2,
-    },
-    {
-      title: "Inactive Hotels",
-      value: stats?.inactiveHotels,
-      bg: "#F7EFFF",
-      iconBg: "#DED0EC",
-      image: home3,
-    },
-    {
-      title: "In Draft",
-      value: stats?.inDraft,
-      bg: "#F3F4FB",
-      iconBg: "#CBCEE7",
-      image: home4,
-    },
+    { title: "Total Hotels",    value: stats?.totalHotels,   bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, trend: `${stats?.growth?.isPositive ? "+" : "-"}${stats?.growth?.percentage ?? 0}%`, trendText: "vs last week", showTrend: true },
+    { title: "Active Hotels",   value: stats?.activeHotels,  bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Inactive Hotels", value: stats?.inactiveHotels, bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
+    { title: "In Draft",        value: stats?.inDraft,       bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
   ];
 
   const columns = [
-    { key: "uiHotelId", label: "Hotel ID", type: "text" },
-    { key: "name", label: "Hotel Name", type: "hotel" },
-    { key: "totalRooms", label: "Total Rooms", type: "number" },
+    { key: "uiHotelId",      label: "Hotel ID",        type: "text" },
+    { key: "name",           label: "Hotel Name",      type: "hotel" },
+    { key: "totalRooms",     label: "Total Rooms",     type: "number" },
     { key: "roomsAvailable", label: "Rooms Available", type: "number" },
-    { key: "roomsOccupied", label: "Rooms Occupied", type: "number" },
-    { key: "reserved", label: "Reserved", type: "number" },
-    { key: "status", label: "Status", type: "status" },
-    { key: "actions", label: "Actions", type: "actions" },
+    { key: "roomsOccupied",  label: "Rooms Occupied",  type: "number" },
+    { key: "reserved",       label: "Reserved",        type: "number" },
+    { key: "status",         label: "Status",          type: "status" },
+    { key: "actions",        label: "Actions",         type: "actions" },
   ];
 
   const onPageChange = (page, pageSize) => {
@@ -152,10 +144,8 @@ const HotelsListing = () => {
       <div className="bg-white p-6 rounded-3xl shadow-sm mt-12">
         {loading ? (
           <div className="flex justify-center items-center p-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-blue-600 font-medium">
-              Loading Hotels...
-            </span>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+            <span className="ml-3 text-blue-600 font-medium">Loading Hotels...</span>
           </div>
         ) : (
           <HotelDirectory
@@ -167,6 +157,7 @@ const HotelsListing = () => {
             lastId={lastId?.nextNumericId}
             path={`/admin/hotel/view`}
             hoteloptions={true}
+            onStatusToggle={(id, newStatus) => handleStatusToggle(id, newStatus)}
           />
         )}
 
@@ -175,13 +166,9 @@ const HotelsListing = () => {
             <Select
               placeholder="Select Entries"
               defaultValue={10}
-              // style={{ paddingLeft: 10, paddingRight: 10, }}
-              className="text-black "
+              className="text-black"
               onChange={(value) => setItemsPerPage(value)}
-              options={entriesPerPageOptions.map((option) => ({
-                label: option,
-                value: option,
-              }))}
+              options={entriesPerPageOptions.map((o) => ({ label: o, value: o }))}
               showSearch
             />
             <span className="text-lightSeconday ml-4">Entries per page</span>
@@ -191,13 +178,20 @@ const HotelsListing = () => {
             total={stats?.totalHotels || 0}
             pageSize={itemsPerPage}
             onChange={onPageChange}
-            // showSizeChanger={false}
-            className="flex justify-end "
-          // style={{ paddingTop: "20px", paddingBottom: "20px" }} // Adds padding for better spacing
+            className="flex justify-end"
           />
         </div>
       </div>
-      {/* Pagination Component */}
+
+      <StatusReasonModal
+        open={reasonModal.open}
+        status={reasonModal.status}
+        reason={reason}
+        onChange={setReason}
+        onConfirm={() => applyStatusUpdate(reasonModal.hotelId, reasonModal.status, reason)}
+        onCancel={() => { setReasonModal({ open: false, hotelId: null, status: "" }); setReason(""); }}
+        loading={statusLoading}
+      />
     </div>
   );
 };

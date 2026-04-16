@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 function RoomCard({ room, active, onClick }) {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate()
-  console.log(room, "roomroomroom");
   let id = room?.id
   const handleEditClick = () => {
     // navigate(`/admin/rooms/edit/${id}`);

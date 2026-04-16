@@ -168,7 +168,6 @@ const AddNewRoom = () => {
   const onBack = () => setCurrentStep(currentStep - 1);
 
   const handleSubmit = async (values) => {
-    console.log("Form Raw Values:", values);
     setLoading(true);
     try {
       let mainImageUrl = null;
@@ -212,7 +211,6 @@ const AddNewRoom = () => {
         ...(galleryUrls.length > 0 && { galleryImages: galleryUrls }),
         maxInfants: Number(values.maxinfants || 0),
       };
-      console.log("Payload for API:", values.maxinfants);
       let res;
       if (isEditMode) {
         res = await updateRoom(id, payload);

@@ -270,7 +270,6 @@ const AddNewAppartment = () => {
       await form.validateFields(STETPS_FIELDS[currentStep]);
       setCurrentStep(prev => prev + 1);
     } catch (err) {
-      console.log("Step validation failed:", err);
     }
   };
 

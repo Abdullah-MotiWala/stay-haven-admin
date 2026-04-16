@@ -76,7 +76,6 @@ const BookingList = ({ recentBookings }) => {
       status: "Checked-In",
     },
   ];
-  console.log(recentBookings, "recentBookings===")
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;

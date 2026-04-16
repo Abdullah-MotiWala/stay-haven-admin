@@ -45,7 +45,6 @@ const HotelForm = () => {
     };
     fetchLastId();
   }, []);
-        // console.log("Last hotel ID:", lastId);
 
 
  useEffect(() => {

@@ -39,7 +39,8 @@ export const TABS = [
   "Room Rules",
   "Pricing & Taxes",
   "Forget Password",
-  "Social Media "
+  "Social Media ",
+  // "Social Links"
 ];
 
 export const ROOM_TYPES = [

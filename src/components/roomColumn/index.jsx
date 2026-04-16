@@ -94,7 +94,6 @@ const RoomCloumns = (props) => {
       try {
         const res = await updateRoom(id);
         const rooms = res.data;
-        console.log("Rooms response", rooms);
         form.setFieldsValue({
           name: rooms.name,
           roomNumber: rooms.room_number,
@@ -157,7 +156,6 @@ const RoomCloumns = (props) => {
       // featureIds: [...values.amenities, ...values.rooms],
     };
 
-    console.log(payload, "payloadpayloadpayload");
     try {
       if (isEditMode) {
         await updateRoom(id, payload);

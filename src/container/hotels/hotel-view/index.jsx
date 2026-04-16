@@ -47,7 +47,6 @@ const HotelProfile = () => {
   const [recentBookings, setRecentBookings] = useState([]);
 
   const uiHotelId = hotel?.hotelId || location.state?.lastId;
-  console.log(uiHotelId, "uiHotelIduiHotelId32423");
 
   useEffect(() => {
     const fetchFeatures = async () => {
@@ -65,26 +64,10 @@ const HotelProfile = () => {
     fetchFeatures();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchStats = async () => {
-  //     try {
-  //       const res = await getStats();
-  //       console.log(res.data, "asdadsaasdas2321413");
-  //       setStats(res.data);
-  //     } catch (err) {
-  //       console.error("Failed to load stats:", err);
-  //       openNotification("error", "Failed to load stats");
-  //     }
-  //   };
-
-  //   fetchStats();
-  // }, []);
-
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
         const res = await getAllHotelsStatistics(id);
-        console.log(res.data.data, "statistics==");
         setStatistics(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
@@ -95,27 +78,11 @@ const HotelProfile = () => {
     fetchStatistics();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchRecentBookings = async () => {
-  //     try {
-  //       const res = await getRecentBooking();
-  //       console.log(res.data, "asdadsaasdas2321413");
-  //       setRecentBookings(res.data);
-  //     } catch (err) {
-  //       console.error("Failed to load stats:", err);
-  //       openNotification("error", "Failed to load stats");
-  //     }
-  //   };
-
-  //   fetchRecentBookings();
-  // }, []);
-
   useEffect(() => {
     const fetchHotelData = async () => {
       try {
         setLoading(true);
         const res = await getHotelById(id);
-        console.log(res.data?.data, "Hotel===");
         setHotel(res.data.data);
       } catch (err) {
         console.error("Hotel detail fetch karne mein error:", err);
@@ -290,7 +257,6 @@ const HotelProfile = () => {
     options.find((o) => o.value === hotel.status) || options[0];
 
 
-    console.log(statistics.analytics?.summary,"statisticsstatisticsstatistics")
 
   return (
     <>

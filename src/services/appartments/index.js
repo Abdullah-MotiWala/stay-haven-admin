@@ -32,6 +32,6 @@ export const deleteAppartment = async (id, data) => {
 export const getStats = async (data) => {
   return Api.get("apartments/stats", data);
 };
-export const updateApartmentStatus = async (id, status) => {
-  return Api.patch(`apartments/${id}/status`, { status });
+export const updateApartmentStatus = async (id, status, reason = "") => {
+  return Api.patch(`apartments/${id}/status`, { status, ...(reason ? { reason } : {}) });
 };

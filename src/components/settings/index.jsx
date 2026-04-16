@@ -14,6 +14,7 @@ import BookingPolicies from "./forms/bookingPolicies";
 import PricingAndTaxes from "./forms/pricingAndTaxes";
 import RoomRules from "./forms/roomRules";
 import SocialMedia from "./forms/socialMedia";
+// import SocialLinks from "./forms/socialLinks";
 
 const Setting = () => {
   const [activeType, setActiveType] = useState("General Settings");
@@ -64,6 +65,7 @@ const Setting = () => {
       case "Pricing & Taxes": return <PricingAndTaxes symbol={currentSymbol}   />;
       case "Forget Password": return ForgetPassword ? <ForgetPassword onCurrenciesFetched={setCurrencyOptions} setGlobalSymbol={setCurrentSymbol} /> : null;
       case "Social Media ": return <SocialMedia />;
+      // case "Social Links": return <SocialLinks />;
       default: return null;
     }
   };

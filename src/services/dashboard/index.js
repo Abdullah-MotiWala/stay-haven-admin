@@ -33,6 +33,5 @@ export const getOpenTickets = async () => {
 };
 
 export const updateTicketStatus = async (ticketId, status) => {
-  console.log("API HIT →", { ticketId, status });
   await Api.patch(`/tickets/${ticketId}/status`, { status });
 };

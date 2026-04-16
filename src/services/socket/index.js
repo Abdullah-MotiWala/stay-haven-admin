@@ -20,10 +20,10 @@ const socket = io(SOCKET_URL, {
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
+    transports: ["websocket", "polling"],
 });
 
 socket.on("connect", () => {
-    console.log("[SOCKET] Connected:", socket.id);
 });
 
 socket.on("connect_error", (err) => {

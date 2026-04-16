@@ -53,7 +53,6 @@ export default function Rooms() {
         res = await getBedtypeId(activeType.typeId);
       }
 
-      console.log(res?.data);
 
       setRooms(res?.data);
 
@@ -66,7 +65,6 @@ export default function Rooms() {
     }
   };
   useEffect(() => {
-    console.log("UseEffect Run Times");
 
     fetchData();
   }, [currentPage, itemsPerPage, search, activeType]);
@@ -75,7 +73,6 @@ export default function Rooms() {
     const fetchStats = async () => {
       try {
         const res = await getStats();
-        console.log(res.data, "Rooms===");
         setStats(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
@@ -138,7 +135,6 @@ export default function Rooms() {
     setItemsPerPage(pageSize);
   };
 
-  console.log(activeType, "activeTypeactiveType");
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} />

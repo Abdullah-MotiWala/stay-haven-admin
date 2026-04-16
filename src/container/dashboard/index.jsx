@@ -75,21 +75,11 @@ const Dashboard = () => {
       setNotifications(notifications?.data?.data || []);
       setAllBookings(AllBooking?.data?.data || []);
       setPaginationData(AllBooking?.data || []);
-      console.log("Stats:", statsRes?.data?.data);
-      console.log("Booking Statistics:", bookingStatsRes?.data?.data);
-      console.log("Rooms Availability:", roomsAvailabilityRes?.data?.data);
-      console.log("Booking Status:", bookingStatusRes?.data?.data);
-      console.log("Customers:", customersRes?.data?.data);
-      // console.log("Recent Bookings:", recentBookingsRes?.data);
-      console.log("Notifications:", notifications?.data?.data || []);
-      console.log("All Bookings:", AllBooking?.data?.data || []);
-
     } catch (err) {
       console.error("Dashboard API error:", err);
       openNotification("error", "Failed to load dashboard data");
     }
   };
-  console.log(bookingStatistics, "statsstatsstats");
   const cardsData = [
     {
       title: "Total Bookings",

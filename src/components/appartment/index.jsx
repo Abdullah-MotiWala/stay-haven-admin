@@ -7,7 +7,6 @@ import home from "../../assets/icons/home.png";
 import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
-import { useNavigate } from "react-router-dom";
 import {
   getAllApartments,
   getStats,
@@ -29,10 +28,7 @@ export default function Appartments() {
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
 
-  const navigate = useNavigate();
   const [appartmentData, setAppartmentsData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refresh, setRefresh] = useState(true);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -65,7 +61,6 @@ export default function Appartments() {
       if (res?.data?.data?.length > 0) {
         setSelectedAppartment(res.data.data[0]);
       }
-      console.log(res.data, "Apartment Data===");
     } catch (err) {
       console.error("Data fetch error", err);
     }
@@ -79,7 +74,6 @@ export default function Appartments() {
       try {
         const res = await getStats();
         setStats(res?.data?.data);
-        console.log(res.data, "Stats===");
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -104,7 +98,6 @@ export default function Appartments() {
     }
   };
 
-  console.log(stats, "stats1231");
 
   const cardsData = [
     {

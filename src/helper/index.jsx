@@ -73,7 +73,6 @@ export const convertFirestoreTimestampToDate = (timestamp) => {
   return date.toLocaleDateString('en-US', options);
 };
 export const getNamesExcludingId = (data, excludedId) => {
-  console.log(data, excludedId, "asdlknasdlnksa")
   if(data){
   return Object?.entries(data)?.filter(([id]) => id !== excludedId)
     .map(([, value]) => value.name);

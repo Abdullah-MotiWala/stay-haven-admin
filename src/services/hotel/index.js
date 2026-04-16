@@ -39,8 +39,8 @@ export const bulkActionApi = async (data) => {
 export const deleteHotel = async (id) => {
   return Api.delete(`/hotels/${id}`);
 };
-export const hotelStatusUpdate = async (id,data) => {
-  return Api.patch(`/hotels/${id}/status`,data);
+export const hotelStatusUpdate = async (id, data) => {
+  return Api.patch(`/hotels/${id}/status`, data);
 };
 
 export const getStats = async (data) => {

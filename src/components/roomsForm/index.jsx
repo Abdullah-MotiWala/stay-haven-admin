@@ -31,11 +31,9 @@ const RoomDetailsForm = () => {
     const file = e.target.files?.[0];
 
     if (!file) {
-      console.log("No file selected");
       return;
     }
 
-    console.log("✅ Main Image Selected:", file.name, file.size);
 
     setMainImage({
       name: file.name,
@@ -53,11 +51,9 @@ const RoomDetailsForm = () => {
     const files = Array.from(e.target.files);
 
     if (files.length === 0) {
-      console.log("No gallery files selected");
       return;
     }
 
-    console.log("✅ Gallery Images Selected:", files.length, "files");
 
     const newFiles = files.map(file => ({
       name: file.name,
@@ -103,7 +99,6 @@ const RoomDetailsForm = () => {
       try {
         const res = await updateRoom(id);
         const rooms = res.data;
-        console.log("Rooms response", rooms)
         form.setFieldsValue({
           name: rooms.name,
           roomNumber: rooms.room_number,
@@ -117,8 +112,6 @@ const RoomDetailsForm = () => {
           status: rooms.status ? "maintenace" : "avalabe"
 
 
-          // guest: hotel.amenities?.map((a) => a.id) || [],
-          // rooms: hotel.roomsIncluded?.map((r) => r.id) || [],
         });
       } catch (err) {
         openNotification(err, "Failed to load hotel");
@@ -149,7 +142,6 @@ const RoomDetailsForm = () => {
   }, []);
 
   const handleSubmit = async (values) => {
-    // setLoading(true);
 
     const payload = {
       name: values.name,
@@ -164,10 +156,8 @@ const RoomDetailsForm = () => {
       status: values.status,
       price: values.price,
       status: values.status
-      // featureIds: [...values.amenities, ...values.rooms],
     };
 
-    console.log(payload, "payloadpayloadpayload");
     try {
       if (isEditMode) {
         await updateRoom(id, payload);
@@ -222,46 +212,11 @@ const RoomDetailsForm = () => {
             <hr />
           </div>
           <div className="p-6 px-36 pb-14">
-            {/* <div className="flex   justify-between mb-10">
-                <div className="flex items-center gap-20 ">
-                  <img
-                    src={DEFAULT_IMAGE}
-                    className="w-[330px] h-[152px] rounded-[16px] object-cover border"
-                    alt="hotel"
-                  />
-                  <div>
-                    <h2 className="text-xl font-semibold text-blue">
-                      Upload Hotel Image
-                    </h2>
-                    <p className="text-lightSeconday">Make sure image is clear</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="py-2">
-                    <span className="text-black font-semibold underline">
-                      Hotel ID
-                    </span>
-                  </div>
-                  <div className="w-24 text-center border py-2 border-havengray   rounded-md ">
-                    <span className="py-2">301</span>
-                  </div>
-                </div>
-              </div> */}
-
             <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <div className="w-full">
                 <label className="text-base text-lightSeconday font-medium">
                   Room Name
                 </label>
-                {/* <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter hotel name"
-                  /> */}
                 <Form.Item
                   name="name"
                   rules={[
@@ -296,14 +251,6 @@ const RoomDetailsForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Select Hotel
                 </label>
-                {/* <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter location"
-                  /> */}
                 <Form.Item
                   name="select_hotel"
                   rules={[{ required: true, message: "hotel is required" }]}
@@ -319,14 +266,6 @@ const RoomDetailsForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Room Type
                 </label>
-                {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
                 <Form.Item
                   name="room_type"
                   rules={[
@@ -345,14 +284,6 @@ const RoomDetailsForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Bed Type
                 </label>
-                {/* <input
-                    type="text"
-                    name="cancellation_policy"
-                    value={formData.cancellation_policy}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                    placeholder="Enter policy"
-                  /> */}
                 <Form.Item
                   name="bed_type"
                   rules={[
@@ -388,14 +319,6 @@ const RoomDetailsForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Guest Adults
                 </label>
-                {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-dark rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
                 <Form.Item
                   name="guest"
                   rules={[
@@ -416,14 +339,6 @@ const RoomDetailsForm = () => {
                 <label className="text-base text-lightSeconday font-medium">
                   Childrens
                 </label>
-                {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
                 <Form.Item
                   name="childrens"
                   rules={[
@@ -448,14 +363,6 @@ const RoomDetailsForm = () => {
               <label className="text-base text-lightSeconday font-medium">
                 Room Description
               </label>
-              {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
               <Form.Item
                 name="description"
                 rules={[
@@ -476,14 +383,6 @@ const RoomDetailsForm = () => {
                     <label className="text-base text-lightSeconday font-medium">
                       Price Per Night
                     </label>
-                    {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
                     <Form.Item
                       name="price"
                       rules={[
@@ -504,14 +403,6 @@ const RoomDetailsForm = () => {
                     <label className="text-base text-lightSeconday font-medium">
                       Room Status
                     </label>
-                    {/* <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Enter email"
-                  /> */}
                     <Form.Item
                       name="status"
                       rules={[

@@ -19,3 +19,7 @@ export const createFeatureApi = (payload) => {
 export const deleteFeatureApi = (id) => {
     return Api.delete(`/features/${id}`);
 };
+
+export const updateFeatureApi = (id, payload) => {
+    return Api.patch(`/features/${id}`, payload);
+};

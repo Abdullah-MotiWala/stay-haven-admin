@@ -14,7 +14,6 @@ const BookingPolicies = () => {
     try {
       const res = await getFeaturesByTypeApi("POLICY");
       setRulesPolicies(res?.data?.data || res.data || []);
-      console.log(res?.data?.data || res.data, "rulesPolicies===");
     } catch (err) {
       console.error("Failed to load rules & policies", err);
     } finally {
