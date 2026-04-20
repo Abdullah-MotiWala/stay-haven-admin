@@ -509,7 +509,13 @@ const AddNewAppartment = () => {
                   <label className="text-base text-lightSeconday font-medium">Status</label>
                   <Form.Item preserve name="status" rules={[{ required: true, message: "Status is required" }]}>
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select status">
-                      {[{ label: "Active", value: "available" }, { label: "Inactive", value: "inactive" }, { label: "Maintenance", value: "maintenance" }, { label: "Occupied", value: "occupied" }].map(item => (
+                      {[
+                        { label: "Available", value: "available" },
+                        { label: "Active", value: "active" },
+                        { label: "Inactive", value: "inactive" },
+                        { label: "Maintenance", value: "maintenance" },
+                        { label: "Occupied", value: "occupied" },
+                      ].map(item => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
                     </Select>

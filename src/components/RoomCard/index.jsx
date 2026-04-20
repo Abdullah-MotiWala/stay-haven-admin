@@ -5,14 +5,12 @@ import location from "../../assets/icons/location.svg";
 import { DEFAULT_IMAGE } from "../../shared/constant";
 import { useNavigate } from "react-router-dom";
 
-function RoomCard({ room, active, onClick }) {
+function RoomCard({ room, active, onClick, onStatusChange }) {
   const [showMenu, setShowMenu] = useState(false);
-  const navigate = useNavigate()
-  let id = room?.id
-  const handleEditClick = () => {
-    // navigate(`/admin/rooms/edit/${id}`);
-    navigate(`/admin/rooms/edit/${id}`);
-  };
+  const navigate = useNavigate();
+  const STATUS_OPTIONS = ["available", "active", "occupied", "maintenance", "inactive"];
+  let id = room?.id;
+  const handleEditClick = () => { navigate(`/admin/rooms/edit/${id}`); };
 
   return (
     <div
@@ -61,18 +59,16 @@ function RoomCard({ room, active, onClick }) {
                 </button>
 
                 {showMenu && (
-                  <div className="absolute right-0 mt-2 w-24 bg-white border border-lightSeconday rounded-xl z-10 py-2 px-4">
-                    <button
-                      className="flex items-center gap-3 w-full py-2 text-sm text-black font-semibold"
-                      // onClick={() => navigate(`/admin/rooms/edit/${room.id}`)}
-                      onClick={handleEditClick}
-
-                    >
-                      Edit
-                    </button>
-                    <button className="flex items-center gap-3 w-full  py-2 text-sm text-red font-semibold">
-                      Delete
-                    </button>
+                  <div className="absolute right-0 mt-2 w-36 bg-white border border-lightSeconday rounded-xl z-10 py-2 px-2">
+                    <button className="flex items-center gap-3 w-full py-2 text-sm text-black font-semibold px-2" onClick={handleEditClick}>Edit</button>
+                    <div className="border-t border-gray-100 my-1" />
+                    <p className="text-xs text-gray-400 px-2 mb-1">Change Status</p>
+                    {STATUS_OPTIONS.map(opt => (
+                      <button key={opt} onClick={(e) => { e.stopPropagation(); setShowMenu(false); onStatusChange && onStatusChange(id, opt); }}
+                        className={`w-full text-left px-2 py-1.5 text-xs capitalize rounded hover:bg-gray-50 ${room.status === opt ? "font-bold text-blue" : "text-gray-700"}`}>
+                        {opt}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>

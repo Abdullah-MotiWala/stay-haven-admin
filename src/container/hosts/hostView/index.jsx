@@ -10,6 +10,7 @@ import downArrowIcon from "../../../assets/icons/downArrowIcon.png";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
 import { Mail, Phone } from "lucide-react";
 import { Pagination } from "antd";
+import StatusReasonModal, { needsReason } from "../../../components/shared/statusReasonModal";
 
 const TABS = ["Hotels", "Rooms", "Apartments", "Hostels"];
 
@@ -98,8 +99,8 @@ const getColumns = (tab) => {
 
 const getStatusOptions = (tab) => {
   if (tab === "Hotels")     return ["active", "inactive", "maintenance", "draft"];
-  if (tab === "Apartments") return ["available", "occupied", "maintenance", "inactive"];
-  return ["available", "occupied", "maintenance", "inactive"];
+  if (tab === "Apartments") return ["available", "active", "occupied", "maintenance", "inactive"];
+  return ["available", "active", "occupied", "maintenance", "inactive"];
 };
 
 const HostView = () => {
@@ -120,6 +121,9 @@ const HostView = () => {
 
   const [openStatusRow, setOpenStatusRow] = useState(null);
   const [dropdownPos, setDropdownPos]     = useState({ top: 0, left: 0 });
+  const [reasonModal, setReasonModal]     = useState({ open: false, rowId: null, status: "" });
+  const [reason, setReason]               = useState("");
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   /* ── host profile ─────────────────────────────────────────────── */
   useEffect(() => {
@@ -197,23 +201,33 @@ const HostView = () => {
   };
 
   /* ── listing status change ───────────────────────────────────── */
-  const handleListingStatusChange = async (rowId, newStatus) => {
+  const handleListingStatusChange = (rowId, newStatus) => {
+    setOpenStatusRow(null);
+    if (needsReason(newStatus)) {
+      setReasonModal({ open: true, rowId, status: newStatus });
+    } else {
+      applyListingStatus(rowId, newStatus, "");
+    }
+  };
+
+  const applyListingStatus = async (rowId, newStatus, reasonText) => {
+    setStatusUpdating(true);
     try {
       if (activeTab === "Hotels") {
-        await hotelStatusUpdate(rowId, { status: newStatus });
+        await hotelStatusUpdate(rowId, { status: newStatus, ...(reasonText ? { reason: reasonText } : {}) });
       } else if (activeTab === "Rooms" || activeTab === "Hostels") {
-        await updateRoomStatus(rowId, newStatus);
+        await updateRoomStatus(rowId, newStatus, reasonText);
       } else if (activeTab === "Apartments") {
-        await updateApartmentStatus(rowId, newStatus);
+        await updateApartmentStatus(rowId, newStatus, reasonText);
       }
-      setTabData(prev =>
-        prev.map(r => r.id === rowId ? { ...r, status: newStatus } : r)
-      );
+      setTabData(prev => prev.map(r => r.id === rowId ? { ...r, status: newStatus } : r));
       openNotification("success", "Status updated");
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
-      setOpenStatusRow(null);
+      setStatusUpdating(false);
+      setReasonModal({ open: false, rowId: null, status: "" });
+      setReason("");
     }
   };
 
@@ -428,6 +442,16 @@ const HostView = () => {
           ))}
         </div>
       )}
+
+      <StatusReasonModal
+        open={reasonModal.open}
+        status={reasonModal.status}
+        reason={reason}
+        onChange={setReason}
+        onConfirm={() => applyListingStatus(reasonModal.rowId, reasonModal.status, reason)}
+        onCancel={() => { setReasonModal({ open: false, rowId: null, status: "" }); setReason(""); }}
+        loading={statusUpdating}
+      />
     </div>
   );
 };

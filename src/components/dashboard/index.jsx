@@ -7,7 +7,7 @@ import OpenTickets from "./openTickets";
 import AvailabilityProgress from "./roomCharts";
 import RoomAvailability from "./roomCharts";
 
-const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets, notifications , paginationdata}) => {
+const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatus, apartmentAvailability, roomsAvailability, openTickets, notifications, paginationdata, onTicketsRefresh}) => {
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} />
@@ -38,7 +38,7 @@ const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatu
           />
         </div>
         <div className="lg:col-span-1">
-          <OpenTickets OpenTickets={openTickets || []} />
+          <OpenTickets OpenTickets={openTickets || []} onRefresh={onTicketsRefresh} />
         </div>
 
         <div className="lg:col-span-1 m-0">

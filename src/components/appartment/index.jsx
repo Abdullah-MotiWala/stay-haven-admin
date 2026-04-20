@@ -11,17 +11,16 @@ import {
   getAllApartments,
   getStats,
   deleteAppartment,
-  getBedType
+  getBedType,
+  updateApartmentStatus,
 } from "../../services/appartments";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
-import {
-  APPARTMENT_TYPES,
-  ENTIRES_PER_PAGE_OPTION,
-} from "../../shared/constant";
+import { APPARTMENT_TYPES, ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
+import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 
 export default function Appartments() {
   const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]); const [selectedAppartment, setSelectedAppartment] = useState(null);
@@ -35,6 +34,9 @@ export default function Appartments() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState(null);
   const [status, setStatus] = useState(null);
+  const [reasonModal, setReasonModal] = useState({ open: false, id: null, status: "" });
+  const [reason, setReason] = useState("");
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   const { Option } = Select;
 
@@ -82,6 +84,29 @@ export default function Appartments() {
 
     fetchStats();
   }, []);
+
+  const handleStatusChange = (id, newStatus) => {
+    if (needsReason(newStatus)) {
+      setReasonModal({ open: true, id, status: newStatus });
+    } else {
+      applyApartmentStatus(id, newStatus, "");
+    }
+  };
+
+  const applyApartmentStatus = async (id, newStatus, reasonText) => {
+    setStatusUpdating(true);
+    try {
+      await updateApartmentStatus(id, newStatus, reasonText);
+      openNotification("success", "Status updated");
+      fetchData();
+    } catch {
+      openNotification("error", "Failed to update status");
+    } finally {
+      setStatusUpdating(false);
+      setReasonModal({ open: false, id: null, status: "" });
+      setReason("");
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
@@ -239,6 +264,7 @@ export default function Appartments() {
                       data={appart}
                       active={selectedAppartment?.id === appart.id}
                       onClick={() => setSelectedAppartment(appart)}
+                      onStatusChange={handleStatusChange}
                     />
                   ))
                 ) : (
@@ -308,6 +334,15 @@ export default function Appartments() {
           </div>
         </div>
       </div>
+      <StatusReasonModal
+        open={reasonModal.open}
+        status={reasonModal.status}
+        reason={reason}
+        onChange={setReason}
+        onConfirm={() => applyApartmentStatus(reasonModal.id, reasonModal.status, reason)}
+        onCancel={() => { setReasonModal({ open: false, id: null, status: "" }); setReason(""); }}
+        loading={statusUpdating}
+      />
     </>
   );
 }

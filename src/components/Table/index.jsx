@@ -243,10 +243,39 @@ const HotelDirectory = ({
       case "status": {
         const status = getRowStatus(row);
         if (onStatusToggle) {
+          const STATUS_OPTIONS = hoteloptions
+            ? ["active", "inactive", "maintenance", "draft"]
+            : ["available", "active", "occupied", "maintenance", "inactive"];
           return (
-            <button onClick={() => onStatusToggle(row.id)} className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap ${getStatusStyle(status)}`}>
-              {status}
-            </button>
+            <div className="relative inline-block">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRowActionOpen(rowActionOpen === `status-${index}` ? null : `status-${index}`);
+                }}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
+              >
+                {status}
+                <span className="text-[10px]">▾</span>
+              </button>
+              {rowActionOpen === `status-${index}` && (
+                <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">
+                  {STATUS_OPTIONS.map(opt => (
+                    <button
+                      key={opt}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRowActionOpen(null);
+                        onStatusToggle(row.id, opt);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           );
         }
         return (

@@ -302,7 +302,7 @@ const AddHostel = () => {
                                     <label className="text-base text-lightSeconday font-medium">Status</label>
                                     <Form.Item name="status" rules={[{ required: true, message: "Required" }]}>
                                         <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-                                            {[["available","Available"],["occupied","Occupied"],["maintenance","Maintenance"],["inactive","Inactive"]].map(([v,l]) => <Option key={v} value={v}>{l}</Option>)}
+                                            {[["available","Available"],["active","Active"],["occupied","Occupied"],["maintenance","Maintenance"],["inactive","Inactive"]].map(([v,l]) => <Option key={v} value={v}>{l}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </div>

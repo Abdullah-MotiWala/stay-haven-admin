@@ -8,13 +8,14 @@ import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getAllRooms, getStats, deleteRoom, getBedtypeId } from "../../services/rooms";
+import { getAllRooms, getStats, deleteRoom, getBedtypeId, updateRoomStatus } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION, ROOM_TYPES } from "../../shared/constant";
+import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 
 export default function Rooms() {
   const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
@@ -32,6 +33,9 @@ export default function Rooms() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState(null);
   const [status, setStatus] = useState(null);
+  const [reasonModal, setReasonModal] = useState({ open: false, id: null, status: "" });
+  const [reason, setReason] = useState("");
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   const { Option } = Select;
 
@@ -82,6 +86,29 @@ export default function Rooms() {
 
     fetchStats();
   }, []);
+
+  const handleStatusChange = (id, newStatus) => {
+    if (needsReason(newStatus)) {
+      setReasonModal({ open: true, id, status: newStatus });
+    } else {
+      applyRoomStatus(id, newStatus, "");
+    }
+  };
+
+  const applyRoomStatus = async (id, newStatus, reasonText) => {
+    setStatusUpdating(true);
+    try {
+      await updateRoomStatus(id, newStatus, reasonText);
+      openNotification("success", "Status updated");
+      fetchData();
+    } catch {
+      openNotification("error", "Failed to update status");
+    } finally {
+      setStatusUpdating(false);
+      setReasonModal({ open: false, id: null, status: "" });
+      setReason("");
+    }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you want to delete this hotel?")) {
@@ -240,6 +267,7 @@ export default function Rooms() {
                         room={room}
                         active={selectedRoom?.id === room.id}
                         onClick={() => setSelectedRoom(room)}
+                        onStatusChange={handleStatusChange}
                       />
 
                     ))}
@@ -311,6 +339,15 @@ export default function Rooms() {
           </div>
         </div>
       </div>
+      <StatusReasonModal
+        open={reasonModal.open}
+        status={reasonModal.status}
+        reason={reason}
+        onChange={setReason}
+        onConfirm={() => applyRoomStatus(reasonModal.id, reasonModal.status, reason)}
+        onCancel={() => { setReasonModal({ open: false, id: null, status: "" }); setReason(""); }}
+        loading={statusUpdating}
+      />
     </>
   );
 }

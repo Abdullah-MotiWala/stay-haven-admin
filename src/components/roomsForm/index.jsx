@@ -410,10 +410,11 @@ const RoomDetailsForm = () => {
                         { message: "Room type required" },
                       ]}
                     ><Select className="w-full h-12 p-2 border border-dark rounded-md font-medium">
-                        <Option value="availble">Available</Option>
-                        <Option value="maintenance">Maintenace</Option>
+                        <Option value="available">Available</Option>
+                        <Option value="active">Active</Option>
                         <Option value="occupied">Occupied</Option>
-
+                        <Option value="maintenance">Maintenance</Option>
+                        <Option value="inactive">Inactive</Option>
                       </Select>
 
                     </Form.Item>

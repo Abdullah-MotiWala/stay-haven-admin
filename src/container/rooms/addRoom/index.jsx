@@ -375,7 +375,13 @@ const AddNewRoom = () => {
                   <label className="text-base text-lightSeconday font-medium">Status</label>
                   <Form.Item preserve={true} name="status" rules={[{ required: true, message: "Status is required" }]}>
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-                      {[{ label: "Active", value: "available" }, { label: "In Active", value: "inactive" }, { label: "Maintenance", value: "maintenance" }, { label: "Occupied", value: "occupied" }].map((item) => (
+                      {[
+                        { label: "Available", value: "available" },
+                        { label: "Active", value: "active" },
+                        { label: "Occupied", value: "occupied" },
+                        { label: "Maintenance", value: "maintenance" },
+                        { label: "Inactive", value: "inactive" },
+                      ].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
                     </Select>

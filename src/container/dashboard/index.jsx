@@ -36,6 +36,13 @@ const Dashboard = () => {
     fetchAllDashboardData();
   }, []);
 
+  const fetchOpenTickets = async () => {
+    try {
+      const res = await getOpenTickets();
+      setOpenTickets(res?.data?.data || []);
+    } catch {}
+  };
+
   const fetchAllDashboardData = async () => {
     try {
       const [
@@ -116,7 +123,7 @@ const Dashboard = () => {
   ];
   return (
     <div>
-      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={allBooking} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} paginationdata={paginationdata} />
+      <DashboardPage cardsData={cardsData} bookingStatistics={bookingStatistics} recentBookings={allBooking} bookingStatus={bookingStatus} apartmentAvailability={apartmentAvailability} roomsAvailability={roomsAvailability} openTickets={openTickets} notifications={notifications} paginationdata={paginationdata} onTicketsRefresh={fetchOpenTickets} />
     </div>
   );
 };
