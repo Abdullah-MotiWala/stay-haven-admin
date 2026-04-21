@@ -120,8 +120,8 @@ const SocialLinks = () => {
 
       <div className="space-y-4">
         {links.map((item, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <div>
+          <div key={index} className="flex flex-col md:flex-row gap-3 items-end p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="flex-1 min-w-0">
               <label className={labelCls}>Platform *</label>
               <input
                 className={inputCls}
@@ -131,7 +131,7 @@ const SocialLinks = () => {
               />
             </div>
 
-            <div>
+            <div className="flex-1 min-w-0">
               <label className={labelCls}>URL *</label>
               <input
                 className={inputCls}
@@ -141,52 +141,50 @@ const SocialLinks = () => {
               />
             </div>
 
-            {/* Icon upload — replaces Icon URL text input */}
-            <div>
+            {/* Icon upload */}
+            <div className="w-40 flex-shrink-0">
               <label className={labelCls}>Icon</label>
-              <div className="flex items-center gap-2">
-                <div
-                  onClick={() => fileRefs.current[index]?.click()}
-                  className="w-10 h-10 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue transition overflow-hidden flex-shrink-0"
-                  title="Upload icon"
-                >
-                  {uploadingIdx === index ? (
-                    <Spin size="small" />
-                  ) : item.icon ? (
-                    <img src={item.icon} alt="icon" className="w-8 h-8 object-contain" />
-                  ) : (
-                    <ImagePlus size={16} className="text-gray-400" />
-                  )}
-                </div>
-                <span className="text-xs text-gray-400 truncate max-w-[120px]">
-                  {item.icon ? "Uploaded" : "Click to upload"}
+              <div
+                onClick={() => fileRefs.current[index]?.click()}
+                className="flex items-center gap-2 h-10 px-3 m-0 border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-blue transition-colors"
+              >
+                {uploadingIdx === index ? (
+                  <Spin size="small" />
+                ) : item.icon ? (
+                  <img src={item.icon} alt="icon" className="w-6 h-6 object-contain bg-gray-300 rounded flex-shrink-0" />
+                ) : (
+                  <ImagePlus size={16} className="text-black flex-shrink-0" />
+                )}
+                <span className="text-sm text-black truncate">
+                  {uploadingIdx === index ? "Uploading..." : item.icon ? "Change icon" : "Upload icon"}
                 </span>
                 <input
                   type="file"
                   accept="image/*"
-                  className="hidden"
+                  style={{ display: "none" }}
                   ref={(el) => (fileRefs.current[index] = el)}
                   onChange={(e) => handleIconUpload(index, e.target.files[0])}
                 />
               </div>
             </div>
 
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
-                <label className={labelCls}>Sort Order</label>
-                <input
-                  type="number"
-                  className={inputCls}
-                  placeholder="0"
-                  value={item.sortOrder}
-                  onChange={(e) => handleChange(index, "sortOrder", e.target.value)}
-                />
-              </div>
+            <div className="w-28 flex-shrink-0">
+              <label className={labelCls}>Sort Order</label>
+              <input
+                type="number"
+                className={inputCls}
+                placeholder="0"
+                value={item.sortOrder}
+                onChange={(e) => handleChange(index, "sortOrder", e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-end flex-shrink-0">
               <button
                 type="button"
                 onClick={() => removeLink(index)}
                 disabled={deletingId === item.id}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-40 flex-shrink-0"
+                className="h-10 w-10 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-40"
               >
                 <Trash2 size={16} />
               </button>
