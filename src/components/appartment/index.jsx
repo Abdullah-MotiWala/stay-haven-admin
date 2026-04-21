@@ -14,16 +14,18 @@ import {
   getBedType,
   updateApartmentStatus,
 } from "../../services/appartments";
+import { getAllFeature } from "../../services/features";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
-import { APPARTMENT_TYPES, ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
+import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 
 export default function Appartments() {
-  const [activeType, setActiveType] = useState(APPARTMENT_TYPES[0]); const [selectedAppartment, setSelectedAppartment] = useState(null);
+  const [appartmentTypes, setAppartmentTypes] = useState([]);
+  const [activeType, setActiveType] = useState({ label: "All Apartments", typeId: null }); const [selectedAppartment, setSelectedAppartment] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -39,6 +41,19 @@ export default function Appartments() {
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   const { Option } = Select;
+
+  useEffect(() => {
+    const fetchAppartmentTypes = async () => {
+      try {
+        const res = await getAllFeature("ROOM_TYPE");
+        const types = [{ label: "All Apartments", typeId: null }, ...(res?.data?.data ?? []).map((f) => ({ label: f.title, typeId: f.id }))];
+        setAppartmentTypes(types);
+      } catch (err) {
+        console.error("Failed to load apartment types", err);
+      }
+    };
+    fetchAppartmentTypes();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -167,7 +182,7 @@ export default function Appartments() {
       <MatrixCard showshadow="true" data={cardsData} icon={home} />
 
       <div className="p-0 ml-3 gap-[2px] flex flex-wrap  item-center rounded-lg">
-        {APPARTMENT_TYPES.map((type, index) => (
+        {appartmentTypes.map((type, index) => (
           <button
             key={type.label}
             onClick={() => setActiveType(type)}
@@ -180,7 +195,7 @@ export default function Appartments() {
                 : "bg-white text-extradark hover:bg-gray-50"
               }
         ${index === 0 ? "" : ""}
-        ${index === APPARTMENT_TYPES.length - 1 ? "" : ""}
+        ${index === appartmentTypes.length - 1 ? "" : ""}
       `}
           >
             {type.label}

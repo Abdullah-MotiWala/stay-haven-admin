@@ -3,7 +3,7 @@ import Api from "../../network/axiosClients";
 export const getAllRooms = async (
   currentPage = 1,
   itemsPerPage = 10,
-  status = "available",
+  status = "",
   search = "",
   sort = "asc",
   activeType = "All Rooms",
@@ -11,7 +11,7 @@ export const getAllRooms = async (
 ) => {
   const hostParam = hostId ? `&hostId=${hostId}` : "";
   return Api.get(
-    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? "available"}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
   );
 };
 

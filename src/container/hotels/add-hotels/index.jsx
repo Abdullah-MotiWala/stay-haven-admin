@@ -88,6 +88,7 @@ const HotelForm = () => {
           email: hotelData.email || "",
           cancellation_policy: hotelData.cancellation_policy || "",
           isActive: hotelData.status || "active",
+          isFeatured: hotelData.isFeatured || false,
           hostId: hotelData.hostId || hotelData.host?.id || undefined,
           amenities: hotelData.amenities?.map((a) => a.id) || [],
           rooms: hotelData.roomsIncluded?.map((r) => r.id) || [],
@@ -170,6 +171,7 @@ const HotelForm = () => {
         email: values.email,
         cancellation_policy: values.cancellation_policy,
         status: values.isActive,
+        isFeatured: values.isFeatured ?? false,
         hostId: values.hostId,
         featureIds: [...(values.amenities || []), ...(values.rooms || [])],
         ...(imageUrl ? { imageUrl } : {}),
@@ -347,6 +349,12 @@ const HotelForm = () => {
                       value: host.id,
                     }))}
                   />
+                </Form.Item>
+              </div>
+
+              <div className="w-full flex items-center gap-3 pt-6">
+                <Form.Item name="isFeatured" valuePropName="checked" className="mb-0">
+                  <Checkbox>Mark as Featured Hotel</Checkbox>
                 </Form.Item>
               </div>
             </div>

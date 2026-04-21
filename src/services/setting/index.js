@@ -21,5 +21,5 @@ export const deleteFeatureApi = (id) => {
 };
 
 export const updateFeatureApi = (id, payload) => {
-    return Api.patch(`/features/${id}`, payload);
+    return Api.put(`/features/${id}`, payload);
 };

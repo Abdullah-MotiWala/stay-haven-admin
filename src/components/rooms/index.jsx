@@ -9,16 +9,18 @@ import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, ConfigProvider, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { getAllRooms, getStats, deleteRoom, getBedtypeId, updateRoomStatus } from "../../services/rooms";
+import { getAllFeature } from "../../services/features";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
 import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
-import { ENTIRES_PER_PAGE_OPTION, ROOM_TYPES } from "../../shared/constant";
+import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 
 export default function Rooms() {
-  const [activeType, setActiveType] = useState(ROOM_TYPES[0]);
+  const [roomTypes, setRoomTypes] = useState([]);
+  const [activeType, setActiveType] = useState({ label: "All Rooms", typeId: null });
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
@@ -38,6 +40,19 @@ export default function Rooms() {
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   const { Option } = Select;
+
+  useEffect(() => {
+    const fetchRoomTypes = async () => {
+      try {
+        const res = await getAllFeature("ROOM_TYPE");
+        const types = [{ label: "All Rooms", typeId: null }, ...(res?.data?.data ?? []).map((f) => ({ label: f.title, typeId: f.id }))];
+        setRoomTypes(types);
+      } catch (err) {
+        console.error("Failed to load room types", err);
+      }
+    };
+    fetchRoomTypes();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -167,7 +182,7 @@ export default function Rooms() {
       <MatrixCard showshadow="true" data={cardsData} icon={home} />
 
       <div className="p-1 ml-3 gap-[2px] flex flex-wrap items-center rounded-lg">
-        {ROOM_TYPES.map((type, index) => (
+        {roomTypes.map((type, index) => (
           <button
             key={type.label}
             onClick={() => setActiveType(type)}
@@ -179,7 +194,7 @@ export default function Rooms() {
                 : "bg-white text-extradark hover:bg-gray-50"
               }
        ${index === 0 ? "rounded-l-lg" : "rounded-0"}
-        ${index === ROOM_TYPES.length - 1 ? "rounded-r-lg" : "rounded-0"}
+        ${index === roomTypes.length - 1 ? "rounded-r-lg" : "rounded-0"}
       `}
           >
             {type.label}

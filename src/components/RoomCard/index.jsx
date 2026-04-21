@@ -5,12 +5,12 @@ import location from "../../assets/icons/location.svg";
 import { DEFAULT_IMAGE } from "../../shared/constant";
 import { useNavigate } from "react-router-dom";
 
-function RoomCard({ room, active, onClick, onStatusChange }) {
+function RoomCard({ room, active, onClick, onStatusChange, editPath }) {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const STATUS_OPTIONS = ["available", "active", "occupied", "maintenance", "inactive"];
   let id = room?.id;
-  const handleEditClick = () => { navigate(`/admin/rooms/edit/${id}`); };
+  const handleEditClick = () => { navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`); };
 
   return (
     <div

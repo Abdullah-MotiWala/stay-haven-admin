@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import Rooms from "../rooms";
 
-function RoomDetail({ room }) {
+function RoomDetail({ room, editPath }) {
   const AMENITY_ICON_BY_NAME = {
     "break fast": Coffee,
     breakfast: Coffee,
@@ -41,8 +41,7 @@ function RoomDetail({ room }) {
   const [hasMore, setHasMore] = useState(false);
   const navigate = useNavigate();
   const handleEditClick = () => {
-    // navigate(`/admin/rooms/edit/${id}`);
-    navigate(`/admin/rooms/edit/${id}`);
+    navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`);
   };
 
   useEffect(() => {
@@ -70,8 +69,8 @@ function RoomDetail({ room }) {
     setHasMore(room?.galleryImages?.length > currentImages.length + 4);
   };
 
-  const getAmenityIcon = (name = "") => {
-    const key = name.toLowerCase().trim();
+  const getAmenityIcon = (name) => {
+    const key = (name ?? "").toLowerCase().trim();
     return AMENITY_ICON_BY_NAME[key] || HelpCircle;
   };
   return (

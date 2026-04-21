@@ -73,10 +73,21 @@ const Amenities = () => {
     if (!customValue.trim()) return;
     setActionLoading(true);
     try {
-      const payload = { title: customValue, type: "AMENITY", ...(customIcon ? { icon: customIcon } : {}) };
+      let iconUrl = customIcon;
+
+      // Agar file selected hai but upload pending hai toh pehle upload karo
+      if (newIconRef.current?.files?.[0] && !customIcon) {
+        const formData = new FormData();
+        formData.append("image", newIconRef.current.files[0]);
+        const res = await uploadSingleMedia(formData);
+        iconUrl = res?.data?.data?.url || "";
+      }
+
+      const payload = { title: customValue, type: "AMENITY", ...(iconUrl ? { icon: iconUrl } : {}) };
       await createFeatureApi(payload);
       setCustomValue("");
       setCustomIcon("");
+      if (newIconRef.current) newIconRef.current.value = "";
       await fetchAmenities();
       openNotification("success", "Amenity added successfully");
     } catch {
