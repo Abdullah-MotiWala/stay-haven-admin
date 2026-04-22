@@ -51,6 +51,14 @@ const AddNewRoom = () => {
     fetchHotelNamesList();
   }, []);
 
+  const handleHotelChange = (val) => {
+    form.setFieldValue("type", undefined);
+    if (!val) { setRoomTypesList([]); return; }
+    const hotel = hotelsList.find((h) => h.id === val);
+    const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
+    setRoomTypesList(types);
+  };
+
   useEffect(() => {
     if (!isEditMode) return;
     const fetchRoomById = async () => {
@@ -85,6 +93,16 @@ const AddNewRoom = () => {
 
         if (room.mainImage) setMainImagePreview(room.mainImage);
         if (room.galleryImages?.length) setGalleryPreviews(room.galleryImages);
+
+        // Set room types from hotel's features
+        if (room.hotel?.id) {
+          const hotelsRes = await getHotelNamesList();
+          const hotels = hotelsRes?.data?.data || hotelsRes?.data || [];
+          const hotel = hotels.find((h) => h.id === room.hotel.id);
+          const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
+          setRoomTypesList(types);
+          setHotelsList(hotels);
+        }
       } catch {
         openNotification("error", "Failed to load room");
       } finally {
@@ -97,18 +115,16 @@ const AddNewRoom = () => {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const [amenityRes, featuresRes, facilityRes, roomTypeRes, policyTypeRes] = await Promise.all([
+        const [amenityRes, featuresRes, facilityRes, policyTypeRes] = await Promise.all([
           getAllFeature("AMENITY"),
           getAllFeature("ROOM_FEATURE"),
           getAllFeature("ROOM_FACILITY"),
-          getAllFeature("ROOM_TYPE"),
           getAllFeature("POLICY"),
         ]);
         setAmenitiesList(amenityRes.data.data || []);
         setFeaturesList(featuresRes.data.data || []);
         setFacilityList(facilityRes.data.data || []);
         setPolicyList(policyTypeRes.data.data || []);
-        setRoomTypesList(roomTypeRes.data.data || []);
       } catch {
         openNotification("error", "Failed to load features");
       }
@@ -277,7 +293,7 @@ const AddNewRoom = () => {
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Select Hotel</label>
                   <Form.Item preserve={true} name="hotel">
-                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
+                    <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} onChange={handleHotelChange}>
                       {hotelsList?.map((item) => (
                         <Option key={item.id} value={item.id}>{item.name}</Option>
                       ))}

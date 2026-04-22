@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getHotelNamesList, getHotelById } from "../../../services/hotel";
+import { getHotelNamesList } from "../../../services/hotel";
 import { DEFAULT_IMAGE, STETPS_FIELDS } from "../../../shared/constant";
 import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
@@ -93,15 +93,6 @@ const AddNewAppartment = () => {
     fetch();
   }, []);
 
-  const extractRoomTypes = (hotelRes) => {
-    const hotelData = hotelRes?.data?.data || hotelRes?.data;
-    const roomsIncluded = hotelData?.roomsIncluded || [];
-    return roomsIncluded.map((r) => ({
-      id: r.id,
-      title: r.name || r.title || "",
-    }));
-  };
-
   useEffect(() => {
     if (!isEditMode) return;
     const fetch = async () => {
@@ -112,8 +103,11 @@ const AddNewAppartment = () => {
 
         if (apt.hotel?.id) {
           try {
-            const hotelRes = await getHotelById(apt.hotel.id);
-            const types = extractRoomTypes(hotelRes);
+            const hotelsRes = await getHotelNamesList();
+            const hotels = hotelsRes?.data?.data || hotelsRes?.data || [];
+            setHotelsList(hotels);
+            const hotel = hotels.find((h) => h.id === apt.hotel.id);
+            const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
             setRoomTypesList(types);
             setHotelSelected(types.length > 0);
           } catch (e) {
@@ -160,17 +154,12 @@ const AddNewAppartment = () => {
     setRoomTypesList([]);
     setHotelSelected(false);
     if (!val) return;
-    try {
-      const hotelRes = await getHotelById(val);
-      const types = extractRoomTypes(hotelRes);
-      setRoomTypesList(types);
-      setHotelSelected(types.length > 0);
-      if (types.length === 0) {
-        openNotification("warning", "This hotel has no room types configured yet.");
-      }
-    } catch (e) {
-      console.error("Failed to load hotel room types", e);
-      openNotification("error", "Failed to load room types for selected hotel");
+    const hotel = hotelsList.find((h) => h.id === val);
+    const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
+    setRoomTypesList(types);
+    setHotelSelected(types.length > 0);
+    if (types.length === 0) {
+      openNotification("warning", "This hotel has no room types configured yet.");
     }
   };
 

@@ -73,7 +73,7 @@ export default function Rooms() {
       }
 
 
-      setRooms(res?.data);
+      setRooms(res?.data ? { ...res.data, data: (res.data.data || []).filter((r) => r.isHostel === false) } : res?.data);
 
       if (res?.data?.data?.length > 0) {
         setSelectedRoom(res.data.data[0]);

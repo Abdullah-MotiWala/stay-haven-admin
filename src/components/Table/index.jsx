@@ -447,14 +447,18 @@ const HotelDirectory = ({
                 const uiHotelId = `#${BASE_HOTEL_CODE}-${String(index + 1).padStart(2, "0")}`;
                 const enrichedRow = { ...row, uiHotelId };
                 return (
-                  <tr key={index} className={`${index % 2 === 0 ? "bg-white" : "bg-lightWhite"} hover:bg-blue-50 transition-colors`}>
+                  <tr key={index} className={`${index % 2 === 0 ? "bg-white" : "bg-lightWhite"} hover:bg-blue-50 transition-colors ${view ? "cursor-pointer" : ""}`}
+                    onClick={() => { if (view) navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
+                  >
                     {checkbox && (
                       <td className="border-b border-t border-r border-dashed">
                         <input type="checkbox" checked={selectedIds.includes(row.id)} onChange={() => toggleRow(row.id)} className="checked:accent-blue" />
                       </td>
                     )}
                     {columns.map((col) => (
-                      <td key={col.key} className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}>
+                      <td key={col.key} className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
+                        onClick={(e) => { if (col.type === "actions" || col.type === "status") e.stopPropagation(); }}
+                      >
                         <div className={`flex items-center ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
                           {renderCell(enrichedRow, col, index)}
                         </div>

@@ -7,7 +7,6 @@ import home from "../../assets/icons/home.png";
 import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, Input, Select } from "antd";
-import { useNavigate } from "react-router-dom";
 import { getAllHostels, getStats, deleteRoom, updateRoomStatus } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
@@ -20,7 +19,6 @@ import StatusReasonModal, { needsReason } from "../../components/shared/statusRe
 export default function HostelListing() {
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
-  const navigate = useNavigate();
   const [hostelsData, setHostelsData] = useState([]);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,12 +125,6 @@ export default function HostelListing() {
               <h2 className="font-semibold text-[#000000] text-lg">
                 All Hostels ({hostelsData?.meta?.totalItems ?? hostelsData?.data?.length ?? 0})
               </h2>
-              <button
-                onClick={() => navigate("/admin/hostels/add")}
-                className="px-4 py-2 bg-blue text-white rounded-lg text-sm font-semibold"
-              >
-                + Add Hostel
-              </button>
             </div>
 
             <div className="flex justify-between items-center bg-white">

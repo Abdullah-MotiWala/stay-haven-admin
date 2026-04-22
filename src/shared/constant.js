@@ -87,6 +87,10 @@ export const PAGE_CONFIG = {
     buttonText: "Add New Host",
     navigateTo: "/admin/hosts/add",
   },
+  "/admin/hostels": {
+    buttonText: "Add New Hostel",
+    navigateTo: "/admin/hostels/add",
+  },
 };
 
 

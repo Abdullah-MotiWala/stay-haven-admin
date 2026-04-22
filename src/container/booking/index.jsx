@@ -19,7 +19,7 @@ const Booking = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Tab state URL se lo — back button pe restore hoga
-  const tabFromUrl = searchParams.get("tab") === "apartment" ? "Apartment Bookings" : "Room Bookings";
+  const tabFromUrl = searchParams.get("tab") === "apartment" ? "Apartment Bookings" : searchParams.get("tab") === "hostel" ? "Hostel Bookings" : "Room Bookings";
   const [activeType, setActiveType] = useState(tabFromUrl);
 
   // Back button pe URL change hone par tab sync karo
@@ -33,7 +33,7 @@ const Booking = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const roomTypes = ["Room Bookings", "Apartment Bookings"];
+  const roomTypes = ["Room Bookings", "Hostel Bookings", "Apartment Bookings"];
 
   const roomColumns = [
     { key: "bookingId",   label: "Booking ID",            type: "text" },
@@ -41,6 +41,18 @@ const Booking = () => {
     { key: "hotelName",   label: "Hotel",                 type: "hotelCell" },
     { key: "roomType",    label: "Room Type",             type: "roomType" },
     { key: "roomNumber",  label: "Room Number",           type: "text" },
+    { key: "duration",    label: "Duration",              type: "text" },
+    { key: "checkInOut",  label: "Check-In & Check-Out",  type: "dateRange" },
+    { key: "status",      label: "Status",                type: "status" },
+    { key: "action",      label: "Action",                type: "actions" },
+  ];
+
+  const hostelColumns = [
+    { key: "bookingId",   label: "Booking ID",            type: "text" },
+    { key: "guestName",   label: "Guest Name",            type: "text" },
+    { key: "hotelName",   label: "Hotel",                 type: "hotelCell" },
+    { key: "roomType",    label: "Hostel Type",           type: "roomType" },
+    { key: "roomNumber",  label: "Bed/Room Number",       type: "text" },
     { key: "duration",    label: "Duration",              type: "text" },
     { key: "checkInOut",  label: "Check-In & Check-Out",  type: "dateRange" },
     { key: "status",      label: "Status",                type: "status" },
@@ -73,7 +85,16 @@ const Booking = () => {
       setLoading(true);
       const isApartment = (type ?? activeType) === "Apartment Bookings";
       const res = await getAllBooking(page ?? currentPage, limit ?? itemsPerPage, isApartment);
-      setRecentBookings(res.data?.data || []);
+      let bookings = res.data?.data || [];
+
+      // Hostel tab: filter by isHostel=true, Room tab: filter by isHostel=false
+      if ((type ?? activeType) === "Hostel Bookings") {
+        bookings = bookings.filter((b) => b.isHostel === true);
+      } else if ((type ?? activeType) === "Room Bookings") {
+        bookings = bookings.filter((b) => b.isHostel === false);
+      }
+
+      setRecentBookings(bookings);
       setTotal(res.data?.meta?.totalItems || res.data?.meta?.total || 0);
     } catch (err) {
       console.error("Failed to load bookings:", err);
@@ -112,7 +133,9 @@ const Booking = () => {
   };
 
   const currentColumns =
-    activeType === "Apartment Bookings" ? apartmentColumns : roomColumns;
+    activeType === "Apartment Bookings" ? apartmentColumns :
+    activeType === "Hostel Bookings" ? hostelColumns :
+    roomColumns;
 
   const sc = stats?.statusCounts ?? {};
   const checkedInCount  = (sc["Checked-In"]  ?? 0) + (sc["Checkin"]  ?? 0);
@@ -142,7 +165,7 @@ const Booking = () => {
             key={type}
             onClick={() => {
               setActiveType(type);
-              setSearchParams({ tab: type === "Apartment Bookings" ? "apartment" : "room" });
+              setSearchParams({ tab: type === "Apartment Bookings" ? "apartment" : type === "Hostel Bookings" ? "hostel" : "room" });
             }}
             className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0 ${
               activeType === type

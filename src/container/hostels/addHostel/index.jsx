@@ -55,21 +55,28 @@ const AddHostel = () => {
         fetchHotels();
     }, []);
 
+    const handleHotelChange = (val) => {
+        form.setFieldValue("roomTypeId", undefined);
+        if (!val) { setRoomTypesList([]); return; }
+        const hotel = hotelsList.find((h) => h.id === val);
+        const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
+        setRoomTypesList(types);
+    };
+
     useEffect(() => {
         const fetchFeatures = async () => {
             try {
-                const [amenityRes, featuresRes, facilityRes, policyRes, roomTypeRes] = await Promise.all([
+                const [amenityRes, featuresRes, facilityRes, policyRes] = await Promise.all([
                     getAllFeature("AMENITY"),
                     getAllFeature("ROOM_FEATURE"),
                     getAllFeature("ROOM_FACILITY"),
                     getAllFeature("POLICY"),
-                    getAllFeature("ROOM_TYPE"),
                 ]);
                 setAmenitiesList(amenityRes.data.data || []);
                 setFeaturesList(featuresRes.data.data || []);
                 setFacilityList(facilityRes.data.data || []);
                 setPolicyList(policyRes.data.data || []);
-                setRoomTypesList(roomTypeRes.data.data || []);            } catch {
+            } catch {
                 openNotification("error", "Failed to load features");
             }
         };
@@ -104,6 +111,16 @@ const AddHostel = () => {
                 });
                 if (room.mainImage) setMainImagePreview(room.mainImage);
                 if (room.galleryImages?.length) setGalleryPreviews(room.galleryImages);
+
+                // Set room types from hotel's features
+                if (room.hotel?.id) {
+                    const hotelsRes = await getHotelNamesList();
+                    const hotels = hotelsRes?.data?.data || hotelsRes?.data || [];
+                    setHotelsList(hotels);
+                    const hotel = hotels.find((h) => h.id === room.hotel.id);
+                    const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
+                    setRoomTypesList(types);
+                }
             } catch {
                 openNotification("error", "Failed to load hostel");
             } finally {
@@ -235,7 +252,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Select Hotel</label>
                                     <Form.Item name="hotel">
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Hotel" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())} onChange={handleHotelChange}>
                                             {hotelsList.map((h) => <Option key={h.id} value={h.id}>{h.name}</Option>)}
                                         </Select>
                                     </Form.Item>
