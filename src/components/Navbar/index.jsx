@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import userImg from "../../assets/images/dummy.png";
 import bellIcon from "../../assets/icons/bellIcon.png";
@@ -8,13 +8,31 @@ import headPhone from "../../assets/icons/headPhone.png";
 import search from "../../assets/icons/search.svg";
 
 import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
-import { Button, Dropdown, Input, Modal } from "antd";
+import { Button, Dropdown, Input, Modal, Badge } from "antd";
 import { LogoutOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { getUnreadCount } from "../../services/notification";
 
 const Navbar = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    fetchUnreadCount();
+    // Poll for unread count every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await getUnreadCount();
+      setUnreadCount(res?.data?.data?.count || 0);
+    } catch (err) {
+      console.error("Failed to fetch unread count", err);
+    }
+  };
 
   const currentDate = new Date().toLocaleDateString("en-GB", {
     weekday: "short",
@@ -97,10 +115,18 @@ const Navbar = () => {
               <img src={headPhone ?? DEFAULT_IMAGE} alt="support" className="w-5 h-5" />
             </button>
 
-            <button className="relative bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50">
-              <img src={bellIcon ?? DEFAULT_IMAGE} alt="notifications" className="w-5 h-5" />
-              <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-            </button>
+            <Badge 
+              count={unreadCount} 
+              offset={[-5, 15]}
+              style={{ backgroundColor: '#8B0000' }}
+            >
+              <button 
+                onClick={() => navigate("/admin/notifications")}
+                className="relative bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50"
+              >
+                <img src={bellIcon ?? DEFAULT_IMAGE} alt="notifications" className="w-5 h-5" />
+              </button>
+            </Badge>
           </div>
 
           <div className="flex items-center border-l border-[#AEB2C9] pl-4 ml-1">

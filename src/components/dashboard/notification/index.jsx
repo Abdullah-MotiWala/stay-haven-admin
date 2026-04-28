@@ -1,37 +1,4 @@
-import Card from "../card";
-
-// const notifications = [
-//   {
-//     type: "Danger",
-//     title: "Low room availability",
-//     message: "Only 2 rooms left in Deluxe Room – Karachi Hotel",
-//     time: "4:12 pm",
-//   },
-//   {
-//     type: "Danger",
-//     title: "Pending bookings",
-//     message: "5 bookings pending approval",
-//     time: "4:12 pm",
-//   },
-//   {
-//     type: "Info",
-//     title: "New booking received",
-//     message: "Lorem Ipsum is simply dummy text of the printing",
-//     time: "4:12 pm",
-//   },
-//   {
-//     type: "Info",
-//     title: "Room updated",
-//     message: "Lorem Ipsum is simply dummy text of the printing",
-//     time: "4:12 pm",
-//   },
-//   {
-//     type: "Danger",
-//     title: "Low room availability",
-//     message: "Only 2 rooms left in Deluxe Room – Karachi Hotel",
-//     time: "4:12 pm",
-//   },
-// ];
+import { useNavigate } from "react-router-dom";
 
 const typeStyles = {
   Danger: {
@@ -55,6 +22,8 @@ const typeStyles = {
 
 
 const NotificationsAlerts = ({ notifications }) => {
+  const navigate = useNavigate();
+  
   const formatTime = (dateString) => {
     if (!dateString) return "";
 
@@ -73,7 +42,10 @@ const NotificationsAlerts = ({ notifications }) => {
     <div className="bg-white rounded-2xl border-red border-1 border-solid shadow-[0_8px_30px_rgba(0,0,0,0.08)] overflow-auto">
       <div className="flex justify-between px-4 pt-6 items-center mb-3">
         <span className="text-red font-medium text-lg">Notification & Alerts</span>
-        <span className="text-mainBlue text-sm font-medium cursor-pointer">
+        <span 
+          onClick={() => navigate("/admin/notifications")}
+          className="text-mainBlue text-sm font-medium cursor-pointer hover:underline"
+        >
           View All
         </span>
       </div>

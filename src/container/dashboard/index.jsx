@@ -18,7 +18,7 @@ import {
 } from "../../services/dashboard/";
 import { getAllBooking } from "../../services/booking"
 import { openNotification } from "../../network/notification";
-import { getNotificationApi } from "../../services/notification";
+import { getAllNotifications } from "../../services/notification";
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [bookingStatistics, setBookingStatistics] = useState(null);
@@ -65,7 +65,7 @@ const Dashboard = () => {
         // getRecentBookings(),
         getApartmentAvailability(),
         getOpenTickets(),
-        getNotificationApi(),
+        getAllNotifications(),
         getAllBooking()
 
 

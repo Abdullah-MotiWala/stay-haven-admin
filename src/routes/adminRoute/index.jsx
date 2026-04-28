@@ -23,6 +23,7 @@ import HotelBookingDashboard from "../../container/dashboard";
 import ContactMessages from "../../container/contact";
 import AdminProfile from "../../container/profile";
 import AddHost from "../../container/hosts/addHost";
+import Notifications from "../../container/notifications";
 
 export const AdminRoute = [
   {
@@ -59,6 +60,7 @@ export const AdminRoute = [
           { path: "hostels/edit/:id", element: <AddHostel /> },
           { path: "contact-messages", element: <ContactMessages /> },
           { path: "profile", element: <AdminProfile /> },
+          { path: "notifications", element: <Notifications /> },
         ],
       },
     ],

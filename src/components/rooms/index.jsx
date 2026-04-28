@@ -72,11 +72,13 @@ export default function Rooms() {
         res = await getBedtypeId(activeType.typeId);
       }
 
+      // Filter out hostels (isHostel=true)
+      const filteredData = (res?.data?.data || []).filter((r) => r.isHostel === false);
+      
+      setRooms(res?.data ? { ...res.data, data: filteredData } : res?.data);
 
-      setRooms(res?.data ? { ...res.data, data: (res.data.data || []).filter((r) => r.isHostel === false) } : res?.data);
-
-      if (res?.data?.data?.length > 0) {
-        setSelectedRoom(res.data.data[0]);
+      if (filteredData.length > 0) {
+        setSelectedRoom(filteredData[0]);
       }
 
     } catch (err) {
