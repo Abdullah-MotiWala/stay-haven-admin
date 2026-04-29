@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import userImg from "../../assets/images/dummy.png";
 import bellIcon from "../../assets/icons/bellIcon.png";
-import themeIcon from "../../assets/icons/theme.png";
 import calendarIcon from "../../assets/icons/Calendar.png";
-import headPhone from "../../assets/icons/headPhone.png";
 import search from "../../assets/icons/search.svg";
-
 import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
-import { Button, Dropdown, Input, Modal, Badge } from "antd";
-import { LogoutOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { getUnreadCount } from "../../services/notification";
+import { Dropdown, Input, Modal, Badge } from "antd";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { getAllNotifications } from "../../services/notification";
+import socket from "../../services/socket";
 
 const Navbar = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -18,21 +15,35 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    fetchUnreadCount();
-    // Poll for unread count every 30 seconds
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
   const fetchUnreadCount = async () => {
     try {
-      const res = await getUnreadCount();
-      setUnreadCount(res?.data?.data?.count || 0);
+      const res = await getAllNotifications();
+      const count = (res?.data?.data || []).filter(n => !n.isRead).length;
+      setUnreadCount(count);
     } catch (err) {
       console.error("Failed to fetch unread count", err);
     }
   };
+
+  useEffect(() => {
+    fetchUnreadCount();
+
+    // Realtime: socket se notification aaye to count update karo
+    const handleNewNotification = (data) => {
+      // If backend sends count directly use it, otherwise refetch
+      if (data?.count !== undefined) {
+        setUnreadCount(data.count);
+      } else {
+        fetchUnreadCount();
+      }
+    };
+
+    socket.on("notification-received", handleNewNotification);
+
+    return () => {
+      socket.off("notification-received", handleNewNotification);
+    };
+  }, []);
 
   const currentDate = new Date().toLocaleDateString("en-GB", {
     weekday: "short",
@@ -107,14 +118,6 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center flex-shrink-0 gap-1">
-            <button className="bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50">
-              <img src={themeIcon ?? DEFAULT_IMAGE} alt="theme" className="w-5 h-5" />
-            </button>
-
-            <button className="bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50">
-              <img src={headPhone ?? DEFAULT_IMAGE} alt="support" className="w-5 h-5" />
-            </button>
-
             <Badge 
               count={unreadCount} 
               offset={[-5, 15]}

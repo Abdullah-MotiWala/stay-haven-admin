@@ -125,23 +125,31 @@ const Amenities = () => {
                   {amenities.map((item) => (
                     <div key={item.id} className="flex items-center justify-between gap-2 p-2 rounded-xl border border-gray-100 bg-gray-50">
                       <div className="flex items-center gap-2 min-w-0">
-                        {/* Icon preview / upload */}
+                        {/* Icon preview / upload with hover edit overlay */}
                         <div
-                          className="relative w-9 h-9 rounded-lg border border-gray-200 bg-white flex items-center justify-center cursor-pointer overflow-hidden flex-shrink-0 hover:border-blue transition"
+                          className="relative w-9 h-9 rounded-lg border border-gray-200 bg-white flex items-center justify-center cursor-pointer flex-shrink-0 group"
                           onClick={() => iconRefs.current[item.id]?.click()}
                           title="Click to change icon"
                         >
                           {uploadingIdx === item.id ? (
                             <Spin size="small" />
                           ) : item.icon ? (
-                            <img src={item.icon} alt={item.title} className="w-6 h-6 object-contain" />
+                            <>
+                              <img src={item.icon} alt={item.title} className="w-6 h-6 object-contain" />
+                              {/* Hover edit overlay */}
+                              <div className="absolute inset-0 bg-black/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                              </div>
+                            </>
                           ) : (
                             <ImagePlus size={16} className="text-gray-400" />
                           )}
                           <input
                             type="file"
                             accept="image/*"
-                            className="hidden"
+                            style={{ display: "none" }}
                             ref={(el) => (iconRefs.current[item.id] = el)}
                             onChange={(e) => handleIconUpload(item.id, e.target.files[0])}
                           />
@@ -188,21 +196,28 @@ const Amenities = () => {
             <div>
               <p className="text-xs font-semibold text-gray-500 mb-1">Icon (optional)</p>
               <div
-                className="w-12 h-12 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue transition overflow-hidden"
+                className="relative w-12 h-12 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue transition group"
                 onClick={() => newIconRef.current?.click()}
                 title="Upload icon"
               >
                 {uploadingNew ? (
                   <Spin size="small" />
                 ) : customIcon ? (
-                  <img src={customIcon} alt="icon" className="w-8 h-8 object-contain" />
+                  <>
+                    <img src={customIcon} alt="icon" className="w-8 h-8 object-contain" />
+                    <div className="absolute inset-0 bg-black/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </div>
+                  </>
                 ) : (
                   <ImagePlus size={18} className="text-gray-400" />
                 )}
                 <input
                   type="file"
                   accept="image/*"
-                  className="hidden"
+                  style={{ display: "none" }}
                   ref={newIconRef}
                   onChange={(e) => handleNewIconUpload(e.target.files[0])}
                 />

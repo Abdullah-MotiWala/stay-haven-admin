@@ -33,7 +33,7 @@ const StatusReasonModal = ({ open, status, reason, onChange, onConfirm, onCancel
           <button
             onClick={onConfirm}
             disabled={loading || !reason.trim()}
-            className="px-6 py-2 bg-red text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            className="px-6 py-2 bg-mainPrimary text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {loading ? "Processing..." : "Confirm & Notify"}
           </button>

@@ -179,20 +179,28 @@ const Booking = () => {
       </div>
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-        <HotelDirectory
-          data={recentBookings}
-          title="All Bookings"
-          columns={currentColumns}
-          filter={true}
-          view={true}
-          path={`/admin/booking/view`}
-          editpath={`/admin/booking/edit`}
-          inp={true}
-          onlyFilter={true}
-          checkbox={false}
-          activeType={activeType}
-          onDelete={handleDelete}
-        />
+        {loading ? (
+          <div className="flex justify-center items-center p-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+            <span className="ml-3 text-blue-600 font-medium">Loading...</span>
+          </div>
+        ) : (
+          <HotelDirectory
+            data={recentBookings}
+            title="All Bookings"
+            columns={currentColumns}
+            filter={true}
+            view={true}
+            path={`/admin/booking/view`}
+            viewpath={`/admin/booking/view`}
+            editpath={`/admin/booking/edit`}
+            inp={true}
+            onlyFilter={true}
+            checkbox={false}
+            activeType={activeType}
+            onDelete={handleDelete}
+          />
+        )}
 
         <div className="mt-4 flex justify-between items-center">
           <div>

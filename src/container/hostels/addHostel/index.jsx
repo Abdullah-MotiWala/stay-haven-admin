@@ -120,6 +120,8 @@ const AddHostel = () => {
                     const hotel = hotels.find((h) => h.id === room.hotel.id);
                     const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
                     setRoomTypesList(types);
+                    // Set roomTypeId AFTER types are loaded
+                    form.setFieldValue("roomTypeId", room.roomTypeId || undefined);
                 }
             } catch {
                 openNotification("error", "Failed to load hostel");

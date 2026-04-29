@@ -12,32 +12,37 @@ const Login = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false)
   const handleLogin = async (values) => {
-    setLoading(true); // 1. Sabse pehle loading start karein
+    setLoading(true);
     try {
       const payload = { ...values, userType: "admin" };
-      const res = await loginApi(payload); // 2. Ab API call ka wait karein
+      const res = await loginApi(payload);
 
       const userData = res.data.data;
       if (!userData.token) {
         throw new Error("Login failed");
-      } else {
-        localStorage.setItem("token", userData.token);
-        localStorage.setItem("userType", userData.userType);
-        localStorage.setItem("fullName", userData.name || userData.fullName);
-
-        dispatch(Authenticate({ token: userData.token }));
-        dispatch(SelfUser(userData));
-
-        openNotification("success", "Welcome back, " + (userData.name || "Admin"));
-        navigate("/admin/dashboard", { replace: true });
       }
+
+      // Only allow admin userType to login to this panel
+      if (userData.userType !== "admin") {
+        openNotification("error", "Access denied. Only admin accounts can login here.");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("token", userData.token);
+      localStorage.setItem("userType", userData.userType);
+      localStorage.setItem("fullName", userData.name || userData.fullName);
+
+      dispatch(Authenticate({ token: userData.token }));
+      dispatch(SelfUser(userData));
+
+      openNotification("success", "Welcome back, " + (userData.name || "Admin"));
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Invalid email or password";
       openNotification("error", errorMsg);
-      setLoading(false); // Error ki surat mein yahan band karein
+      setLoading(false);
     }
-    // Note: Agar navigate ho raha hai to loading true hi rehne den 
-    // warna agar aap isi page par ruk rahe hain to setLoading(false) catch ya finally mein lazmi karein.
   };
   return (
     <>

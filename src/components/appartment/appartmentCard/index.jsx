@@ -33,7 +33,7 @@ function AppartmentCard({ data, active, onClick, onStatusChange }) {
               <span className="text-[14px] font-medium text-gray-800">
                 Appartment No: {data.apartmentNumber ?? 0}
               </span>
-              <h3>{data.type}</h3>
+              <h3>{data?.apartmentName || data?.type || "N/A"}</h3>
             </div>
             <div className="flex items-center gap-2">
               <span
@@ -91,14 +91,14 @@ function AppartmentCard({ data, active, onClick, onStatusChange }) {
               </span>
             </div>
           </div>
-          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0">
+          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0 line-clamp-2 overflow-hidden">
             {data?.description ?? "N/A"}
           </p>
         </div>
 
         <div className="flex justify-between items-end mt-0">
           <div className="text-[#7C8DB5] font-medium text-[14px]">
-            Guest: <span className="text-[#7C8DB5]">{data?.host?.name ?? "N/A"}</span>
+            Host: <span className="text-[#7C8DB5]">{data?.hostUser?.name || data?.host?.name || "N/A"}</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[24px] font-bold text-gray-900">

@@ -1,51 +1,63 @@
-import { ArrowUpOutlined, HomeOutlined } from "@ant-design/icons";
+import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { DEFAULT_IMAGE } from "../../shared/constant";
+import { MatrixCardSkeleton } from "../shared/skeletons";
 
-const MatrixCard = ({ showShadow = true ,data }) => {
-  
+// Accept old props (showShadow, showshadow, icon) so callers don't break
+const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, ...rest }) => {
+  if (loading) return <MatrixCardSkeleton />;
+
   return (
-    <div
-      className={`
-        grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
-        gap-6 mb-8 bg-white p-6 rounded-3xl
-        ${showShadow ? "shadow-sm" : ""}
-      `}
-    >
-      {Array.isArray(data) && data?.map((card, i) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-white p-5 rounded-3xl shadow-sm">
+      {Array.isArray(data) && data.map((card, i) => (
         <div
           key={i}
-          className={`relative p-6 pb-4 rounded-3xl ${
-            showShadow ? "shadow-sm" : ""
-          }`}
-          style={{ backgroundColor: card.bg }}
+          className="relative p-5 rounded-2xl flex flex-col justify-between min-h-[120px]"
+          style={{ backgroundColor: card.bg || "#F3F7EE" }}
         >
-
-          <div
-            className="absolute top-4 right-4 p-2 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: card.iconBg }}
-          >
-            <img
-              src={card.image}
-              alt={card.title}
-              className="w-5 h-5 object-contain"
-            />
+          {/* Title + Icon row */}
+          <div className="flex justify-between items-start">
+            <p className="text-sm font-medium text-gray-600 leading-tight pr-8">
+              {card.title}
+            </p>
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: card.iconBg || "#D1E1BC" }}
+            >
+              <img
+                src={card.image ?? DEFAULT_IMAGE}
+                alt={card.title}
+                className="w-5 h-5 object-contain"
+              />
+            </div>
           </div>
 
-          {/* Title */}
-          <p className="text-sm font-medium text-gray-700">{card.title}</p>
-
-          {/* Value */}
-          <div className="flex justify-between items-end mt-2 h-full ">
-            <h3 className="text-3xl font-bold position-relative bottom-8 ">
-              {card.value}
+          {/* Value + trend row */}
+          <div className="mt-3 flex items-end justify-between">
+            <h3 className="text-3xl font-bold text-gray-900 leading-none">
+              {card.value ?? "—"}
             </h3>
 
-            {card.showTrend && (
-              <div className="flex flex-col items-center gap-2 mt-8 mb-4 text-sm">
-                <span className="flex items-center gap-1 text-lightGreen px-3 py-1 rounded-full bg-extraLightGreen   font-medium">
-                  <ArrowUpOutlined />
+            {card.showTrend && card.trend && (
+              <div className="flex flex-col items-end gap-0.5">
+                <span
+                  className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    String(card.trend).startsWith("-")
+                      ? "bg-red-100 text-red-600"
+                      : "bg-green-100 text-green-600"
+                  }`}
+                >
+                  {String(card.trend).startsWith("-") ? (
+                    <ArrowDownOutlined />
+                  ) : (
+                    <ArrowUpOutlined />
+                  )}
                   {card.trend}
                 </span>
-                <span className="font-medium">{card.trendText}</span>
+                {card.trendText && (
+                  <span className="text-[10px] text-gray-400 font-medium">
+                    {card.trendText}
+                  </span>
+                )}
               </div>
             )}
           </div>

@@ -7,7 +7,7 @@ import home from "../../assets/icons/home.png";
 import searchImg from "../../assets/icons/search.svg";
 import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, Input, Select } from "antd";
-import { getAllHostels, getStats, deleteRoom, updateRoomStatus } from "../../services/rooms";
+import { getAllHostels, getStats, deleteRoom, updateRoomStatus, getBedtypeId } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
@@ -15,8 +15,12 @@ import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../../components/shared/statusReasonModal";
+import { RoomCardSkeleton } from "../../components/shared/skeletons";
+import { getAllFeature } from "../../services/features";
 
 export default function HostelListing() {
+  const [hostelTypes, setHostelTypes] = useState([]);
+  const [activeType, setActiveType] = useState({ label: "All Hostels", typeId: null });
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [hostelsData, setHostelsData] = useState([]);
@@ -29,22 +33,57 @@ export default function HostelListing() {
   const [reasonModal, setReasonModal] = useState({ open: false, id: null, status: "" });
   const [reason, setReason] = useState("");
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { Option } = Select;
 
+  // Fetch hostel types (same ROOM_TYPE features, deduped)
+  useEffect(() => {
+    const fetchHostelTypes = async () => {
+      try {
+        const res = await getAllFeature("ROOM_TYPE");
+        const raw = res?.data?.data ?? [];
+        const seen = new Set();
+        const deduped = raw.filter((f) => {
+          const key = f.title?.toLowerCase().replace(/\s+/g, " ").trim();
+          const normalized = (key === "one bed room" || key === "single bed") ? "single-bed" : key;
+          if (seen.has(normalized)) return false;
+          seen.add(normalized);
+          return true;
+        });
+        setHostelTypes([{ label: "All Hostels", typeId: null }, ...deduped.map((f) => ({ label: f.title, typeId: f.id }))]);
+      } catch {
+        console.error("Failed to load hostel types");
+      }
+    };
+    fetchHostelTypes();
+  }, []);
+
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const res = await getAllHostels(currentPage, itemsPerPage, status, search, sort);
+      let res;
+      if (activeType.typeId === null) {
+        res = await getAllHostels(currentPage, itemsPerPage, status, search, sort);
+      } else {
+        res = await getBedtypeId(activeType.typeId);
+        // Filter to only hostels from the type result
+        if (res?.data?.data) {
+          res = { ...res, data: { ...res.data, data: res.data.data.filter(r => r.isHostel === true) } };
+        }
+      }
       setHostelsData(res?.data);
       if (res?.data?.data?.length > 0) setSelectedHostel(res.data.data[0]);
     } catch (err) {
       console.error("Data fetch error", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, itemsPerPage, search]);
+  }, [currentPage, itemsPerPage, search, activeType]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -72,6 +111,9 @@ export default function HostelListing() {
       await updateRoomStatus(id, newStatus, reasonText);
       openNotification("success", "Status updated");
       fetchData();
+      // Refresh stats after status change
+      const res = await getStats();
+      setStats(res.data.data);
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
@@ -82,13 +124,14 @@ export default function HostelListing() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this hostel?")) {
+    if (window.confirm("Are you sure you want to delete this hostel? This will also remove associated bookings.")) {
       try {
         await deleteRoom(id);
         setHostelsData((prev) => ({ ...prev, data: prev.data.filter((h) => h.id !== id) }));
         openNotification("success", "Hostel deleted successfully");
-      } catch {
-        openNotification("error", "Internal Server Error");
+      } catch (err) {
+        const msg = err?.response?.data?.message || "Cannot delete hostel. It may have active bookings.";
+        openNotification("error", msg);
       }
     }
   };
@@ -116,14 +159,31 @@ export default function HostelListing() {
 
   return (
     <>
-      <MatrixCard showshadow="true" data={cardsData} icon={home} />
+      <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
+
+      {/* Hostel Type Filter Tabs */}
+      <div className="p-1 ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-hidden">
+        {hostelTypes.map((type, index) => (
+          <button
+            key={type.label}
+            onClick={() => setActiveType(type)}
+            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 m-0
+              ${activeType.label === type.label ? "bg-blue text-white" : "bg-white text-extradark hover:bg-gray-50"}
+              ${index === 0 ? "rounded-l-lg" : "rounded-none"}
+              ${index === hostelTypes.length - 1 ? "rounded-r-lg" : "rounded-none"}
+            `}
+          >
+            {type.label}
+          </button>
+        ))}
+      </div>
 
       <div className="p-4 md:p-6 bg-white min-h-screen">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="font-semibold text-[#000000] text-lg">
-                All Hostels ({hostelsData?.meta?.totalItems ?? hostelsData?.data?.length ?? 0})
+                {activeType.label} ({hostelsData?.meta?.totalItems ?? hostelsData?.data?.length ?? 0})
               </h2>
             </div>
 
@@ -167,7 +227,10 @@ export default function HostelListing() {
                     >
                       <Option value="sort" disabled>Sort by Status</Option>
                       <Option value="available">Available</Option>
+                      <Option value="active">Active</Option>
                       <Option value="occupied">Occupied</Option>
+                      <Option value="maintenance">Maintenance</Option>
+                      <Option value="inactive">Inactive</Option>
                     </Select>
                   </div>
                   <button
@@ -181,7 +244,9 @@ export default function HostelListing() {
             )}
 
             <div>
-              {hostelsData?.data?.length > 0 ? (
+              {loading ? (
+                <RoomCardSkeleton count={3} />
+              ) : hostelsData?.data?.length > 0 ? (
                 <>
                   <div className="space-y-4">
                     {hostelsData.data.map((hostel) => (

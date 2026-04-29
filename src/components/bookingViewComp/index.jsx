@@ -90,12 +90,10 @@ const BookingComp = ({ guestInfo, stayDetails, paymentSummary, status: initialSt
         <>
             {/* Back */}
             <div className="flex items-center gap-4 border-b border-gray-300 mb-2 pb-4">
-                <button className="text-gray-600 flex items-center gap-4  " onClick={() => {
-                    const tab = fromTab === "Apartment Bookings" ? "apartment" : "room";
-                    navigate(`/admin/bookings?tab=${tab}`);
-                }}>
+                <button className="text-gray-600 flex items-center gap-4" onClick={() => navigate(-1)}>
                     <img src={leftangle} alt="" />
-                    Back</button>
+                    Back
+                </button>
             </div>
 
             {/* Header */}

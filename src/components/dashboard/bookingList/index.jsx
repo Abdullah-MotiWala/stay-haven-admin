@@ -90,6 +90,8 @@ const BookingList = ({ recentBookings }) => {
           columns={columns}
           filter={false}
           view={true}
+          path={`/admin/booking/view`}
+          viewpath={`/admin/booking/view`}
         />
         <div className="mt-4 flex justify-between">
           <div>

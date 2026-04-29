@@ -134,6 +134,9 @@ const HostsListing = () => {
                             columns={columns}
                             setRefresh={setRefresh}
                             path={`/admin/hosts/edit`}
+                            viewpath={`/admin/hosts/view`}
+                            view={true}
+                            hostOptions={true}
                             onStatusToggle={handleStatusToggle}
                             extraActions={[
                                 {

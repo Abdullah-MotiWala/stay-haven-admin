@@ -17,6 +17,7 @@ import home4 from "../../assets/icons/home-4.png";
 import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
+import { RoomCardSkeleton } from "../shared/skeletons";
 
 export default function Rooms() {
   const [roomTypes, setRoomTypes] = useState([]);
@@ -45,7 +46,16 @@ export default function Rooms() {
     const fetchRoomTypes = async () => {
       try {
         const res = await getAllFeature("ROOM_TYPE");
-        const types = [{ label: "All Rooms", typeId: null }, ...(res?.data?.data ?? []).map((f) => ({ label: f.title, typeId: f.id }))];
+        const raw = res?.data?.data ?? [];
+        const seen = new Set();
+        const deduped = raw.filter((f) => {
+          const key = f.title?.toLowerCase().replace(/\s+/g, " ").trim();
+          const normalized = (key === "one bed room" || key === "single bed") ? "single-bed" : key;
+          if (seen.has(normalized)) return false;
+          seen.add(normalized);
+          return true;
+        });
+        const types = [{ label: "All Rooms", typeId: null }, ...deduped.map((f) => ({ label: f.title, typeId: f.id }))];
         setRoomTypes(types);
       } catch (err) {
         console.error("Failed to load room types", err);
@@ -55,6 +65,7 @@ export default function Rooms() {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       let res;
 
@@ -83,6 +94,8 @@ export default function Rooms() {
 
     } catch (err) {
       console.error("Data fetch error", err);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -118,6 +131,9 @@ export default function Rooms() {
       await updateRoomStatus(id, newStatus, reasonText);
       openNotification("success", "Status updated");
       fetchData();
+      // Refresh stats after status change
+      const res = await getStats();
+      setStats(res.data.data);
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
@@ -128,14 +144,14 @@ export default function Rooms() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you want to delete this hotel?")) {
+    if (window.confirm("Are you sure you want to delete this room? This will also remove associated bookings.")) {
       try {
         await deleteRoom(id);
-        setRooms(roomsdata?.data.filter((room) => room.id !== id));
-        openNotification("success", "Hotel deleted successfully");
+        setRooms(prev => ({ ...prev, data: prev.data.filter((r) => r.id !== id) }));
+        openNotification("success", "Room deleted successfully");
       } catch (err) {
-        console.error("Any Problem in deleteing", err);
-        openNotification("error", "Internal Server Error");
+        const msg = err?.response?.data?.message || "Cannot delete room. It may have active bookings.";
+        openNotification("error", msg);
       }
     }
   };
@@ -181,7 +197,7 @@ export default function Rooms() {
 
   return (
     <>
-      <MatrixCard showshadow="true" data={cardsData} icon={home} />
+      <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
       <div className="p-1 ml-3 gap-[2px] flex flex-wrap items-center rounded-lg">
         {roomTypes.map((type, index) => (
@@ -236,7 +252,7 @@ export default function Rooms() {
                 <h3 className="text-[18px] font-medium">Apply Filter</h3>
 
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                  <div className="bg-green-400  flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
                     <Select
                       className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                       defaultValue="sort"
@@ -246,7 +262,6 @@ export default function Rooms() {
                       <Option value="sort" disabled>
                         Sort by hotel name
                       </Option>
-
                       <Option value="ASC">A → Z</Option>
                       <Option value="DESC">Z → A</Option>
                     </Select>
@@ -256,12 +271,12 @@ export default function Rooms() {
                       onChange={(value) => setStatus(value)}
                       suffixIcon={<img src={right_arrow} alt="" />}
                     >
-                      <Option value="sort" disabled>
-                        Sort by Staus
-                      </Option>
-
+                      <Option value="sort" disabled>Sort by Status</Option>
                       <Option value="available">Available</Option>
+                      <Option value="active">Active</Option>
                       <Option value="occupied">Occupied</Option>
+                      <Option value="maintenance">Maintenance</Option>
+                      <Option value="inactive">Inactive</Option>
                     </Select>
                   </div>
                   <button
@@ -275,7 +290,9 @@ export default function Rooms() {
             )}
 
             <div>
-              {roomsdata?.data?.length > 0 ? (
+              {loading ? (
+                <RoomCardSkeleton count={3} />
+              ) : roomsdata?.data?.length > 0 ? (
                 <>
                   <div className="space-y-4">
                     {roomsdata.data.map((room) => (

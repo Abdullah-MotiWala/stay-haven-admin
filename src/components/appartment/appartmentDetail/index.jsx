@@ -62,7 +62,7 @@ const [mainImage, setMainImage] = useState(null);
   };
 
   const getAmenityIcon = (name = "") => {
-    const key = name.toLowerCase().trim();
+    const key = (name ?? "").toLowerCase().trim();
     return AMENITY_ICON_BY_NAME[key] || HelpCircle;
   };
   return (
@@ -80,7 +80,7 @@ const [mainImage, setMainImage] = useState(null);
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-4">
         <div className="flex justify-center    items-center gap-2 md:gap-4">
           <h1 className="text-2xl md:text-md font-semibold text-extradark leading-tight">
-            {data?.type}
+            {data?.apartmentName || data?.type || "N/A"}
           </h1>
           <span
             className={`text-sm  ${data?.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}  px-2 py-1 rounded-lg  font-medium`}
@@ -210,7 +210,11 @@ const [mainImage, setMainImage] = useState(null);
                       key={index}
                       className="p-1 px-4 bg-havenLight rounded-xl flex flex-col items-center justify-center h-15"
                     >
-                      {Icon && <Icon size={16} className="text-lightPurple" />}
+                      {item.icon ? (
+                        <img src={item.icon} alt={item.title} className="w-5 h-5 object-contain" />
+                      ) : (
+                        Icon && <Icon size={16} className="text-lightPurple" />
+                      )}
                       <p className="font-medium mb-0 text-[12px] text-center">
                         {item.title}
                       </p>

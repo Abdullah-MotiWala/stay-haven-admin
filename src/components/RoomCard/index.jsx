@@ -34,7 +34,7 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath }) {
               <span className="text-[14px] font-medium text-gray-800">
                 Room No: {room.roomNumber ?? 0}
               </span>
-              <h3>{room.type}</h3>
+              <h3>{room?.roomName || room?.roomType?.title || room?.type || "N/A"}</h3>
             </div>
             <div className="flex items-center gap-2">
               <span
@@ -91,14 +91,14 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath }) {
             </div>
           </div>
           {/* Description */}
-          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0">
-            {room?.hotel?.description ?? "N/A"}
+          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0 line-clamp-2 overflow-hidden">
+            {room?.description ?? "N/A"}
           </p>
         </div>
 
         <div className="flex justify-between items-end mt-0">
           <div className="text-[#7C8DB5] font-medium text-[14px]">
-            Guest: <span className="text-[#7C8DB5]">N/A</span>
+            Host: <span className="text-[#7C8DB5]">{room?.host?.name ?? "N/A"}</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[24px] font-bold text-gray-900">

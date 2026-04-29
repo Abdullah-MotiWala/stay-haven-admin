@@ -17,6 +17,7 @@ import home4 from "../../../assets/icons/home-4.png";
 import { openNotification } from "../../../network/notification";
 import { Pagination, Select } from "antd";
 import StatusReasonModal, { needsReason } from "../../../components/shared/statusReasonModal";
+import { TableSkeleton } from "../../../components/shared/skeletons";
 
 const entriesPerPageOptions = [10, 20, 30, 40];
 
@@ -87,6 +88,9 @@ const HotelsListing = () => {
       await hotelStatusUpdate(id, { status, ...(reasonText ? { reason: reasonText } : {}) });
       openNotification("success", "Hotel status updated");
       setRefresh(true);
+      // Refresh stats after status change
+      const res = await getStats();
+      setStats(res.data.data);
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
@@ -97,13 +101,14 @@ const HotelsListing = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you want to delete this hotel?")) {
+    if (window.confirm("Are you sure you want to delete this hotel? This will also remove all associated rooms, apartments and bookings.")) {
       try {
         await deleteHotel(id);
         setHotels(hotels.filter((hotel) => hotel.id !== id));
         openNotification("success", "Hotel deleted successfully");
       } catch (err) {
-        openNotification("error", "Internal Server Error");
+        const msg = err?.response?.data?.message || "Cannot delete hotel. It may have active bookings or dependencies.";
+        openNotification("error", msg);
       }
     }
   };
@@ -138,15 +143,12 @@ const HotelsListing = () => {
       </div>
 
       <div className="my-12">
-        <MatrixCard data={cardsData} />
+        <MatrixCard data={cardsData} loading={!stats} />
       </div>
 
       <div className="bg-white p-6 rounded-3xl shadow-sm mt-12">
         {loading ? (
-          <div className="flex justify-center items-center p-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-            <span className="ml-3 text-blue-600 font-medium">Loading Hotels...</span>
-          </div>
+          <TableSkeleton rows={5} cols={8} />
         ) : (
           <HotelDirectory
             data={hotels?.data}
@@ -155,7 +157,9 @@ const HotelsListing = () => {
             columns={columns}
             setRefresh={setRefresh}
             lastId={lastId?.nextNumericId}
-            path={`/admin/hotel/view`}
+            path={`/admin/hotel/edit`}
+            viewpath={`/admin/hotel/view`}
+            view={true}
             hoteloptions={true}
             onStatusToggle={(id, newStatus) => handleStatusToggle(id, newStatus)}
           />

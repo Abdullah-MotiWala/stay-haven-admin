@@ -29,6 +29,7 @@ const HotelDirectory = ({
   roomTypes = [],
   onStatusToggle,
   hoteloptions = false,
+  hostOptions = false,
   editpath,
   viewpath,
   onRowClick,
@@ -245,6 +246,8 @@ const HotelDirectory = ({
         if (onStatusToggle) {
           const STATUS_OPTIONS = hoteloptions
             ? ["active", "inactive", "maintenance", "draft"]
+            : hostOptions
+            ? ["active", "inactive"]
             : ["available", "active", "occupied", "maintenance", "inactive"];
           return (
             <div className="relative inline-block">
