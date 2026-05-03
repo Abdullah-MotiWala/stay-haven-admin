@@ -297,6 +297,7 @@ export default function Appartments() {
                       active={selectedAppartment?.id === appart.id}
                       onClick={() => setSelectedAppartment(appart)}
                       onStatusChange={handleStatusChange}
+                      onDelete={() => fetchData()}
                     />
                   ))
                 ) : (

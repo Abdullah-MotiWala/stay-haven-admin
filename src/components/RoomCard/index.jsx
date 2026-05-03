@@ -4,13 +4,71 @@ import checkList from "../../assets/icons/checkList.svg";
 import location from "../../assets/icons/location.svg";
 import { DEFAULT_IMAGE } from "../../shared/constant";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "antd";
+import { deleteRoom } from "../../services/rooms";
+import { openNotification } from "../../network/notification";
 
-function RoomCard({ room, active, onClick, onStatusChange, editPath }) {
+function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete }) {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const STATUS_OPTIONS = ["available", "active", "occupied", "maintenance", "inactive"];
   let id = room?.id;
   const handleEditClick = () => { navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`); };
+
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    Modal.confirm({
+      title: "Delete Room",
+      icon: null,
+      content: "Are you sure you want to delete this room?",
+      okText: "Delete",
+      okButtonProps: { style: { backgroundColor: '#8B0000', borderColor: '#8B0000', color: '#fff' } },
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          const res = await deleteRoom(id);
+          if (res?.data?.success === false) {
+            const { message, dependencies } = res.data;
+            if (dependencies?.length) {
+              Modal.error({
+                title: "Cannot Delete",
+                icon: null,
+                content: (
+                  <div>
+                    <p className="text-gray-600 mb-3">{message}</p>
+                    <div className="space-y-2">
+                      {dependencies.map((dep, i) => (
+                        <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
+                          <p className="text-gray-800 font-semibold">{dep.name}</p>
+                          {dep.detail && <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            } else {
+              Modal.error({
+                title: "Cannot Delete",
+                icon: null,
+                content: <p className="text-gray-600">{message || "Cannot delete. It may have active bookings."}</p>,
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            }
+            return;
+          }
+          openNotification("success", "Deleted successfully");
+          onDelete && onDelete(id);
+        } catch (err) {
+          openNotification("error", err?.response?.data?.message || "Failed to delete");
+        }
+      },
+    });
+  };
 
   return (
     <div
@@ -61,6 +119,12 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath }) {
                 {showMenu && (
                   <div className="absolute right-0 mt-2 w-36 bg-white border border-lightSeconday rounded-xl z-10 py-2 px-2">
                     <button className="flex items-center gap-3 w-full py-2 text-sm text-black font-semibold px-2" onClick={handleEditClick}>Edit</button>
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center gap-3 w-full py-2 text-sm text-red-600 font-semibold px-2 hover:bg-red-50 rounded"
+                    >
+                      Delete
+                    </button>
                     <div className="border-t border-gray-100 my-1" />
                     <p className="text-xs text-gray-400 px-2 mb-1">Change Status</p>
                     {STATUS_OPTIONS.map(opt => (

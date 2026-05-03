@@ -107,7 +107,7 @@ const HotelProfile = () => {
   const cardsData = [
     {
       title: "Total Rooms",
-      value: output?.totalRooms,
+      value: output?.totalRooms ?? hotel?.totalRooms ?? 0,
       bg: "#F3F7EE",
       iconBg: "#D1E1BC",
       image: hotel1,
@@ -115,24 +115,35 @@ const HotelProfile = () => {
     },
     {
       title: "Occupied",
-      value: output?.occupiedRooms,
+      value: output?.occupiedRooms ?? hotel?.roomsOccupied ?? 0,
       bg: "#EFF9FF",
       iconBg: "#C7DAE7",
       image: hotel1,
     },
     {
       title: "Available Rooms",
-      value: output?.availableRooms,
+      value: output?.availableRooms ?? hotel?.roomsAvailable ?? 0,
       bg: "#F7EFFF",
       iconBg: "#DED0EC",
       image: hotel3,
     },
     {
       title: "In Maintenance",
-      value: output?.maintenanceRooms,
+      value: output?.maintenanceRooms ?? 0,
       bg: "#F3F4FB",
       iconBg: "#CBCEE7",
       image: hotel4,
+    },
+    {
+      title: "This Month Revenue",
+      value: (() => {
+        const formatted = hotel?.currentMonthRevenueFormatted ?? "Rs. 0";
+        // Normalize to PKR format: "Rs. 45,000" → "PKR 45,000"
+        return formatted.replace(/^Rs\.\s*/, "PKR ");
+      })(),
+      bg: "#FFF7ED",
+      iconBg: "#FED7AA",
+      image: hotel2,
     },
   ];
 
@@ -282,7 +293,7 @@ const HotelProfile = () => {
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-10">
           <div className="w-full lg:w-[217px] h-[152px] shrink-0">
             <img
-              src={hotel.img ?? DEFAULT_IMAGE}
+              src={hotel.imageUrl ?? DEFAULT_IMAGE}
               className="w-full h-full rounded-[16px] object-cover border border-gray-100"
               alt={hotel.name}
             />
@@ -399,13 +410,16 @@ const HotelProfile = () => {
                   <div className="flex flex-wrap gap-2">
                     {hotel?.amenities?.map((item) => {
                       const Icon = getAmenityIcon(item.name);
+                      const isUrl = item.icon?.startsWith("http");
                       return (
                         <div
                           key={item.id}
                           className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-lightPurple bg-lightColor"
                         >
-                          {Icon && (
-                            <Icon size={16} className="text-lightPurple" />
+                          {isUrl ? (
+                            <img src={item.icon} alt={item.name} className="w-4 h-4 object-contain" />
+                          ) : (
+                            Icon && <Icon size={16} className="text-lightPurple" />
                           )}
                           {item.name}
                         </div>
@@ -465,6 +479,9 @@ const HotelProfile = () => {
           columns={columns}
           filter={false}
           view={true}
+          path={`/admin/booking/view`}
+          viewpath={`/admin/booking/view`}
+          checkbox={false}
         />
       </div>
     </>

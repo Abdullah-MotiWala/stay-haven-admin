@@ -15,7 +15,7 @@ import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
 import home4 from "../../../assets/icons/home-4.png";
 import { openNotification } from "../../../network/notification";
-import { Pagination, Select } from "antd";
+import { Pagination, Select, Modal } from "antd";
 import StatusReasonModal, { needsReason } from "../../../components/shared/statusReasonModal";
 import { TableSkeleton } from "../../../components/shared/skeletons";
 
@@ -101,16 +101,57 @@ const HotelsListing = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this hotel? This will also remove all associated rooms, apartments and bookings.")) {
-      try {
-        await deleteHotel(id);
-        setHotels(hotels.filter((hotel) => hotel.id !== id));
-        openNotification("success", "Hotel deleted successfully");
-      } catch (err) {
-        const msg = err?.response?.data?.message || "Cannot delete hotel. It may have active bookings or dependencies.";
-        openNotification("error", msg);
-      }
-    }
+    Modal.confirm({
+      title: "Delete Hotel",
+      icon: null,
+      content: "Are you sure you want to delete this hotel?",
+      okText: "Delete",
+      okButtonProps: { style: { backgroundColor: '#8B0000', borderColor: '#8B0000', color: '#fff' } },
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          const res = await deleteHotel(id);
+          if (res?.data?.success === false) {
+            const { message, dependencies } = res.data;
+            if (dependencies?.length) {
+              Modal.error({
+                title: "Cannot Delete Hotel",
+                icon: null,
+                content: (
+                  <div>
+                    <p className="text-gray-600 mb-3">{message}</p>
+                    <div className="space-y-2">
+                      {dependencies.map((dep, i) => (
+                        <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
+                          <p className="text-gray-800 font-semibold">{dep.name}</p>
+                          {dep.detail && <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            } else {
+              Modal.error({
+                title: "Cannot Delete",
+                icon: null,
+                content: <p className="text-gray-600">{message || "Cannot delete hotel."}</p>,
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            }
+            return;
+          }
+          setHotels(prev => ({ ...prev, data: (prev?.data || []).filter((h) => h.id !== id) }));
+          openNotification("success", "Hotel deleted successfully");
+        } catch (err) {
+          const msg = err?.response?.data?.message || "Cannot delete hotel. It may have active dependencies.";
+          openNotification("error", msg);
+        }
+      },
+    });
   };
 
   const cardsData = [

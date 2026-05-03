@@ -7,7 +7,7 @@ const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, 
   if (loading) return <MatrixCardSkeleton />;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-white p-5 rounded-3xl shadow-sm">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-white p-5 rounded-3xl shadow-sm" style={{ gridTemplateColumns: data.length === 5 ? 'repeat(5, minmax(0, 1fr))' : undefined }}>
       {Array.isArray(data) && data.map((card, i) => (
         <div
           key={i}
@@ -33,7 +33,7 @@ const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, 
 
           {/* Value + trend row */}
           <div className="mt-3 flex items-end justify-between">
-            <h3 className="text-3xl font-bold text-gray-900 leading-none">
+            <h3 className={`font-bold text-gray-900 leading-none ${String(card.value ?? "").length > 8 ? "text-xl" : "text-3xl"}`}>
               {card.value ?? "—"}
             </h3>
 

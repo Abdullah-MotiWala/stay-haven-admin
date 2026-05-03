@@ -18,8 +18,18 @@ const GeneralSettings = ({ onCurrenciesFetched, setGlobalSymbol }) => {
         ]);
 
         const currData = currRes.data.data.map(item => ({ label: item.title, value: item.id }));
-        setCurrencies(currData);
-        onCurrenciesFetched(currData); 
+        
+        // Ensure PKR is always available as an option
+        const hasPKR = currData.some(c => c.label?.toUpperCase().includes("PKR"));
+        const hasUSD = currData.some(c => c.label?.toUpperCase().includes("USD"));
+        
+        const fallbackCurrencies = [];
+        if (!hasUSD) fallbackCurrencies.push({ label: "USD", value: "usd" });
+        if (!hasPKR) fallbackCurrencies.push({ label: "PKR", value: "pkr" });
+        
+        const finalCurrencies = [...currData, ...fallbackCurrencies];
+        setCurrencies(finalCurrencies);
+        onCurrenciesFetched(finalCurrencies); 
         setTimezones(tzRes.data.data.map(item => ({ label: item.title, value: item.id })));
       } catch (err) {
         console.error("Failed to fetch features:", err);
@@ -31,21 +41,18 @@ const GeneralSettings = ({ onCurrenciesFetched, setGlobalSymbol }) => {
   }, []);
 
   const handleCurrencyChange = async (val, option) => {
-    const symbol = option?.label?.toUpperCase().includes("USD") ? "$" : "Rs.";
+    const label = option?.label?.toUpperCase() || "";
+    const symbol = label.includes("PKR") ? "PKR" : label.includes("USD") ? "$" : "Rs.";
     
     form.setFieldsValue({ currentSymbol: symbol });
 
     if (setGlobalSymbol) {
-    setGlobalSymbol(symbol);
+      setGlobalSymbol(symbol);
     }
 
     try {
-      const payload = { 
-        currencyId: val,
-      };
-      
+      const payload = { currencyId: val };
       await updateSettingsApi(payload);
-      // openNotification("success", "Success", "Currency updated in database!");
     } catch (err) {
       openNotification("error", "Error", "Failed to sync with database");
     }

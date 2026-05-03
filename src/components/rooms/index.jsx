@@ -302,6 +302,7 @@ export default function Rooms() {
                         active={selectedRoom?.id === room.id}
                         onClick={() => setSelectedRoom(room)}
                         onStatusChange={handleStatusChange}
+                        onDelete={() => fetchData()}
                       />
 
                     ))}

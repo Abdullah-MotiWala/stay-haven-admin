@@ -257,6 +257,7 @@ export default function HostelListing() {
                         onClick={() => setSelectedHostel(hostel)}
                         onStatusChange={handleStatusChange}
                         editPath="/admin/hostels/edit"
+                        onDelete={() => fetchData()}
                       />
                     ))}
                   </div>
