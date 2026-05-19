@@ -2,6 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Pagination } from "antd";
 import Api from "../../network/axiosClients";
 import Breadcrumb from "../../components/Breadcrumb";
+import ExportCsvButton from "../../components/shared/ExportCsvButton";
+
+const CONTACT_EXPORT_COLUMNS = [
+  { key: "name", label: "Name", getValue: (m) => `${m.first_name || ""} ${m.last_name || ""}`.trim() },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone", getValue: (m) => m.phone || "" },
+  { key: "message", label: "Message" },
+  {
+    key: "created_at",
+    label: "Date",
+    getValue: (m) =>
+      m.created_at
+        ? new Date(m.created_at).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "",
+  },
+];
 
 const ContactMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -34,7 +56,14 @@ const ContactMessages = () => {
     <>
       <Breadcrumb title="Contact Messages" />
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-6">Contact Messages</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold text-gray-800">Contact Messages</h2>
+          <ExportCsvButton
+            data={messages}
+            columns={CONTACT_EXPORT_COLUMNS}
+            fileName="contact-messages.csv"
+          />
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-16 text-gray-400">Loading...</div>

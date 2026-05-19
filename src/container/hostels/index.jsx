@@ -16,7 +16,17 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../../components/shared/statusReasonModal";
 import { RoomCardSkeleton } from "../../components/shared/skeletons";
+import ExportCsvButton from "../../components/shared/ExportCsvButton";
 import { getAllFeature } from "../../services/features";
+
+const HOSTEL_EXPORT_COLUMNS = [
+  { key: "roomNumber", label: "Bed/Room Number" },
+  { key: "roomName", label: "Hostel Name", getValue: (r) => r.roomName || r.roomType?.title || r.type || "" },
+  { key: "hotel", label: "Hotel", getValue: (r) => r.hotel?.name || "" },
+  { key: "status", label: "Status" },
+  { key: "pricePerNight", label: "Price/Night" },
+  { key: "bedType", label: "Bed Type" },
+];
 
 export default function HostelListing() {
   const [hostelTypes, setHostelTypes] = useState([]);
@@ -196,12 +206,19 @@ export default function HostelListing() {
                   className="w-full p-2 border border-lightSeconday rounded-xl font-medium"
                 />
               </div>
-              <button
-                onClick={() => setShowFilter(!showFilter)}
-                className="border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
-              >
-                <img src={filter} alt="filter" className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <ExportCsvButton
+                  data={hostelsData?.data || []}
+                  columns={HOSTEL_EXPORT_COLUMNS}
+                  fileName="hostels.csv"
+                />
+                <button
+                  onClick={() => setShowFilter(!showFilter)}
+                  className="border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
+                >
+                  <img src={filter} alt="filter" className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {showFilter && (

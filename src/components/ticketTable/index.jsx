@@ -1,6 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { Select } from "antd";
+import ExportCsvButton from "../shared/ExportCsvButton";
+
+const TICKET_EXPORT_COLUMNS = [
+  { key: "ticketId", label: "Ticket ID" },
+  { key: "userName", label: "User Name", getValue: (t) => t.userName || t.user?.name || "" },
+  { key: "subject", label: "Subject" },
+  { key: "dateCreated", label: "Date Created" },
+  { key: "status", label: "Status" },
+  { key: "lastUpdate", label: "Last Update" },
+];
 
 const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => { 
   const navigate = useNavigate(); 
@@ -11,7 +21,10 @@ const TicketTable = ({ tickets, setSearchTerm, setStatusFilter, loading }) => {
         
         <div className="bg-[#F8F9FA] px-6 py-4 border-b border-gray-100 shadow-sm flex justify-between items-center">
           <h2 className="text-lg font-bold text-gray-800">Tickets</h2>
-          {loading && <span className="text-sm text-blue-500 animate-pulse">Updating...</span>}
+          <div className="flex items-center gap-3">
+            {loading && <span className="text-sm text-blue-500 animate-pulse">Updating...</span>}
+            <ExportCsvButton data={tickets} columns={TICKET_EXPORT_COLUMNS} fileName="tickets.csv" />
+          </div>
         </div>
 
         <div className="p-6">

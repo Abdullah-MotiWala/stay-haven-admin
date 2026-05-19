@@ -23,6 +23,16 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 import { RoomCardSkeleton } from "../shared/skeletons";
+import ExportCsvButton from "../shared/ExportCsvButton";
+
+const APARTMENT_EXPORT_COLUMNS = [
+  { key: "roomNumber", label: "Apartment Number" },
+  { key: "roomName", label: "Apartment Name", getValue: (r) => r.roomName || r.roomType?.title || r.type || "" },
+  { key: "hotel", label: "Hotel", getValue: (r) => r.hotel?.name || "" },
+  { key: "status", label: "Status" },
+  { key: "pricePerNight", label: "Price/Night" },
+  { key: "bedType", label: "Bed Type" },
+];
 
 export default function Appartments() {
   const [appartmentTypes, setAppartmentTypes] = useState([]);
@@ -237,12 +247,19 @@ export default function Appartments() {
                 />
               </div>
 
-              <button
-                onClick={() => setShowFilter(!showFilter)}
-                className={`border px-2 py-2  text-sm transition-all flex items-center gap-2 rounded-lg`}
-              >
-                <img src={filter} alt="filter" className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <ExportCsvButton
+                  data={appartmentData?.data || []}
+                  columns={APARTMENT_EXPORT_COLUMNS}
+                  fileName="apartments.csv"
+                />
+                <button
+                  onClick={() => setShowFilter(!showFilter)}
+                  className="border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
+                >
+                  <img src={filter} alt="filter" className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {showFilter && (

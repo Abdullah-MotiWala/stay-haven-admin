@@ -5,6 +5,7 @@ import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
 import { bulkActionApi } from "../../services/hotel";
 import { openNotification } from "../../network/notification";
 import { exportToExcel } from "../../utils/exportExcel";
+import { exportToCsv, slugifyFileName } from "../../utils/exportCsv";
 import { deriveBookingStatus } from "../../helper";
 import search from "../../assets/icons/search.png";
 import { RotateCcw } from "lucide-react";
@@ -33,7 +34,11 @@ const HotelDirectory = ({
   editpath,
   viewpath,
   onRowClick,
-  extraActions = []
+  extraActions = [],
+  exportEndpoint = "",
+  onExportSuccess,
+  exportFileName = "",
+  showExport = true,
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -42,8 +47,6 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
-  const targetPath = editpath ? editpath : path;
-
   const [filters, setFilters] = useState({
     roomType: "",
     hotelName: "",
@@ -190,6 +193,40 @@ const HotelDirectory = ({
     const rowsToExport = selectedIds.length > 0 ? data.filter((row) => selectedIds.includes(row.id)) : data;
     if (rowsToExport.length === 0) { openNotification("info", "No data to export"); return; }
     exportToExcel({ data: rowsToExport, columns, fileName: "hotels.xlsx" });
+  };
+
+  // Server-side CSV export using provided endpoint
+  const handleExportServer = () => {
+    const params = new URLSearchParams({
+      ...filters,
+    });
+    // Convert filter object values to strings, ignore empty
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v) params.append(k, v);
+    });
+    const url = `${exportEndpoint}?${params.toString()}`;
+    // Navigate to URL to trigger download
+    window.location.href = url;
+  };
+  const resolveExportFileName = () =>
+    exportFileName || slugifyFileName(title);
+
+  const handleExportCSV = () => {
+    const source = filteredData.length > 0 || data.length === 0 ? filteredData : data;
+    const rowsToExport =
+      selectedIds.length > 0
+        ? source.filter((row) => selectedIds.includes(row.id))
+        : source;
+    if (rowsToExport.length === 0) {
+      openNotification("info", "No data to export");
+      return;
+    }
+    const ok = exportToCsv({
+      data: rowsToExport,
+      columns,
+      fileName: resolveExportFileName(),
+    });
+    if (ok) onExportSuccess?.();
   };
 
   const renderCell = (row, col, index) => {
@@ -342,12 +379,17 @@ const HotelDirectory = ({
                       </div>
                     )}
                   </div>
-                  <button onClick={handleExportExcel} className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2">
-                    <Upload size={16} /> Import / Export CSV
-                  </button>
                 </>
               )}
             </div>
+          )}
+          {showExport && (
+            <button
+              onClick={exportEndpoint ? handleExportServer : handleExportCSV}
+              className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
+            >
+              <Upload size={16} /> Export CSV
+            </button>
           )}
         </div>
       </div>
@@ -490,7 +532,7 @@ const HotelDirectory = ({
                               </button>
                             )}
                             <button
-                              onClick={() => { setRowActionOpen(null); navigate(`${targetPath}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
+                              onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
                               className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                             >
                               Edit

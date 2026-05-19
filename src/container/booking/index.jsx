@@ -196,6 +196,7 @@ const Booking = () => {
             editpath={`/admin/booking/edit`}
             inp={true}
             onlyFilter={true}
+            exportFileName="bookings.csv"
             checkbox={false}
             activeType={activeType}
             onDelete={handleDelete}
