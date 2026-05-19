@@ -131,7 +131,7 @@ const HotelsListing = () => {
                   </div>
                 ),
                 okText: "OK",
-                okButtonProps: { className: "bg-mainPrimary" },
+                okButtonProps: { className: "bg-mainPrimary hover:bg-mainPrimary/90" },
               });
             } else {
               Modal.error({
