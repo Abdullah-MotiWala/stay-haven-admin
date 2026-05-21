@@ -108,6 +108,7 @@ const ContactMessages = () => {
         {total > limit && (
           <div className="flex justify-end mt-6">
             <Pagination
+              className="admin-pagination flex-wrap"
               current={page}
               total={total}
               pageSize={limit}

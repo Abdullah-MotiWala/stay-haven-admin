@@ -7,6 +7,7 @@ import './assets/css/folders.css'
 import './assets/css/responsive.css'
 import './assets/css/style-web.css'
 import './assets/css/styles.css'
+import './assets/css/table-responsive.css'
 import { store, persistor } from './redux/store';
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react';

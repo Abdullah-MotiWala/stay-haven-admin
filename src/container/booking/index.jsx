@@ -223,7 +223,7 @@ const Booking = () => {
             total={total}
             pageSize={itemsPerPage}
             onChange={onPageChange}
-            className="flex justify-end"
+            className="admin-pagination flex justify-end flex-wrap"
           />
         </div>
       </div>

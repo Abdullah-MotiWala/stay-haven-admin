@@ -82,8 +82,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between bg-transparent py-3">
 
         {/* Search Section */}
-        <div className="flex-1 md:max-w-md lg:max-w-lg min-w-0 transition-all duration-300">
-          {/* Desktop Input: Hidden on mobile */}
+        {/* <div className="flex-1 md:max-w-md lg:max-w-lg min-w-0 transition-all duration-300">
           <div className="hidden md:block">
             <Input
               placeholder="Search"
@@ -93,14 +92,13 @@ const Navbar = () => {
             />
           </div>
 
-          {/* Mobile Search Icon */}
           <button
             onClick={() => setIsSearchModalOpen(true)}
             className="md:hidden bg-white p-2.5 rounded-full shadow-sm border border-white/50 active:scale-95 transition-all"
           >
             <img src={search} className="w-5 h-5" alt="search" />
           </button>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2 ml-2">
           {currentConfig && (

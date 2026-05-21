@@ -131,7 +131,7 @@ const HotelsListing = () => {
                   </div>
                 ),
                 okText: "OK",
-                okButtonProps: { className: "bg-mainPrimary hover:bg-mainPrimary/90" },
+                okButtonProps: { className: "bg-mainPrimary !hover:!bg-mainPrimary/90" },
               });
             } else {
               Modal.error({
@@ -223,7 +223,7 @@ const HotelsListing = () => {
             total={stats?.totalHotels || 0}
             pageSize={itemsPerPage}
             onChange={onPageChange}
-            className="flex justify-end"
+            className="admin-pagination flex justify-end flex-wrap"
           />
         </div>
       </div>

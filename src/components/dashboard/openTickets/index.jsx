@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import Card from "../card";
 import TicketStatusDropdown from "./ticketStatusDropdown";
 import { updateTicketStatus } from "../../../services/chat";
@@ -33,7 +33,13 @@ const OpenTickets = ({ OpenTickets: ticketsData, onRefresh }) => {
       `}</style>
 
       <div className="red-scrollbar space-y-6 overflow-y-auto pr-2" style={{ maxHeight: "420px" }}>
-        {displayTickets.map((ticket, index) => (
+        {displayTickets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <p className="font-medium text-gray-500 m-0">No data found</p>
+            <p className="text-sm text-gray-400 mt-1 m-0">No open tickets at the moment</p>
+          </div>
+        ) : (
+        displayTickets.map((ticket, index) => (
           <div
             key={ticket.id || index}
             className={`bg-white rounded-2xl border border-lightSeconday shadow-[0_8px_30px_rgba(0,0,0,0.08)] px-4 py-4 transition-opacity ${loadingId === ticket.id ? "opacity-60 pointer-events-none" : ""}`}
@@ -94,12 +100,13 @@ const OpenTickets = ({ OpenTickets: ticketsData, onRefresh }) => {
               <div className="flex flex-col items-end gap-0 flex-shrink-0">
                 <p className="text-sm text-blue font-medium m-0">Ticket Date</p>
                 <p className="text-sm font-medium text-extradark m-0 whitespace-nowrap">
-                  {ticket.dateCreated || ticket.date || "—"}
+                  {ticket.dateCreated || ticket.date || "â€”"}
                 </p>
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </Card>
   );

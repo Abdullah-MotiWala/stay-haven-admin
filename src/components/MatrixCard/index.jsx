@@ -1,4 +1,4 @@
-import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+﻿import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
 import { DEFAULT_IMAGE } from "../../shared/constant";
 import { MatrixCardSkeleton } from "../shared/skeletons";
 
@@ -7,7 +7,13 @@ const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, 
   if (loading) return <MatrixCardSkeleton />;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-white p-5 rounded-3xl shadow-sm" style={{ gridTemplateColumns: data.length === 5 ? 'repeat(5, minmax(0, 1fr))' : undefined }}>
+    <div
+      className={`grid gap-3 sm:gap-4 mb-6 bg-white p-4 sm:p-5 rounded-3xl shadow-sm ${
+        data.length === 5
+          ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      }`}
+    >
       {Array.isArray(data) && data.map((card, i) => (
         <div
           key={i}
@@ -34,7 +40,7 @@ const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, 
           {/* Value + trend row */}
           <div className="mt-3 flex items-end justify-between">
             <h3 className={`font-bold text-gray-900 leading-none ${String(card.value ?? "").length > 8 ? "text-xl" : "text-3xl"}`}>
-              {card.value ?? "—"}
+              {card.value ?? "â€”"}
             </h3>
 
             {card.showTrend && card.trend && (

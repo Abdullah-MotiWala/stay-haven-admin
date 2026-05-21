@@ -123,25 +123,50 @@ a :hover {
   color: #000000;
 }
 
-:where(.css-dev-only-do-not-override-qghzx5).ant-pagination .ant-pagination-item-active {
+/* Pagination — dev + production (no hash-specific selectors) */
+.ant-pagination .ant-pagination-item-active,
+.admin-pagination .ant-pagination-item-active {
   border-color: #8b0002 !important;
   background-color: #8b0002 !important;
-  color: white !important;
+}
+
+.ant-pagination .ant-pagination-item-active a,
+.admin-pagination .ant-pagination-item-active a {
+  color: #fff !important;
+}
+
+.ant-pagination .ant-pagination-item-active:hover,
+.admin-pagination .ant-pagination-item-active:hover {
+  border-color: #8b0002 !important;
+  background-color: #8b0002 !important;
+}
+
+.ant-pagination .ant-pagination-item-active:hover a,
+.admin-pagination .ant-pagination-item-active:hover a {
+  color: #fff !important;
+}
+
+.ant-pagination .ant-pagination-item:hover,
+.admin-pagination .ant-pagination-item:hover {
+  border-color: #8b0002;
+}
+
+.ant-pagination .ant-pagination-item:hover a,
+.admin-pagination .ant-pagination-item:hover a {
+  color: #8b0002;
+}
+
+.ant-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next:hover .ant-pagination-item-link,
+.admin-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.admin-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  color: #8b0002;
+  border-color: #8b0002;
 }
 
 a :hover {
   text-decoration-line: none !important;
   text-decoration: none !important;
-}
-
-/* Jo page active ho, uska text white kar do */
-.ant-pagination-item-active a {
-  color: white !important;
-}
-
-/* Hover karne par bhi white hi rahe */
-.ant-pagination-item-active:hover a {
-  color: white !important;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+﻿import React, { useState, useMemo, useRef } from "react";
 import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
@@ -72,7 +72,7 @@ const HotelDirectory = ({
         item.hotel?.name === filters.hotelName ||
         item.name === filters.hotelName;
 
-      // ── Status filter: use actual row.status, not derived ──
+      // â”€â”€ Status filter: use actual row.status, not derived â”€â”€
       const actualStatus = item.status?.toLowerCase() || "";
       const matchesStatus =
         !filters.status ||
@@ -149,7 +149,7 @@ const HotelDirectory = ({
     }
   };
 
-  // ── FIXED: actual status pehle, dates se derive sirf fallback ──────────
+  // â”€â”€ FIXED: actual status pehle, dates se derive sirf fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRowStatus = (row) => {
     const s = row.status?.toLowerCase();
 
@@ -173,7 +173,19 @@ const HotelDirectory = ({
     // Sirf agar status bilkul nahi hai toh dates se derive karo
     if (!s && row.checkInOut) return deriveBookingStatus(row.checkInOut);
 
-    return row.status || "—";
+    return row.status || "â€”";
+  };
+
+  const getColumnMaxClass = (col) => {
+    if (col.maxWidth) return col.maxWidth;
+    if (col.type === "actions") return "w-14 max-w-[3.5rem]";
+    if (col.type === "status") return "max-w-[7.5rem]";
+    if (col.type === "hotel" || col.type === "hotelCell") return "max-w-[10rem]";
+    if (col.key === "guestName") return "max-w-[11rem]";
+    if (col.key === "checkInOut" || col.type === "dateRange") return "max-w-[10rem]";
+    if (col.key === "bookingId") return "max-w-[7rem]";
+    if (col.type === "roomType") return "max-w-[8rem]";
+    return "max-w-[9rem]";
   };
 
   const toggleRow = (id) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
@@ -241,7 +253,7 @@ const HotelDirectory = ({
             />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-gray-900 m-0 truncate">
-                {row.hotelName || row.hotel?.name || "—"}
+                {row.hotelName || row.hotel?.name || "â€”"}
               </p>
               {row.hotel?.city && (
                 <p className="text-xs text-gray-400 m-0">{row.hotel.city}</p>
@@ -250,7 +262,7 @@ const HotelDirectory = ({
           </div>
         );
 
-      case "text":   return row[col.key] ?? "—";
+      case "text":   return row[col.key] ?? "â€”";
       case "number": return row[col.key] ?? 0;
 
       case "hotel":
@@ -296,7 +308,7 @@ const HotelDirectory = ({
                 className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
               >
                 {status}
-                <span className="text-[10px]">▾</span>
+                <span className="text-[10px]">â–¾</span>
               </button>
               {rowActionOpen === `status-${index}` && (
                 <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">
@@ -475,8 +487,8 @@ const HotelDirectory = ({
                 </th>
               )}
               {columns.map((col) => (
-                <th key={col.key} className={`px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue border-b border-t border-l border-dashed border-gray-200 ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}>
-                  {col.label}
+                <th key={col.key} className={`px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue border-b border-t border-l border-dashed border-gray-200 ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}>
+                  <span className="block truncate">{col.label}</span>
                 </th>
               ))}
             </tr>
@@ -501,11 +513,15 @@ const HotelDirectory = ({
                       </td>
                     )}
                     {columns.map((col) => (
-                      <td key={col.key} className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
+                      <td key={col.key} 
+                        data-label={col.label}
+                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
                         onClick={(e) => { if (col.type === "actions" || col.type === "status") e.stopPropagation(); }}
                       >
-                        <div className={`flex items-center ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
-                          {renderCell(enrichedRow, col, index)}
+                        <div className={`flex items-center min-w-0 ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
+                          <div className={`min-w-0 w-full ${col.type !== "actions" && col.type !== "status" ? "truncate" : ""}`}>
+                            {renderCell(enrichedRow, col, index)}
+                          </div>
                         </div>
 
                         {/* ACTION DROPDOWN */}

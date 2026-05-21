@@ -1,11 +1,10 @@
-import React from 'react';
-import { Input, Button, Badge, Avatar } from 'antd';
+﻿import React from 'react';
+import { Badge, Avatar } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { 
-  SearchOutlined, 
-  BellOutlined, 
-  AudioOutlined, 
-  MoonOutlined, 
+import {
+  BellOutlined,
+  AudioOutlined,
+  MoonOutlined,
   CalendarOutlined,
   UserOutlined
 } from '@ant-design/icons';
@@ -16,17 +15,13 @@ const Header = () => {
   const initial = fullName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex justify-between items-center bg-transparent py-4">
-      <Input 
-        placeholder="Search" 
-        prefix={<SearchOutlined className="text-gray-400" />} 
-        className="w-1/3 rounded-mdborder-none h-11 shadow-sm"
-      />
-
-      <div className="flex items-center gap-6">
+    <div className="flex justify-end items-center bg-transparent py-4">
+      <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-end">
         <div className="bg-white px-4 py-2 rounded-xl shadow-sm flex items-center gap-2 text-gray-600">
           <CalendarOutlined />
-          <span className="font-medium">{new Date().toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          <span className="font-medium text-sm sm:text-base">
+            {new Date().toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
+          </span>
         </div>
 
         <div className="flex gap-3 items-center">

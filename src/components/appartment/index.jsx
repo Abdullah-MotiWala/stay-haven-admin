@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import ApparmentCard from "./appartmentCard";
 import AppartmentDetail from "./appartmentDetail";
 import filter from "../../assets/icons/filter.png";
@@ -209,7 +209,7 @@ export default function Appartments() {
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
-      <div className="p-0 ml-3 gap-[2px] flex flex-wrap  item-center rounded-lg">
+      <div className="p-1 ml-0 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
         {appartmentTypes.map((type, index) => (
           <button
             key={type.label}
@@ -231,14 +231,14 @@ export default function Appartments() {
         ))}
       </div>
 
-      <div className="p-4 md:p-6 bg-white min-h-screen">
+      <div className="p-3 sm:p-4 md:p-6 bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <h2 className="font-semibold text-[#000000] text-lg">
               All Appartments ({appartmentData?.meta?.totalItems ?? appartmentData?.data?.length ?? 0})
             </h2>
-            <div className="flex justify-between items-center bg-white ">
-              <div className="max-w-96">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white">
+              <div className="w-full sm:max-w-96">
                 <Input
                   placeholder="Search"
                   onChange={(e) => setSearch(e.target.value)}
@@ -269,17 +269,17 @@ export default function Appartments() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-2 py-2">
                   <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
                   <Select
-                    className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                     defaultValue="sort"
                     onChange={(value) => setSort(value)}
                     suffixIcon={<img src={right_arrow} alt="" />}
                   >
                     <Option value="sort" disabled>Sort by hotel name</Option>
-                    <Option value="ASC">A → Z</Option>
-                    <Option value="DESC">Z → A</Option>
+                    <Option value="ASC">A â†’ Z</Option>
+                    <Option value="DESC">Z â†’ A</Option>
                   </Select>
                   <Select
-                    className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                     defaultValue="sort"
                     onChange={(value) => setStatus(value)}
                     suffixIcon={<img src={right_arrow} alt="" />}
@@ -324,7 +324,7 @@ export default function Appartments() {
                 )}
               </div>
 
-              <div className="mt-4 flex justify-between">
+              <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div>
                   <Select
                     defaultValue={10}
@@ -345,7 +345,7 @@ export default function Appartments() {
                   total={appartmentData?.meta?.totalItems || 0}
                   pageSize={itemsPerPage}
                   onChange={onPageChange}
-                  className="flex justify-end"
+                  className="admin-pagination flex justify-end flex-wrap"
                 />
               </div>
             </div>

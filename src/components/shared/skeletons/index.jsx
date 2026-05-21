@@ -5,7 +5,7 @@ const Pulse = ({ className }) => (
 
 // MatrixCard skeleton — 4 stat cards
 export const MatrixCardSkeleton = () => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-white p-5 rounded-3xl shadow-sm">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 bg-white p-4 sm:p-5 rounded-3xl shadow-sm">
     {[...Array(4)].map((_, i) => (
       <div key={i} className="relative p-5 rounded-2xl min-h-[120px] bg-gray-50 flex flex-col justify-between">
         <div className="flex justify-between items-start">

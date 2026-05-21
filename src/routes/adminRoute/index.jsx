@@ -24,6 +24,7 @@ import ContactMessages from "../../container/contact";
 import AdminProfile from "../../container/profile";
 import AddHost from "../../container/hosts/addHost";
 import Notifications from "../../container/notifications";
+import Reports from "../../container/reports";
 
 export const AdminRoute = [
   {
@@ -61,6 +62,7 @@ export const AdminRoute = [
           { path: "contact-messages", element: <ContactMessages /> },
           { path: "profile", element: <AdminProfile /> },
           { path: "notifications", element: <Notifications /> },
+          { path: "reports", element: <Reports /> },
         ],
       },
     ],

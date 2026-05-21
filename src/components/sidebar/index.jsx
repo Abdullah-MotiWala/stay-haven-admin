@@ -13,6 +13,7 @@ import {
   MenuOutlined,
   ExclamationCircleOutlined,
   UserOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 
 
@@ -56,6 +57,11 @@ const menuItems = [
     key: "/admin/bookings",
     icon: <img src={bookingIcon} className={iconStyle} alt="bookings" />,
     label: <Link to="/admin/bookings">Bookings</Link>,
+  },
+  {
+    key: "/admin/reports",
+    icon: <FileTextOutlined className={iconStyle} />,
+    label: <Link to="/admin/reports">Reports</Link>,
   },
   {
     key: "/admin/tickets",

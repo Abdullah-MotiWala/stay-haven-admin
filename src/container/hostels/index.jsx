@@ -172,7 +172,7 @@ export default function HostelListing() {
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
       {/* Hostel Type Filter Tabs */}
-      <div className="p-1 ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-hidden">
+      <div className="p-1 ml-0 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
         {hostelTypes.map((type, index) => (
           <button
             key={type.label}
@@ -188,7 +188,7 @@ export default function HostelListing() {
         ))}
       </div>
 
-      <div className="p-4 md:p-6 bg-white min-h-screen">
+      <div className="p-3 sm:p-4 md:p-6 bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <div className="flex justify-between items-center">
@@ -197,8 +197,8 @@ export default function HostelListing() {
               </h2>
             </div>
 
-            <div className="flex justify-between items-center bg-white">
-              <div className="max-w-96">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white">
+              <div className="w-full sm:max-w-96">
                 <Input
                   placeholder="Search"
                   onChange={(e) => setSearch(e.target.value)}
@@ -227,7 +227,7 @@ export default function HostelListing() {
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
                   <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
                     <Select
-                      className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                       defaultValue="sort"
                       onChange={(value) => setSort(value)}
                       suffixIcon={<img src={right_arrow} alt="" />}
@@ -237,7 +237,7 @@ export default function HostelListing() {
                       <Option value="DESC">Z → A</Option>
                     </Select>
                     <Select
-                      className="w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
                       defaultValue="sort"
                       onChange={(value) => setStatus(value)}
                       suffixIcon={<img src={right_arrow} alt="" />}
@@ -278,7 +278,7 @@ export default function HostelListing() {
                       />
                     ))}
                   </div>
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                     <div>
                       <Select
                         defaultValue={10}
@@ -293,7 +293,7 @@ export default function HostelListing() {
                       total={hostelsData?.meta?.totalItems || 0}
                       pageSize={itemsPerPage}
                       onChange={onPageChange}
-                      className="flex justify-end"
+                      className="admin-pagination flex justify-end flex-wrap"
                     />
                   </div>
                 </>

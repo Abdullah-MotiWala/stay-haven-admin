@@ -2,10 +2,10 @@ import React from "react";
 import HotelDirectory from "../../Table";
 import { Pagination, Select } from "antd";
 import { useState } from "react";
-const entriesPerPageOptions = [10, 20, 30, 40];
+const entriesPerPageOptions = [5, 10, 15, 20];
 
 const BookingList = ({ recentBookings }) => {
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [stats, setStats] = useState(null);
 
@@ -93,11 +93,11 @@ const BookingList = ({ recentBookings }) => {
           path={`/admin/booking/view`}
           viewpath={`/admin/booking/view`}
         />
-        <div className="mt-4 flex justify-between">
-          <div>
+        <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Select
               value={itemsPerPage}
-              className="text-black"
+              className="text-black min-w-[72px]"
               onChange={(value) => {
                 setItemsPerPage(value);
                 setCurrentPage(1);
@@ -108,17 +108,15 @@ const BookingList = ({ recentBookings }) => {
               }))}
             />
 
-            <span className="text-lightSeconday ml-4">
-              Entries per page
-            </span>
+            <span className="text-lightSeconday text-sm">Entries per page</span>
           </div>
 
           <Pagination
             current={currentPage}
-            total={recentBookings.length}
+            total={recentBookings?.length || 0}
             pageSize={itemsPerPage}
             onChange={onPageChange}
-            className="flex justify-end"
+            className="admin-pagination flex justify-end flex-wrap"
           />
 
         </div>

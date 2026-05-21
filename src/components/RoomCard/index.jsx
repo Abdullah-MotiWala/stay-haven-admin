@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { MoreVertical } from "lucide-react";
 import checkList from "../../assets/icons/checkList.svg";
 import location from "../../assets/icons/location.svg";
@@ -77,11 +77,11 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
         ${active ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-100 hover:border-gray-200"}
       `}
     >
-      <div className="w-full md:w-60 h-50 shrink-0">
+      <div className="w-full md:w-60 shrink-0">
         <img
           src={room.mainImage ?? DEFAULT_IMAGE}
           alt={room.title}
-          className="object-cover rounded-lg h-44 w-60"
+          className="object-cover rounded-lg h-44 w-full md:w-60 max-w-full"
         />
       </div>
 
