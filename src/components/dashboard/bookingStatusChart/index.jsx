@@ -1,7 +1,7 @@
 import { Pie } from "@ant-design/plots";
 import Card from "../card";
 
-const BookingStatus = ({ bookingStatus }) => {
+const BookingStatus = ({ bookingStatus , height}) => {
   const allowedStatuses = ["Booked", "Checked-In", "Cancelled"];
 
   const chartData = (bookingStatus || [])
@@ -53,6 +53,7 @@ const BookingStatus = ({ bookingStatus }) => {
     <Card
       title="Booking Status"
       right={<span className="text-sm text-gray-500">Today</span>}
+      height={height}
     >
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-4">
         {chartData.map((item) => (

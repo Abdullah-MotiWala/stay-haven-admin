@@ -1,8 +1,8 @@
 import Card from "../card";
 
-const AvailabilityProgress = ({ title, units }) => {
+const AvailabilityProgress = ({ title, units , height}) => {
   return (
-    <Card title={title}>
+    <Card title={title} height={height}>
       <div className="space-y-4">
         {!units || units.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-4">No data available</p>

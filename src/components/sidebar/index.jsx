@@ -91,6 +91,54 @@ const menuItems = [
 ];
 
 
+// const SidebarContent = ({ location }) => {
+//   const navigate = useNavigate();
+
+//   // --- Logout Function ---
+//   const handleLogout = () => {
+//     Modal.confirm({
+//       title: 'Do you want to logout?',
+//       icon: <ExclamationCircleOutlined />,
+//       content: 'You will need to login again to access the dashboard.',
+//       okText: 'Logout',
+//       okType: 'danger',
+//       cancelText: 'Cancel',
+//       onOk() {
+//         // 1. LocalStorage se sab saaf kar dein
+//         localStorage.clear();
+//         // 2. Wapas login page par bhej dein
+//         navigate("/auth/login", { replace: true });
+//       },
+//     });
+//   };
+
+//   return (
+//     <div className="flex flex-col h-full">
+//       <div className="p-2 flex justify-center mb-16 mt-10">
+//         <img src={logo} alt="STAY HAVEN" className=" object-contain" />
+//       </div>
+
+//       <Menu
+//         mode="inline"
+//         selectedKeys={[location.pathname]}
+//         items={menuItems}
+//         className="px-2 sidebar-menu font-medium text-gray-500"
+//       />
+
+//       <div className="p-2 mt-auto border-t border-gray-100">
+//         <Button
+//           icon={<LogoutOutlined />}
+//           block
+//           onClick={handleLogout} // Click handler connect kiya
+//           className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed  hover:!border-blue hover:!text-blue"
+//         >
+//           Logout
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// };
+
 const SidebarContent = ({ location }) => {
   const navigate = useNavigate();
 
@@ -113,24 +161,40 @@ const SidebarContent = ({ location }) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 flex justify-center mb-16 mt-10">
+    <div className="flex flex-col h-full overflow-hidden ">
+      {/* 1. Logo Section: Margins kam kiye aur shrink-0 add kiya */}
+      <div className="p-2 flex justify-center mb-6 mt-6 shrink-0">
         <img src={logo} alt="STAY HAVEN" className=" object-contain" />
       </div>
 
-      <Menu
-        mode="inline"
-        selectedKeys={[location.pathname]}
-        items={menuItems}
-        className="px-2 sidebar-menu font-medium text-gray-500"
-      />
+      {/* 2. Menu Section: flex-1 aur overflow-y-auto add kiya taake sirf menu scroll ho */}
+      <div 
+        className="flex-1 overflow-y-auto"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        <style>{`
+          .sidebar-menu::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <Menu
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          className="px-2 sidebar-menu font-medium text-gray-500 border-none "
+        />
+      </div>
 
-      <div className="p-2 mt-auto border-t border-gray-100">
+      {/* 3. Logout Section: shrink-0 add kiya taake bottom fix rahe */}
+      <div className="p-3 mt-auto border-t border-gray-100 shrink-0">
         <Button
           icon={<LogoutOutlined />}
           block
-          onClick={handleLogout} // Click handler connect kiya
-          className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed  hover:!border-blue hover:!text-blue"
+          onClick={handleLogout}
+          className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed hover:!border-blue hover:!text-blue"
         >
           Logout
         </Button>

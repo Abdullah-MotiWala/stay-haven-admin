@@ -11,23 +11,30 @@ const DashboardPage = ({ cardsData,bookingStatistics,recentBookings,bookingStatu
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} />
+<<<<<<< Updated upstream
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         <div className="lg:col-span-2">
           <BookingStatistics bookingStatistics={bookingStatistics} />
         </div>
+=======
+     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 items-stretch">
+  <div className="lg:col-span-2 flex flex-col">
+    <BookingStatistics bookingStatistics={bookingStatistics} height={'h-full'} />
+  </div>
+>>>>>>> Stashed changes
 
-        <div className="lg:col-span-1">
-          {/* <RoomAvailability /> */}
-          <AvailabilityProgress
-           title="Room Availability"
-           units={roomsAvailability || []}
-          />
-        </div>
+  <div className="lg:col-span-1 flex flex-col">
+    <AvailabilityProgress
+      title="Room Availability"
+      units={roomsAvailability || []}
+      height={'h-full'}
+    />
+  </div>
 
-        <div className="lg:col-span-1">
-          <BookingStatus  bookingStatus={bookingStatus}/>
-        </div>
-      </div>
+  <div className="lg:col-span-1 flex flex-col">
+    <BookingStatus bookingStatus={bookingStatus} height={'h-full'} />
+  </div>
+</div>
       <BookingList recentBookings={recentBookings} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">

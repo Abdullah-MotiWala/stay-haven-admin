@@ -2,7 +2,7 @@ import { Line } from "@ant-design/plots";
 import { Select } from "antd";
 import Card from "../card";
 
-const BookingStatistics = ({ bookingStatistics }) => {
+const BookingStatistics = ({ bookingStatistics  , height}) => {
   const chartData = [];
   
   (bookingStatistics || []).forEach((item) => {
@@ -47,6 +47,7 @@ const BookingStatistics = ({ bookingStatistics }) => {
   return (
     <Card
       title="Booking Statistics"
+      height={height}
       right={
         <Select
           size="small"
@@ -67,22 +68,6 @@ const BookingStatistics = ({ bookingStatistics }) => {
 };
 
 export default BookingStatistics;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
