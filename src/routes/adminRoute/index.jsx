@@ -23,10 +23,7 @@ import HotelBookingDashboard from "../../container/dashboard";
 import ContactMessages from "../../container/contact";
 import AdminProfile from "../../container/profile";
 import AddHost from "../../container/hosts/addHost";
-<<<<<<< Updated upstream
 import Notifications from "../../container/notifications";
-=======
->>>>>>> Stashed changes
 import Reports from "../../container/reports";
 
 export const AdminRoute = [
@@ -64,14 +61,11 @@ export const AdminRoute = [
           { path: "hostels/edit/:id", element: <AddHostel /> },
           { path: "contact-messages", element: <ContactMessages /> },
           { path: "profile", element: <AdminProfile /> },
-<<<<<<< Updated upstream
           { path: "notifications", element: <Notifications /> },
           { path: "reports", element: <Reports /> },
-=======
-          { path: "reports", element: <Reports /> },
+         
 
           
->>>>>>> Stashed changes
         ],
       },
     ],

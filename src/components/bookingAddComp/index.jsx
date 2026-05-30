@@ -37,11 +37,11 @@ const RadioBtn = ({ name, value, label, checked, onChange }) => (
 );
 
 const BOOKING_STATUSES = [
-  { value: "Booked",       label: "Booked" },
-  { value: "Checked-In",   label: "Check In" },
-  { value: "Checked-Out",  label: "Check Out" },
-  { value: "Completed",    label: "Completed" },
-  { value: "Cancelled",    label: "Cancel" },
+  { value: "Booked", label: "Booked" },
+  { value: "Checked-In", label: "Check In" },
+  { value: "Checked-Out", label: "Check Out" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancel" },
 ];
 
 const BookingAddComp = () => {
@@ -276,7 +276,7 @@ const BookingAddComp = () => {
           {isEditMode && (
             <button
               type="button"
-              onClick={() => navigate(`/admin/booking/${id}`, { state: { fromTab } })}
+              onClick={() => navigate(`/admin/booking/view/${id}`, { state: { fromTab } })}
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition"
             >
               <Eye size={15} />
@@ -329,7 +329,7 @@ const BookingAddComp = () => {
                       value={formData.infants !== undefined ? formData.infants : undefined}
                       onChange={(val) => handleChange({ target: { name: "infants", value: val } })}
                       suffixIcon={<ChevronDown size={16} className="text-gray-400" />}>
-                      {[0,1,2,3,4,5,6].map(v => <Option key={v} value={v}>{v} Infant{v !== 1 ? "s" : ""}</Option>)}
+                      {[0, 1, 2, 3, 4, 5, 6].map(v => <Option key={v} value={v}>{v} Infant{v !== 1 ? "s" : ""}</Option>)}
                     </Select>
                   </SelectWrap>
                 </div>
@@ -499,13 +499,38 @@ const BookingAddComp = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-3 mt-6">
-          <button type="button" onClick={() => navigate(backUrl)} className="px-8 py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all">Back</button>
-          <button type="submit" disabled={loading} className="px-8 py-2.5 bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50">
+        {/* <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => navigate(backUrl)}
+            className="px-8 py-2.5 min-w-[140px] border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-8 py-2.5 min-w-[140px] border border-transparent bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50"
+          >
             {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
           </button>
-        </div>
+        </div> */}
+<div className="flex justify-end gap-3 mt-6">
+  <button
+    type="button"
+    onClick={() => navigate(backUrl)}
+    className="w-[140px] py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all"
+  >
+    Back
+  </button>
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-[140px] h-11 mt-[10px] border border-transparent bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50"
+  >
+    {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
+  </button>
+</div>
       </form>
 
       {isModalOpen && (

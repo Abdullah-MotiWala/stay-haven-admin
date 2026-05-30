@@ -18,6 +18,34 @@ function AppartmentCard({ data, active, onClick, onStatusChange, onDelete }) {
   const handleDelete = async (e) => {
     e.stopPropagation();
     setShowMenu(false);
+
+  if (data?.status === "occupied" || data?.status === "booked") {
+    Modal.error({
+      title: "Cannot Delete Apartment",
+      icon: null,
+      content: (
+        <div className="py-2">
+          <p className="text-gray-600 text-sm">
+            This apartment cannot be deleted because it is currently{" "}
+            <span className="font-semibold text-red-600">Occupied</span>.
+          </p>
+          <p className="text-gray-500 text-xs mt-2">
+            Please wait until the guest checks out or change the apartment status before deleting.
+          </p>
+        </div>
+      ),
+      okText: "Okay",
+      okButtonProps: {
+        style: {
+          backgroundColor: "#DC2626",
+          borderColor: "#DC2626",
+          color: "#fff",
+        },
+      },
+    });
+    return; // 🔴 Delete nahi hoga
+  }
+
     Modal.confirm({
       title: "Delete Apartment",
       icon: null,

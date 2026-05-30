@@ -23,6 +23,8 @@ const Reports = () => {
     checkOut: null,
     bookingType: null,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   useEffect(() => {
     fetchHotels();
@@ -59,7 +61,7 @@ const Reports = () => {
       setLoading(true);
       const res = await getAllBooking(1, 10000, filters.bookingType === "apartment");
       let data = res.data?.data || res.data || [];
-      
+
       // Ensure data is an array
       if (!Array.isArray(data)) {
         data = [];
@@ -75,12 +77,26 @@ const Reports = () => {
       if (filters.status) {
         data = data.filter((b) => b.status?.toLowerCase() === filters.status.toLowerCase());
       }
+      // ... aapke baqi filters
+
       if (filters.checkIn) {
-        data = data.filter((b) => dayjs(b.checkIn).isSameOrAfter(dayjs(filters.checkIn), "day"));
+        data = data.filter((b) => {
+          if (!b.checkIn) return false; // Agar API se date nahi aayi to skip karo
+          // API ki date ko YYYY-MM-DD main convert karke filter se compare karein
+          const bookingDate = dayjs(b.checkIn).format("YYYY-MM-DD");
+          return bookingDate >= filters.checkIn;
+        });
       }
+
       if (filters.checkOut) {
-        data = data.filter((b) => dayjs(b.checkOut).isSameOrBefore(dayjs(filters.checkOut), "day"));
+        data = data.filter((b) => {
+          if (!b.checkOut) return false;
+          const bookingDate = dayjs(b.checkOut).format("YYYY-MM-DD");
+          return bookingDate <= filters.checkOut;
+        });
       }
+
+      // ... aapke baqi filters (bookingType waghera)
       if (filters.bookingType === "hostel") {
         data = data.filter((b) => b.isHostel === true);
       } else if (filters.bookingType === "room") {
@@ -99,6 +115,7 @@ const Reports = () => {
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    // console.log("Filters " , filters);
   };
 
   const handleApplyFilters = () => {
@@ -115,6 +132,7 @@ const Reports = () => {
       bookingType: null,
     });
     setTimeout(() => fetchReports(), 100);
+
   };
 
   const exportToCSV = () => {
@@ -204,13 +222,13 @@ const Reports = () => {
       title: "Host",
       dataIndex: ["hotel", "host", "name"],
       key: "host",
-      render: (text, record) => text || record.apartment?.hotel?.host?.name || "—",
+      render: (text, record) => text || record.apartment?.hotel?.host?.name || record.room?.host?.name || "—",
       width: 130,
     },
     {
       title: "Room/Apartment",
       key: "roomType",
-      render: (_, record) => record.room?.roomType?.name || record.apartment?.name || "—",
+      render: (_, record) => record.room?.roomType?.name || record.apartment?.name || record.room?.roomNumber || "—",
       width: 150,
     },
     {
@@ -236,8 +254,8 @@ const Reports = () => {
     },
     {
       title: "Amount",
-      dataIndex: "totalAmount",
-      key: "totalAmount",
+      dataIndex: "paidAmount",
+      key: "paidAmount",
       render: (amount) => `$${amount || 0}`,
       width: 100,
     },
@@ -245,23 +263,41 @@ const Reports = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            status === "Confirmed"
-              ? "bg-green-100 text-green-700"
-              : status === "Pending"
-              ? "bg-yellow-100 text-yellow-700"
-              : status === "Cancelled"
-              ? "bg-red-100 text-red-700"
-              : status === "Completed"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-gray-100 text-gray-700"
-          }`}
-        >
-          {status || "—"}
-        </span>
-      ),
+      render: (status) => {
+        const s = status?.toLowerCase();
+
+        const styleMap = {
+          "booked": { background: "#DBEAFE", color: "#1D4ED8" },
+          "reserved": { background: "#DBEAFE", color: "#1D4ED8" },
+          "checked-in": { background: "#DCFCE7", color: "#15803D" },
+          "checkin": { background: "#DCFCE7", color: "#15803D" },
+          "checked-out": { background: "#F3F4F6", color: "#374151" },
+          "checkout": { background: "#F3F4F6", color: "#374151" },
+          "completed": { background: "#EDE9FE", color: "#6D28D9" },
+          "cancelled": { background: "#FEE2E2", color: "#DC2626" },
+          "canceled": { background: "#FEE2E2", color: "#DC2626" },
+          "pending": { background: "#FEF9C3", color: "#A16207" },
+          "confirmed": { background: "#DCFCE7", color: "#15803D" },
+        };
+
+        const style = styleMap[s] || { background: "#F3F4F6", color: "#6B7280" };
+
+        return (
+          <span
+            style={{
+              ...style,
+              padding: "4px 12px",
+              borderRadius: "9999px",
+              fontSize: "12px",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              display: "inline-block",
+            }}
+          >
+            {status || "—"}
+          </span>
+        );
+      },
       width: 120,
     },
   ];
@@ -382,7 +418,8 @@ const Reports = () => {
               className="w-full"
               placeholder="Select check-in date"
               value={filters.checkIn ? dayjs(filters.checkIn) : null}
-              onChange={(date) => handleFilterChange("checkIn", date ? date.toISOString() : null)}
+              // yahan .toISOString() ko .format("YYYY-MM-DD") se replace kiya hai
+              onChange={(date) => handleFilterChange("checkIn", date ? date.format("YYYY-MM-DD") : null)}
             />
           </div>
 
@@ -392,9 +429,8 @@ const Reports = () => {
               className="w-full"
               placeholder="Select check-out date"
               value={filters.checkOut ? dayjs(filters.checkOut) : null}
-              onChange={(date) =>
-                handleFilterChange("checkOut", date ? date.toISOString() : null)
-              }
+
+              onChange={(date) => handleFilterChange("checkOut", date ? date.format("YYYY-MM-DD") : null)}
             />
           </div>
         </div>
@@ -427,12 +463,21 @@ const Reports = () => {
           rowKey={(record) => record.id}
           scroll={{ x: 1200 }}
           pagination={{
-            pageSize: 20,
+            current: currentPage,
+            pageSize: pageSize, // Ab yeh state se aayega
             showSizeChanger: true,
             showTotal: (total) => `Total ${total} bookings`,
             pageSizeOptions: ["10", "20", "50", "100"],
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size); // Jab user size badlega, toh yeh state update karega
+
+              // Yahan aap apni API call ka function laga sakte hain
+              // fetchBookings(page, size); 
+            },
           }}
           className="report-table"
+          childrenColumnName="nestedData"
         />
       </div>
     </div>

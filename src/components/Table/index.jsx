@@ -39,6 +39,7 @@ const HotelDirectory = ({
   onExportSuccess,
   exportFileName = "",
   showExport = true,
+  disableEditStatuses = [],
 }) => {
   const navigate = useNavigate();
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -121,25 +122,6 @@ const HotelDirectory = ({
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "booked":
-<<<<<<< Updated upstream
-      case "reserved":    return "bg-lightYellow text-black";
-      case "checked-in":
-      case "checkin":     return "bg-lightGreenOne text-darkGreen";
-      case "checked-out":
-      case "checkout":
-      case "completed":   return "bg-shadeGreen text-black";
-      case "maintenance": return "bg-lightYellow text-lightSeconday";
-      case "draft":       return "bg-lightBrown text-lightSeconday";
-      case "inactive":
-      case "deactivate":  return "bg-lightBlue text-blue";
-      case "active":
-      case "available":   return "bg-lightGreenOne text-darkGreen";
-      case "occupied":    return "bg-lightYellow text-black";
-      case "cancelled":
-      case "canceled":    return "bg-lightRed text-red";
-      case "delete":      return "bg-red-100 text-red-600";
-      default:            return "bg-gray-100 text-gray-600";
-=======
       case "reserved": return "bg-lightYellow text-black";
       case "checked-in":
       case "checkin": return "bg-lightGreenOne text-darkGreen";
@@ -157,21 +139,32 @@ const HotelDirectory = ({
       case "canceled": return "bg-lightRed text-red";
       case "delete": return "bg-red-100 text-red-600";
       default: return "bg-gray-100 text-gray-600";
->>>>>>> Stashed changes
-    }
-  };
+      //   case "reserved": return "bg-lightYellow text-black";
+      //   case "checked-in":
+      //   case "checkin": return "bg-lightGreenOne text-darkGreen";
+      //   case "checked-out":
+      //   case "checkout":
+      //   case "completed": return "bg-shadeGreen text-black";
+      //   case "maintenance": return "bg-lightYellow text-lightSeconday";
+      //   case "draft": return "bg-lightBrown text-lightSeconday";
+      //   case "inactive":
+      //   case "deactivate": return "bg-lightBlue text-blue";
+      //   case "active":
+      //   case "available": return "bg-lightGreenOne text-darkGreen";
+      //   case "occupied": return "bg-lightYellow text-black";
+      //   case "cancelled":
+      //   case "canceled": return "bg-lightRed text-red";
+      //   case "delete": return "bg-red-100 text-red-600";
+      //   default: return "bg-gray-100 text-gray-600";
+      // }
+    };
+  }
 
   const getRoomTypeStyle = (type) => {
     switch (type) {
-<<<<<<< Updated upstream
-      case "Deluxe":   return "bg-lightYellow text-black";
-      case "Standard": return "bg-shadeGreen text-black";
-      default:         return "bg-gray-100 text-gray-600";
-=======
       case "Deluxe": return "bg-lightYellow text-black";
       case "Standard": return "bg-shadeGreen text-black";
       default: return "bg-gray-100 text-gray-600";
->>>>>>> Stashed changes
     }
   };
 
@@ -180,23 +173,6 @@ const HotelDirectory = ({
     const s = row.status?.toLowerCase();
 
     // Pehle actual API status check karo
-<<<<<<< Updated upstream
-    if (s === "cancelled" || s === "canceled")  return "Cancelled";
-    if (s === "checked-in" || s === "checkin")  return "Checked-In";
-    if (s === "checked-out" || s === "checkout") return "Checked-Out";
-    if (s === "completed")  return "Completed";
-    if (s === "booked")     return "Booked";
-    if (s === "reserved")   return "Reserved";
-
-    // Hotel/room statuses
-    if (row.isDeleted)      return "Deleted";
-    if (s === "active")     return "Active";
-    if (s === "available")  return "Available";
-    if (s === "occupied")   return "Occupied";
-    if (s === "maintenance") return "Maintenance";
-    if (s === "deactivate" || s === "inactive") return "Inactive";
-    if (s === "draft")      return "Draft";
-=======
     if (s === "cancelled" || s === "canceled") return "Cancelled";
     if (s === "checked-in" || s === "checkin") return "Checked-In";
     if (s === "checked-out" || s === "checkout") return "Checked-Out";
@@ -212,7 +188,6 @@ const HotelDirectory = ({
     if (s === "maintenance") return "Maintenance";
     if (s === "deactivate" || s === "inactive") return "Inactive";
     if (s === "draft") return "Draft";
->>>>>>> Stashed changes
 
     // Sirf agar status bilkul nahi hai toh dates se derive karo
     if (!s && row.checkInOut) return deriveBookingStatus(row.checkInOut);
@@ -306,11 +281,7 @@ const HotelDirectory = ({
           </div>
         );
 
-<<<<<<< Updated upstream
-      case "text":   return row[col.key] ?? "â€”";
-=======
       case "text": return row[col.key] ?? "â€”";
->>>>>>> Stashed changes
       case "number": return row[col.key] ?? 0;
 
       case "hotel":
@@ -344,13 +315,8 @@ const HotelDirectory = ({
           const STATUS_OPTIONS = hoteloptions
             ? ["active", "inactive", "maintenance", "draft"]
             : hostOptions
-<<<<<<< Updated upstream
-            ? ["active", "inactive"]
-            : ["available", "active", "occupied", "maintenance", "inactive"];
-=======
               ? ["active", "inactive"]
               : ["available", "active", "occupied", "maintenance", "inactive"];
->>>>>>> Stashed changes
           return (
             <div className="relative inline-block">
               <button
@@ -536,19 +502,8 @@ const HotelDirectory = ({
           <thead>
             <tr>
               {checkbox && (
-<<<<<<< Updated upstream
                 <th className="w-10 border-b border-t border-r border-dashed">
                   <input type="checkbox" checked={selectedIds.length === data.length && data.length > 0} onChange={toggleAll} className="checked:accent-blue" />
-=======
-                <th className="w-10 border-b border-t border-r border-dashed text-center align-middle">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.length === data.length && data.length > 0}
-                    onChange={toggleAll}
-                    onClick={(e) => e.stopPropagation()}
-                    className="checked:accent-blue"
-                  />
->>>>>>> Stashed changes
                 </th>
               )}
               {columns.map((col) => (
@@ -572,31 +527,14 @@ const HotelDirectory = ({
                     onClick={() => { if (view) navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
                   >
                     {checkbox && (
-<<<<<<< Updated upstream
                       <td className="border-b border-t border-r border-dashed">
                         <input type="checkbox" checked={selectedIds.includes(row.id)} onChange={() => toggleRow(row.id)} className="checked:accent-blue" />
                       </td>
                     )}
                     {columns.map((col) => (
-                      <td key={col.key} 
-                        data-label={col.label}
-                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
-=======
-                      <td className="border-b border-t border-r border-dashed text-center align-middle">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(row.id)}
-                          onChange={() => toggleRow(row.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="checked:accent-blue"
-                        />
-                      </td>
-                    )}
-                    {columns.map((col) => (
                       <td key={col.key}
                         data-label={col.label}
-                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative align-middle ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-center"}`}
->>>>>>> Stashed changes
+                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
                         onClick={(e) => { if (col.type === "actions" || col.type === "status") e.stopPropagation(); }}
                       >
                         <div className={`flex items-center min-w-0 ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
@@ -610,7 +548,6 @@ const HotelDirectory = ({
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
                             {view && (
-<<<<<<< Updated upstream
                               <button
                                 onClick={() => {
                                   setRowActionOpen(null);
@@ -621,24 +558,31 @@ const HotelDirectory = ({
                                 View
                               </button>
                             )}
-                            <button
-                              onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                            >
-                              Edit
-                            </button>
+                            {(() => {
+                              const rowStatus = getRowStatus(row)?.toLowerCase();
+                              const isEditDisabled = disableEditStatuses.some(s => s.toLowerCase() === rowStatus);
+                              return isEditDisabled ? (
+                                <button
+                                  disabled
+                                  className="w-full text-left px-3 py-2 text-sm text-gray-300 cursor-not-allowed"
+                                >
+                                  Edit
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
+                                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                                >
+                                  Edit
+                                </button>
+                              );
+                            })()}
                             <button
                               onClick={() => { setRowActionOpen(null); onDelete(row.id); }}
                               className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
                             >
                               Delete
                             </button>
-=======
-                              <button onClick={() => { setRowActionOpen(null); navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
-                            )}
-                            <button onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
-                            <button onClick={() => { setRowActionOpen(null); onDelete(row.id); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
->>>>>>> Stashed changes
                           </div>
                         )}
                       </td>
@@ -703,7 +647,15 @@ const HotelDirectory = ({
                             {view && (
                               <button onClick={() => { setRowActionOpen(null); navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
                             )}
-                            <button onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
+                            {(() => {
+                              const rowStatus = getRowStatus(row)?.toLowerCase();
+                              const isEditDisabled = disableEditStatuses.some(s => s.toLowerCase() === rowStatus);
+                              return isEditDisabled ? (
+                                <button disabled className="w-full text-left px-3 py-2 text-sm text-gray-300 cursor-not-allowed">Edit</button>
+                              ) : (
+                                <button onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
+                              );
+                            })()}
                             <button onClick={() => { setRowActionOpen(null); onDelete?.(row.id); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
                           </div>
                         )}

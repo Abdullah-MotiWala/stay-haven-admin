@@ -200,6 +200,7 @@ const Booking = () => {
             checkbox={false}
             activeType={activeType}
             onDelete={handleDelete}
+            disableEditStatuses={["checked-out", "cancelled", "completed"]}
           />
         )}
 

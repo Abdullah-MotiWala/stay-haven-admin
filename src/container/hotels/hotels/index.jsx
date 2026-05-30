@@ -8,24 +8,16 @@ import {
   deleteHotel,
   getStats,
   lastHotelId,
-<<<<<<< Updated upstream
   hotelStatusUpdate,
-=======
-  getHotelsList,
->>>>>>> Stashed changes
 } from "../../../services/hotel";
 import home1 from "../../../assets/icons/home-1.png";
 import home2 from "../../../assets//icons/home-2.png";
 import home3 from "../../../assets/icons/home-3.png";
 import home4 from "../../../assets/icons/home-4.png";
 import { openNotification } from "../../../network/notification";
-<<<<<<< Updated upstream
 import { Pagination, Select, Modal } from "antd";
 import StatusReasonModal, { needsReason } from "../../../components/shared/statusReasonModal";
 import { TableSkeleton } from "../../../components/shared/skeletons";
-=======
-import { Pagination, Select, Modal } from "antd"; // Modal import add kiya hai
->>>>>>> Stashed changes
 
 const entriesPerPageOptions = [10, 20, 30, 40];
 
@@ -82,7 +74,6 @@ const HotelsListing = () => {
     fetchData();
   }, [refresh, currentPage, itemsPerPage]);
 
-<<<<<<< Updated upstream
   const handleStatusToggle = (id, newStatus) => {
     if (needsReason(newStatus)) {
       setReasonModal({ open: true, hotelId: id, status: newStatus });
@@ -163,57 +154,6 @@ const HotelsListing = () => {
     });
   };
 
-=======
-  // UPDATED DELETE LOGIC
-  const handleDelete = async (id) => {
-    // 1. Array mein se us specific hotel ko find karein
-    const targetHotel = hotels?.data?.find((hotel) => hotel.id === id);
-
-    // 2. Agar rooms/apartments majood hain, toh Warning Modal show karein
-    if (targetHotel && targetHotel.totalRooms > 0) {
-      Modal.warning({
-        title: "Deletion Restricted",
-        content: `You cannot delete this hotel because it currently contains ${targetHotel.totalRooms} rooms/properties. Please delete them first.`,
-        okText: "Got it",
-        centered: true,
-        okButtonProps: {
-          danger: true
-        }
-      });
-      return;
-    }
-
-    Modal.confirm({
-      title: "Delete Hotel",
-      content: "Are you sure you want to delete this hotel? This action cannot be undone.",
-      okText: "Yes, Delete",
-      // Modal 2: Confirm modal ka button red karne ke liye (okType ki jagah)
-      okButtonProps: {
-        danger: true,
-        type: "primary"
-      },
-      cancelText: "Cancel",
-      centered: true,
-      onOk: async () => {
-        try {
-          await deleteHotel(id);
-
-          // State ko proper structure ke sath update kiya gaya hai
-          setHotels((prev) => ({
-            ...prev,
-            data: prev.data.filter((hotel) => hotel.id !== id)
-          }));
-
-          openNotification("success", "Hotel deleted successfully");
-          setRefresh(true); // Table aur stats ko refresh karne ke liye
-        } catch (err) {
-          console.error("Any Problem in deleting", err);
-          openNotification("error", "Internal Server Error");
-        }
-      },
-    });
-  }
->>>>>>> Stashed changes
   const cardsData = [
     { title: "Total Hotels",    value: stats?.totalHotels,   bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, trend: `${stats?.growth?.isPositive ? "+" : "-"}${stats?.growth?.percentage ?? 0}%`, trendText: "vs last week", showTrend: true },
     { title: "Active Hotels",   value: stats?.activeHotels,  bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
@@ -271,11 +211,7 @@ const HotelsListing = () => {
             <Select
               placeholder="Select Entries"
               defaultValue={10}
-<<<<<<< Updated upstream
               className="text-black"
-=======
-              className="text-black "
->>>>>>> Stashed changes
               onChange={(value) => setItemsPerPage(value)}
               options={entriesPerPageOptions.map((o) => ({ label: o, value: o }))}
               showSearch
@@ -287,7 +223,6 @@ const HotelsListing = () => {
             total={stats?.totalHotels || 0}
             pageSize={itemsPerPage}
             onChange={onPageChange}
-<<<<<<< Updated upstream
             className="admin-pagination flex justify-end flex-wrap"
           />
         </div>
@@ -302,12 +237,6 @@ const HotelsListing = () => {
         onCancel={() => { setReasonModal({ open: false, hotelId: null, status: "" }); setReason(""); }}
         loading={statusLoading}
       />
-=======
-            className="flex justify-end "
-          />
-        </div>
-      </div>
->>>>>>> Stashed changes
     </div>
   );
 };

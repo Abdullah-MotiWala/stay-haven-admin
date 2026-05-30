@@ -47,7 +47,7 @@ const BookingStatistics = ({ bookingStatistics  , height}) => {
   return (
     <Card
       title="Booking Statistics"
-      height={height}
+      height={"h-full"}
       right={
         <Select
           size="small"

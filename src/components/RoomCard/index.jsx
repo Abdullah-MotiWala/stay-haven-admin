@@ -15,60 +15,98 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
   let id = room?.id;
   const handleEditClick = () => { navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`); };
 
-  const handleDelete = async (e) => {
-    e.stopPropagation();
-    setShowMenu(false);
-    Modal.confirm({
-      title: "Delete Room",
+ const handleDelete = async (e) => {
+  e.stopPropagation();
+  setShowMenu(false);
+
+  // ✅ Occupied check — API call se pehle hi rok do
+  if (room?.status === "occupied" || room?.status === "booked") {
+    Modal.error({
+      title: "Cannot Delete Room",
       icon: null,
-      content: "Are you sure you want to delete this room?",
-      okText: "Delete",
-      okButtonProps: { style: { backgroundColor: '#8B0000', borderColor: '#8B0000', color: '#fff' } },
-      cancelText: "Cancel",
-      onOk: async () => {
-        try {
-          const res = await deleteRoom(id);
-          if (res?.data?.success === false) {
-            const { message, dependencies } = res.data;
-            if (dependencies?.length) {
-              Modal.error({
-                title: "Cannot Delete",
-                icon: null,
-                content: (
-                  <div>
-                    <p className="text-gray-600 mb-3">{message}</p>
-                    <div className="space-y-2">
-                      {dependencies.map((dep, i) => (
-                        <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
-                          <p className="text-gray-800 font-semibold">{dep.name}</p>
-                          {dep.detail && <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ),
-                okText: "OK",
-                okButtonProps: { className: "bg-mainPrimary" },
-              });
-            } else {
-              Modal.error({
-                title: "Cannot Delete",
-                icon: null,
-                content: <p className="text-gray-600">{message || "Cannot delete. It may have active bookings."}</p>,
-                okText: "OK",
-                okButtonProps: { className: "bg-mainPrimary" },
-              });
-            }
-            return;
-          }
-          openNotification("success", "Deleted successfully");
-          onDelete && onDelete(id);
-        } catch (err) {
-          openNotification("error", err?.response?.data?.message || "Failed to delete");
-        }
+      content: (
+        <div className="py-2">
+          <p className="text-gray-600 text-sm">
+            This room cannot be deleted because it is currently{" "}
+            <span className="font-semibold text-red-600">Occupied</span>.
+          </p>
+          <p className="text-gray-500 text-xs mt-2">
+            Please wait until the guest checks out or change the room status before deleting.
+          </p>
+        </div>
+      ),
+      okText: "Okay",
+      okButtonProps: {
+        style: {
+          backgroundColor: "#DC2626",
+          borderColor: "#DC2626",
+          color: "#fff",
+        },
       },
     });
-  };
+    return; // 🔴 yahan se bahar — delete nahi hoga
+  }
+
+  // Normal delete flow (occupied nahi hai toh)
+  Modal.confirm({
+    title: "Delete Room",
+    icon: null,
+    content: "Are you sure you want to delete this room?",
+    okText: "Delete",
+    okButtonProps: {
+      style: { backgroundColor: "#8B0000", borderColor: "#8B0000", color: "#fff" },
+    },
+    cancelText: "Cancel",
+    onOk: async () => {
+      try {
+        const res = await deleteRoom(id);
+        if (res?.data?.success === false) {
+          const { message, dependencies } = res.data;
+          if (dependencies?.length) {
+            Modal.error({
+              title: "Cannot Delete",
+              icon: null,
+              content: (
+                <div>
+                  <p className="text-gray-600 mb-3">{message}</p>
+                  <div className="space-y-2">
+                    {dependencies.map((dep, i) => (
+                      <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
+                        <p className="text-gray-800 font-semibold">{dep.name}</p>
+                        {dep.detail && (
+                          <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ),
+              okText: "OK",
+              okButtonProps: { className: "bg-mainPrimary" },
+            });
+          } else {
+            Modal.error({
+              title: "Cannot Delete",
+              icon: null,
+              content: (
+                <p className="text-gray-600">
+                  {message || "Cannot delete. It may have active bookings."}
+                </p>
+              ),
+              okText: "OK",
+              okButtonProps: { className: "bg-mainPrimary" },
+            });
+          }
+          return;
+        }
+        openNotification("success", "Deleted successfully");
+        onDelete && onDelete(id);
+      } catch (err) {
+        openNotification("error", err?.response?.data?.message || "Failed to delete");
+      }
+    },
+  });
+};
 
   return (
     <div
