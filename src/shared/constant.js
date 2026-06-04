@@ -38,7 +38,7 @@ export const TABS = [
   "Booking Policies",
   "Room Rules",
   "Pricing & Taxes",
-  "Forget Password",
+  "Change Password",
   "Social Media ",
   // "Social Links"
 ];

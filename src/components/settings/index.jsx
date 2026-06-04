@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { TABS } from "../../shared/constant";
 import { useNavigate } from "react-router-dom";
 import { openNotification } from "../../network/notification";
-import ForgetPassword from "./forms/forgetPassword";
+import ChangePassword from "./forms/forgetPassword";
 import { getSettingsApi, updateSettingsApi } from "../../services/setting/index"; 
 
 import GeneralSettings from "./forms/generalSettings";
@@ -63,7 +63,7 @@ const Setting = () => {
       case "Booking Policies": return <BookingPolicies />;
       case "Room Rules": return <RoomRules />;
       case "Pricing & Taxes": return <PricingAndTaxes symbol={currentSymbol}   />;
-      case "Forget Password": return ForgetPassword ? <ForgetPassword onCurrenciesFetched={setCurrencyOptions} setGlobalSymbol={setCurrentSymbol} /> : null;
+      case "Change Password": return ChangePassword ? <ChangePassword onCurrenciesFetched={setCurrencyOptions} setGlobalSymbol={setCurrentSymbol} /> : null;
       case "Social Media ": return <SocialMedia />;
       // case "Social Links": return <SocialLinks />;
       default: return null;

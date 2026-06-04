@@ -19,52 +19,80 @@ const BookingStatistics = ({ bookingStatistics  , height}) => {
     });
   });
 
-  const config = {
-    data: chartData,
-    xField: "month",
-    yField: "value",
-    seriesField: "type",
-    smooth: true,
-    height: 285,
-    color: ["#2563EB", "#F97316"],
-    lineStyle: {
-      lineWidth: 2,
-    },
-    yAxis: {
-      grid: null,
-    },
-    xAxis: {
-      tickLine: null,
-    },
-    legend: {
-      position: "top",
-    },
-    tooltip: {
-      showMarkers: false,
-    },
-  };
-
-  return (
-    <Card
-      title="Booking Statistics"
-      height={"h-full"}
-      right={
-        <Select
-          size="small"
-          defaultValue="thisYear"
-          options={[{ label: "This Year", value: "thisYear" }]}
-        />
-      }
-    >
-      {chartData.length > 0 ? (
-        <Line {...config} key={chartData.length} /> 
-      ) : (
-        <div className="h-[285px] flex items-center justify-center text-gray-400">
-          Loading Statistics...
-        </div>
-      )}
-    </Card>
-  );
+  // const config = {
+  //   data: chartData,
+  //   xField: "month",
+  //   yField: "value",
+  //   seriesField: "type",
+  //   smooth: true,
+  //   height: 245,
+  //   color: ["#2563EB", "#F97316"],
+  //   lineStyle: {
+  //     lineWidth: 2,
+  //   },
+  //   yAxis: {
+  //     grid: null,
+  //   },
+  //   xAxis: {
+  //     tickLine: null,
+  //   },
+  //   legend: {
+  //     position: "top",
+  //   },
+  //   tooltip: {
+  //     showMarkers: false,
+  //   },
+  // };
+// BookingStatistics.jsx
+const config = {
+  data: chartData,
+  xField: "month",
+  yField: "value",
+  seriesField: "type",
+  smooth: true,
+  autoFit: true, // Yeh property add karein
+  // height: 245, // Isko chahein toh hata dein ya comment kar dein
+  color: ["#2563EB", "#F97316"],
+  lineStyle: {
+    lineWidth: 2,
+  },
+  yAxis: {
+    grid: null,
+  },
+  xAxis: {
+    tickLine: null,
+  },
+  legend: {
+    position: "top",
+  },
+  tooltip: {
+    showMarkers: false,
+  },
+};
+ return (
+  <Card
+    title="Booking Statistics"
+    height={"h-full"}
+    right={
+      <Select
+        size="small"
+        defaultValue="thisYear"
+        options={[{ label: "This Year", value: "thisYear" }]}
+      />
+    }
+  >
+    {chartData.length > 0 ? (
+      // Ek wrapper div add karein jisme flex-1 aur min-h-0 ho
+      <div className="flex-1 min-h-0 w-full h-full"> 
+        <Line {...config} key={chartData.length} />
+      </div>
+    ) : (
+      <div className="flex-1 flex items-center justify-center text-gray-400 min-h-[245px]">
+        Loading Statistics...
+      </div>
+    )}
+  </Card>
+);
 };
 
 export default BookingStatistics;

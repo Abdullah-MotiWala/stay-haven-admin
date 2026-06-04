@@ -281,8 +281,8 @@ const HotelDirectory = ({
           </div>
         );
 
-      case "text": return row[col.key] ?? "â€”";
-      case "number": return row[col.key] ?? 0;
+      case "text": return col.getValue ? col.getValue(row) : (row[col.key] ?? "—");
+       case "number": return row[col.key] ?? 0;
 
       case "hotel":
         return (
@@ -296,9 +296,10 @@ const HotelDirectory = ({
         );
 
       case "roomType": {
-        const typeLabel = typeof row.roomType === "object" ? row.roomType?.title : row.roomType;
+       const raw = col.getValue ? col.getValue(row) : row[col.key];
+    const typeLabel = typeof raw === "object" ? raw?.title : raw;
         return (
-          <span className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center justify-center whitespace-nowrap ${getRoomTypeStyle(typeLabel)}`}>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium inline-block w-full text-center ${getRoomTypeStyle(typeLabel)}`}>
             {typeLabel ?? "N/A"}
           </span>
         );
@@ -315,7 +316,7 @@ const HotelDirectory = ({
           const STATUS_OPTIONS = hoteloptions
             ? ["active", "inactive", "maintenance", "draft"]
             : hostOptions
-              ? ["active", "inactive"]
+              ? ["active", "inactive", "maintenance", "draft", "delete"]
               : ["available", "active", "occupied", "maintenance", "inactive"];
           return (
             <div className="relative inline-block">
@@ -394,7 +395,26 @@ const HotelDirectory = ({
               <button className="p-2 border rounded-lg hover:bg-gray-50" onClick={() => setShowFilter(!showFilter)}>
                 <Filter size={16} />
               </button>
-              {!onlyFilter && (
+              {/* {!onlyFilter && (
+                <>
+                  <div className="relative">
+                    <button onClick={() => setBulkOpen(!bulkOpen)} className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1">
+                      Bulk Actions <ChevronDown size={14} />
+                    </button>
+                    {bulkOpen && (
+                      <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
+                        {["Active", "InActive", "Delete", "Draft", "Maintenance"].map((item) => (
+                          <button key={item} onClick={() => { handleBulkAction(item.split(" ")[0].toLowerCase()); setBulkOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )} */}
+
+              {!onlyFilter && !hostOptions && (
                 <>
                   <div className="relative">
                     <button onClick={() => setBulkOpen(!bulkOpen)} className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1">
@@ -435,7 +455,7 @@ const HotelDirectory = ({
                 <div className="relative ant-select-custom">
                   <Select placeholder={activeType === "Apartment Bookings" ? "Select Apartment" : "Select Room"} value={filters.roomType || undefined} onChange={(val) => handleFilterChange("roomType", val)} className="w-full h-[50px] custom-antd-select" suffixIcon={<ChevronDown size={18} className="text-gray-900" />} showSearch>
                     <Option value="">Select Room</Option>
-                    {roomTypes.length > 0 ? roomTypes.map((type) => (<Option key={type.id} value={type.id}>{type.title}</Option>)) : (<><Option value="One Bed Room">One Bed Room</Option><Option value="Two Bed Room">Two Bed Room</Option></>)}
+                    {roomTypes.length > 0 ? roomTypes.map((type) => (<Option key={type.id} value={type.id}>{type.title}</Option>)) : (<><Option value="One Bed Room">One Bed Room</Option><Option value="Four Bed Room">Four Bed Room</Option><Option value="Single Room">Single Bed Room</Option><Option value="Two Bed Room">Two Bed Room</Option><Option value="Luxury Suites">Luxury Suites</Option></>)}
                   </Select>
                 </div>
               )}
@@ -528,13 +548,21 @@ const HotelDirectory = ({
                   >
                     {checkbox && (
                       <td className="border-b border-t border-r border-dashed">
-                        <input type="checkbox" checked={selectedIds.includes(row.id)} onChange={() => toggleRow(row.id)} className="checked:accent-blue" />
-                      </td>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(row.id)}
+                          onChange={(e) => {
+                            e.stopPropagation(); // Event ko row tak jane se roke ga
+                            toggleRow(row.id);
+                          }}
+                          onClick={(e) => e.stopPropagation()} // Click ko bhi prevent karein
+                          className="checked:accent-blue"
+                        />                      </td>
                     )}
                     {columns.map((col) => (
                       <td key={col.key}
                         data-label={col.label}
-                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}
+                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-center"}`}
                         onClick={(e) => { if (col.type === "actions" || col.type === "status") e.stopPropagation(); }}
                       >
                         <div className={`flex items-center min-w-0 ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
@@ -543,17 +571,42 @@ const HotelDirectory = ({
                           </div>
                         </div>
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+                          <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50">
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
+                            {/* ✅ Status Update — hostOptions ho to action dropdown mein show karo */}
+                            {hostOptions && onStatusToggle && (() => {
+                              const STATUS_OPTIONS = ["active", "inactive"];
+                              return (
+                                <>
+                                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-400 border-t border-gray-100 mt-1">
+                                    Update Status
+                                  </div>
+                                  {STATUS_OPTIONS.map(opt => (
+                                    <button
+                                      key={opt}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setRowActionOpen(null);
+                                        onStatusToggle(row.id, opt);
+                                      }}
+                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"
+                                        }`}
+                                    >
+                                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                                    </button>
+                                  ))}
+                                </>
+                              );
+                            })()}
                             {view && (
                               <button
                                 onClick={() => {
                                   setRowActionOpen(null);
                                   navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } });
                                 }}
-                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-t border-gray-100"
                               >
                                 View
                               </button>
@@ -562,27 +615,12 @@ const HotelDirectory = ({
                               const rowStatus = getRowStatus(row)?.toLowerCase();
                               const isEditDisabled = disableEditStatuses.some(s => s.toLowerCase() === rowStatus);
                               return isEditDisabled ? (
-                                <button
-                                  disabled
-                                  className="w-full text-left px-3 py-2 text-sm text-gray-300 cursor-not-allowed"
-                                >
-                                  Edit
-                                </button>
+                                <button disabled className="w-full text-left px-3 py-2 text-sm text-gray-300 cursor-not-allowed">Edit</button>
                               ) : (
-                                <button
-                                  onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
-                                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                                >
-                                  Edit
-                                </button>
+                                <button onClick={() => { setRowActionOpen(null); navigate(`${editpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
                               );
                             })()}
-                            <button
-                              onClick={() => { setRowActionOpen(null); onDelete(row.id); }}
-                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                            >
-                              Delete
-                            </button>
+                            <button onClick={() => { setRowActionOpen(null); onDelete(row.id); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
                           </div>
                         )}
                       </td>
@@ -644,6 +682,31 @@ const HotelDirectory = ({
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
+
+                            {hostOptions && onStatusToggle && (() => {
+                              const STATUS_OPTIONS = ["active", "inactive"];
+                              return (
+                                <>
+                                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-gray-400 border-t border-gray-100 mt-1">
+                                    Update Status
+                                  </div>
+                                  {STATUS_OPTIONS.map(opt => (
+                                    <button
+                                      key={opt}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setRowActionOpen(null);
+                                        onStatusToggle(row.id, opt);
+                                      }}
+                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"
+                                        }`}
+                                    >
+                                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                                    </button>
+                                  ))}
+                                </>
+                              );
+                            })()}
                             {view && (
                               <button onClick={() => { setRowActionOpen(null); navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
                             )}

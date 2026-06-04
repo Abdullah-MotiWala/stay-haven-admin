@@ -138,6 +138,7 @@ const HostsListing = () => {
                             view={true}
                             hostOptions={true}
                             onStatusToggle={handleStatusToggle}
+                            checkbox={false}
                             extraActions={[
                                 {
                                     label: "View Details",

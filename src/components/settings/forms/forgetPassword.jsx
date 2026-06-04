@@ -1,118 +1,115 @@
-import React, { useState, useEffect } from "react";
-import { Form, Select, Spin , Input} from "antd";
-import { getFeaturesByTypeApi, updateSettingsApi } from "../../../services/setting"; // API import karein
+import React, { useState } from "react";
+import { Input, Button } from "antd";
 import { openNotification } from "../../../network/notification";
+import { changePasswordApi } from "../../../services/auth";
 
-const ForgetPassword = ({ onCurrenciesFetched, setGlobalSymbol }) => {
-  const [currencies, setCurrencies] = useState([]);
-  const [timezones, setTimezones] = useState([]);
+const ChangePassword = () => {
   const [loading, setLoading] = useState(false);
-  const form = Form.useFormInstance();
+  const [fields, setFields] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
 
-//   useEffect(() => {
-//     const fetchOptions = async () => {
-//       try {
-//         const [currRes, tzRes] = await Promise.all([
-//           getFeaturesByTypeApi("CURRENCY"),
-//           getFeaturesByTypeApi("TIMEZONE"),
-//         ]);
+  const validate = () => {
+    const newErrors = {};
+    if (!fields.currentPassword) newErrors.currentPassword = "Please enter current password";
+    if (!fields.newPassword) newErrors.newPassword = "Please enter new password";
+    if (!fields.confirmPassword) newErrors.confirmPassword = "Please confirm your password";
+    if (fields.newPassword && fields.confirmPassword &&
+      fields.newPassword.trim() !== fields.confirmPassword.trim()) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-//         const currData = currRes.data.data.map(item => ({ label: item.title, value: item.id }));
-//         setCurrencies(currData);
-//         onCurrenciesFetched(currData); 
-//         setTimezones(tzRes.data.data.map(item => ({ label: item.title, value: item.id })));
-//       } catch (err) {
-//         console.error("Failed to fetch features:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchOptions();
-//   }, []);
+  const handleChange = (key, value) => {
+    setFields((prev) => ({ ...prev, [key]: value.trim() }));
+    setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
 
-//   const handleCurrencyChange = async (val, option) => {
-//     const symbol = option?.label?.toUpperCase().includes("USD") ? "$" : "Rs.";
-    
-//     form.setFieldsValue({ currentSymbol: symbol });
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-//     if (setGlobalSymbol) {
-//     setGlobalSymbol(symbol);
-//     }
+    setLoading(true);
+    try {
+      const res = await changePasswordApi({
+        currentPassword: fields.currentPassword,
+        newPassword: fields.newPassword,
+        confirmPassword: fields.confirmPassword,
+      });
 
-//     try {
-//       const payload = { 
-//         currencyId: val,
-//       };
-      
-//       await updateSettingsApi(payload);
-//       // openNotification("success", "Success", "Currency updated in database!");
-//     } catch (err) {
-//       openNotification("error", "Error", "Failed to sync with database");
-//     }
-//   };
+      if (res?.status === 200 || res?.status === 201 || res?.data?.success) {
+        openNotification("success", "Password changed successfully!");
+        setFields({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        setErrors({});
+      } else {
+        const msg = res?.data?.message
+          || res?.data?.meta?.message
+          || res?.data?.error
+          || "Failed to update password";
+        openNotification("error", msg);
+      }
+    } catch (err) {
+      openNotification("error", err?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold">Forget Password</h3>
+    <div className="p-6">
+      <h3 className="text-lg font-semibold mb-6">Change Password</h3>
 
-      {loading ? (
-        <div className="flex justify-center my-20"><Spin title="Loading Options..." /></div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto my-20">
-          <div className="w-full">
-            <label className="text-base text-lightSeconday font-medium">
-              Current Password
-            </label>
-            <Form.Item 
-              name="currentPassword" 
-              rules={[{ required: true, message: 'Please enter current Password' }]}
-            >
-              <Input.Password
-                placeholder="Enter current password"
-                className="w-full h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                showSearch
-                optionFilterProp="label"
-                 
-              />
-            </Form.Item>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
 
-          <div className="w-full">
-            <label className="text-base text-lightSeconday font-medium">
-              New Password
-            </label>
-            <Form.Item 
-              name="newPassword"
-              rules={[{ required: true, message: 'Please enter new Password' }]}
-            >
-              <Input.Password
-                placeholder="Encter new password"
-                className="w-full h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                showSearch
-                optionFilterProp="label"
-              />
-            </Form.Item>
-          </div>
-          <div className="w-full">
-            <label className="text-base text-lightSeconday font-medium">
-              Conform Password
-            </label>
-            <Form.Item 
-              name="confirmPassword"
-              rules={[{ required: true, message: 'Please enter conform Password' }]}
-            >
-              <Input.Password
-                placeholder="Select Confirm password"
-                className="w-full h-12 p-2 border-2 border-lightSeconday rounded-md font-medium"
-                showSearch
-                optionFilterProp="label"
-              />
-            </Form.Item>
-          </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Current Password</label>
+          <Input.Password
+            value={fields.currentPassword}
+            onChange={(e) => handleChange("currentPassword", e.target.value)}
+            placeholder="Enter current password"
+            className="h-12"
+          />
+          {errors.currentPassword && <span className="text-red-500 text-xs">{errors.currentPassword}</span>}
         </div>
-      )}
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">New Password</label>
+          <Input.Password
+            value={fields.newPassword}
+            onChange={(e) => handleChange("newPassword", e.target.value)}
+            placeholder="Enter new password"
+            className="h-12"
+          />
+          {errors.newPassword && <span className="text-red-500 text-xs">{errors.newPassword}</span>}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+          <Input.Password
+            value={fields.confirmPassword}
+            onChange={(e) => handleChange("confirmPassword", e.target.value)}
+            placeholder="Confirm new password"
+            className="h-12"
+          />
+          {errors.confirmPassword && <span className="text-red-500 text-xs">{errors.confirmPassword}</span>}
+        </div>
+
+      </div>
+
+      <Button
+        type="primary"
+        loading={loading}
+        onClick={handleSubmit}
+        className="bg-blue h-12 px-8 mt-4 hover:!bg-lightRed hover:!text-red transition-all"
+      >
+        Update Password
+      </Button>
     </div>
   );
 };
 
-export default ForgetPassword;
+export default ChangePassword;

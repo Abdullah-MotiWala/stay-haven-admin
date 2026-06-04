@@ -515,22 +515,22 @@ const BookingAddComp = () => {
             {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
           </button>
         </div> */}
-<div className="flex justify-end gap-3 mt-6">
-  <button
-    type="button"
-    onClick={() => navigate(backUrl)}
-    className="w-[140px] py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all"
-  >
-    Back
-  </button>
-  <button
-    type="submit"
-    disabled={loading}
-    className="w-[140px] h-11 mt-[10px] border border-transparent bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50"
-  >
-    {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
-  </button>
-</div>
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => navigate(backUrl)}
+            className="w-[140px] py-2.5 border border-gray-200 bg-white text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-[140px] h-11 mt-[10px] border border-transparent bg-mainPrimary text-white rounded-lg text-sm font-semibold hover:bg-mainPrimaryHover transition-all disabled:opacity-50"
+          >
+            {loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Booking"}
+          </button>
+        </div>
       </form>
 
       {isModalOpen && (

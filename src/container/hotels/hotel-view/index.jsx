@@ -163,13 +163,23 @@ const HotelProfile = () => {
   const columns = [
     { key: "bookingId", label: "Booking ID", type: "text" },
     { key: "guestName", label: "Guest Name", type: "text" },
-    { key: "roomType", label: "Room Type", type: "roomType" },
-    { key: "roomNumber", label: "Room No", type: "text" },
+    {
+      key: "roomType",
+      label: "Room Type",
+      type: "roomType",
+      // nested value extract karo
+      getValue: (row) => row.room?.roomType || row.roomType || "N/A"
+    },
+    {
+      key: "roomNumber",
+      label: "Room No",
+      type: "text",
+      getValue: (row) => row.room?.roomNumber || row.roomNumber || "—"
+    },
     { key: "duration", label: "Duration", type: "text" },
     { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
     { key: "status", label: "Status", type: "status" },
   ];
-
   const bookings = [
     {
       bookingId: "#321-02",
@@ -337,11 +347,10 @@ const HotelProfile = () => {
                   <div
                     onClick={() => setOpen((prev) => !prev)}
                     className={`flex items-center gap-3 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer
-      ${
-        hotel.status === "active"
-          ? "bg-lightGreenOne text-darkGreen"
-          : "bg-lightRed text-red"
-      }
+      ${hotel.status === "active"
+                        ? "bg-lightGreenOne text-darkGreen"
+                        : "bg-lightRed text-red"
+                      }
     `}
                   >
                     {currentStatus.label}
@@ -435,8 +444,8 @@ const HotelProfile = () => {
         <MatrixCard showShadow={false} icon={ShopOutlined} data={cardsData} />
       </div>
 
-   <div className="grid mt-6 gap-6 grid-cols-1 lg:grid-cols-[40%_59%]">
-        
+      <div className="grid mt-6 gap-6 grid-cols-1 lg:grid-cols-[40%_59%]">
+
         {/* <RoomOccupancyCard
           data={[
             { label: "One Bed Rooms", used: 18, total: 25 },

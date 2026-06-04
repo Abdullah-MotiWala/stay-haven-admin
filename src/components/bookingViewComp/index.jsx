@@ -105,6 +105,7 @@ const BookingComp = ({ guestInfo, stayDetails, paymentSummary, status: initialSt
                     </span>
                 </div>
                 <button
+                    disabled={isCancelled || isCompleted}
                     className="border-2 p-2 px-3 flex items-center gap-2 font-medium rounded-full bg-slate-100 hover:bg-lightGray transition-all"
                     onClick={() => navigate(`/admin/booking/edit/${ids}`, { state: { fromTab } })}
                 >
@@ -152,7 +153,7 @@ const BookingComp = ({ guestInfo, stayDetails, paymentSummary, status: initialSt
                                                 {item.label}
                                             </span>
                                             <span className={`text-15 font-bold ${item.type === "total" ? "text-[#0061F2]" :
-                                                    item.type === "paid" ? "text-[#05CD99]" : "text-dark"
+                                                item.type === "paid" ? "text-[#05CD99]" : "text-dark"
                                                 }`}>
                                                 {item.value}
                                             </span>

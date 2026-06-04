@@ -69,27 +69,52 @@ export default function HostelListing() {
     fetchHostelTypes();
   }, []);
 
-  const fetchData = async () => {
+ const fetchData = async () => {
     setLoading(true);
     try {
       let res;
       if (activeType.typeId === null) {
+        // "All Hostels" tab — normal API, isHostel filter server side handle karega
         res = await getAllHostels(currentPage, itemsPerPage, status, search, sort);
+        setHostelsData(res?.data);
       } else {
-        res = await getBedtypeId(activeType.typeId);
-        // Filter to only hostels from the type result
-        if (res?.data?.data) {
-          res = { ...res, data: { ...res.data, data: res.data.data.filter(r => r.isHostel === true) } };
-        }
+        // Specific type selected — pehle saare hostels lo, phir client side type match karo
+        const allRes = await getAllHostels(1, 9999, status, search, sort);
+        const allHostels = allRes?.data?.data || [];
+
+        // isHostel true AND roomType/bedType ID match karo
+        const filtered = allHostels.filter((r) => {
+          if (!r.isHostel) return false;
+          // roomType feature ID match
+          const roomTypeId = r.roomType?.id || r.roomTypeId || r.bedTypeId;
+          return String(roomTypeId) === String(activeType.typeId);
+        });
+
+        // Fake response structure bana do pagination ke liye
+        res = {
+          data: {
+            data: filtered,
+            meta: {
+              totalItems: filtered.length,
+              currentPage: 1,
+              itemsPerPage: filtered.length,
+            },
+          },
+        };
+        setHostelsData(res.data);
       }
-      setHostelsData(res?.data);
-      if (res?.data?.data?.length > 0) setSelectedHostel(res.data.data[0]);
+
+      const currentData = res?.data?.data || [];
+      if (currentData.length > 0) setSelectedHostel(currentData[0]);
+      else setSelectedHostel(null);
+
     } catch (err) {
       console.error("Data fetch error", err);
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchData();
@@ -177,11 +202,11 @@ export default function HostelListing() {
           <button
             key={type.label}
             onClick={() => setActiveType(type)}
-            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 m-0
-              ${activeType.label === type.label ? "bg-blue text-white" : "bg-white text-extradark hover:bg-gray-50"}
-              ${index === 0 ? "rounded-l-lg" : "rounded-none"}
-              ${index === hostelTypes.length - 1 ? "rounded-r-lg" : "rounded-none"}
-            `}
+            className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0 ${
+              activeType === type
+                ? "bg-blue text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
           >
             {type.label}
           </button>
@@ -248,6 +273,8 @@ export default function HostelListing() {
                       <Option value="occupied">Occupied</Option>
                       <Option value="maintenance">Maintenance</Option>
                       <Option value="inactive">Inactive</Option>
+                      <Option value="booked">Booked</Option>
+
                     </Select>
                   </div>
                   <button
