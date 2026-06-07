@@ -43,7 +43,7 @@ const HotelProfile = () => {
   const location = useLocation();
   const [stats, setStats] = useState(null);
   const [open, setOpen] = useState(false);
-  const [statistics, setStatistics] = useState(false);
+  const [statistics, setStatistics] = useState(null);
   const [recentBookings, setRecentBookings] = useState([]);
 
   const uiHotelId = hotel?.hotelId || location.state?.lastId;
@@ -68,7 +68,10 @@ const HotelProfile = () => {
     const fetchStatistics = async () => {
       try {
         const res = await getAllHotelsStatistics(id);
-        setStatistics(res.data.data);
+        console.log("Statistics full response:", res.data);
+        const statsData = res.data?.data || res.data;
+        setStatistics(statsData);
+        // console.log("Hotel Statistics:", res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
         openNotification("error", "Failed to load stats");
@@ -84,6 +87,7 @@ const HotelProfile = () => {
         setLoading(true);
         const res = await getHotelById(id);
         setHotel(res.data.data);
+        console.log("Hotel Data:", res.data.data);
       } catch (err) {
         console.error("Hotel detail fetch karne mein error:", err);
       } finally {
@@ -180,6 +184,7 @@ const HotelProfile = () => {
     { key: "checkInOut", label: "Check-In & Check-Out", type: "dateRange" },
     { key: "status", label: "Status", type: "status" },
   ];
+
   const bookings = [
     {
       bookingId: "#321-02",
@@ -483,7 +488,7 @@ const HotelProfile = () => {
 
       <div className="min-h-[400px] mt-6 bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
         <HotelDirectory
-          data={statistics?.recentBookings}
+          data={statistics?.recentBookings || []}
           title="Recent Bookings"
           columns={columns}
           filter={false}
