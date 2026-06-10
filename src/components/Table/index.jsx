@@ -527,7 +527,7 @@ const HotelDirectory = ({
                 </th>
               )}
               {columns.map((col) => (
-                <th key={col.key} className={`px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue border-b border-t border-l border-dashed border-gray-200 ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-left"}`}>
+                <th key={col.key} className={`px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue border-b border-t border-l border-dashed border-gray-200 ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-center"}`}>
                   <span className="block truncate">{col.label}</span>
                 </th>
               ))}
