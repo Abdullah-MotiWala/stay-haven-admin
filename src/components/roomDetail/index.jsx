@@ -85,21 +85,22 @@ function RoomDetail({ room, editPath }) {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-4">
-        <div className="flex justify-center    items-center gap-2 md:gap-4">
-          <h1 className="text-2xl md:text-md font-semibold text-extradark leading-tight">
+      <div className="flex flex-col  justify-between items-start md:items-center gap-4 mb-4 w-full min-w-0">
+
+        {/* Left Side: Name and Status (Added min-w-0 aur flex-1) */}
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 min-w-0 flex-1">
+          <h1 className="text-xl md:text-2xl font-semibold text-extradark leading-tight truncate max-w-full">
             {room?.roomName || room?.roomType || room?.type || "N/A"}
           </h1>
-          <span
-            className={`text-sm  ${room?.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}  px-2 py-1 rounded-lg  font-medium`}
-          >
-            {room?.status
-              ? room?.status.charAt(0).toUpperCase() + room?.status.slice(1)
-              : "N/A"}
+
+          <span className={`text-xs md:text-sm px-2 py-1 rounded-lg font-medium shrink-0 ${room?.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}`}>
+            {room?.status ? room?.status.charAt(0).toUpperCase() + room?.status.slice(1) : "N/A"}
           </span>
         </div>
-        <div className="flex items-baseline gap-1">
-          <span className="text-2xl md:text-[24px] font-bold text-[#111827]">
+
+        {/* Right Side: Price (Added shrink-0 taake ye kabhi chhota na ho) */}
+        <div className="flex items-baseline gap-1 shrink-0">
+          <span className="text-xl md:text-[24px] font-bold text-[#111827]">
             ${room.pricePerNight ?? 0}
           </span>
           <span className="text-[#7C8DB5] text-xs md:text-lg font-medium">
@@ -166,7 +167,7 @@ function RoomDetail({ room, editPath }) {
         </span>
       </div>
 
-      <p className="text-lightSeconday   leading-relaxed my-4 text-sm md:text-sm">
+      <p className="text-[#7C8DB5] leading-relaxed my-4 text-sm md:text-sm break-words">
         {room?.description ?? "N/A"}
       </p>
 

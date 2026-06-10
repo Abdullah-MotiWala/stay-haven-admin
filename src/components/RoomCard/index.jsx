@@ -15,98 +15,98 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
   let id = room?.id;
   const handleEditClick = () => { navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`); };
 
- const handleDelete = async (e) => {
-  e.stopPropagation();
-  setShowMenu(false);
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    setShowMenu(false);
 
-  // ✅ Occupied check — API call se pehle hi rok do
-  if (room?.status === "occupied" || room?.status === "booked") {
-    Modal.error({
-      title: "Cannot Delete Room",
-      icon: null,
-      content: (
-        <div className="py-2">
-          <p className="text-gray-600 text-sm">
-            This room cannot be deleted because it is currently{" "}
-            <span className="font-semibold text-red-600">Occupied</span>.
-          </p>
-          <p className="text-gray-500 text-xs mt-2">
-            Please wait until the guest checks out or change the room status before deleting.
-          </p>
-        </div>
-      ),
-      okText: "Okay",
-      okButtonProps: {
-        style: {
-          backgroundColor: "#DC2626",
-          borderColor: "#DC2626",
-          color: "#fff",
+    // ✅ Occupied check — API call se pehle hi rok do
+    if (room?.status === "occupied" || room?.status === "booked") {
+      Modal.error({
+        title: "Cannot Delete Room",
+        icon: null,
+        content: (
+          <div className="py-2">
+            <p className="text-gray-600 text-sm">
+              This room cannot be deleted because it is currently{" "}
+              <span className="font-semibold text-red-600">Occupied</span>.
+            </p>
+            <p className="text-gray-500 text-xs mt-2">
+              Please wait until the guest checks out or change the room status before deleting.
+            </p>
+          </div>
+        ),
+        okText: "Okay",
+        okButtonProps: {
+          style: {
+            backgroundColor: "#DC2626",
+            borderColor: "#DC2626",
+            color: "#fff",
+          },
         },
+      });
+      return; // 🔴 yahan se bahar — delete nahi hoga
+    }
+
+    // Normal delete flow (occupied nahi hai toh)
+    Modal.confirm({
+      title: "Delete Room",
+      icon: null,
+      content: "Are you sure you want to delete this room?",
+      okText: "Delete",
+      okButtonProps: {
+        style: { backgroundColor: "#8B0000", borderColor: "#8B0000", color: "#fff" },
+      },
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          const res = await deleteRoom(id);
+          if (res?.data?.success === false) {
+            const { message, dependencies } = res.data;
+            if (dependencies?.length) {
+              Modal.error({
+                title: "Cannot Delete",
+                icon: null,
+                content: (
+                  <div>
+                    <p className="text-gray-600 mb-3">{message}</p>
+                    <div className="space-y-2">
+                      {dependencies.map((dep, i) => (
+                        <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
+                          <p className="text-gray-800 font-semibold">{dep.name}</p>
+                          {dep.detail && (
+                            <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            } else {
+              Modal.error({
+                title: "Cannot Delete",
+                icon: null,
+                content: (
+                  <p className="text-gray-600">
+                    {message || "Cannot delete. It may have active bookings."}
+                  </p>
+                ),
+                okText: "OK",
+                okButtonProps: { className: "bg-mainPrimary" },
+              });
+            }
+            return;
+          }
+          openNotification("success", "Deleted successfully");
+          onDelete && onDelete(id);
+        } catch (err) {
+          openNotification("error", err?.response?.data?.message || "Failed to delete");
+        }
       },
     });
-    return; // 🔴 yahan se bahar — delete nahi hoga
-  }
-
-  // Normal delete flow (occupied nahi hai toh)
-  Modal.confirm({
-    title: "Delete Room",
-    icon: null,
-    content: "Are you sure you want to delete this room?",
-    okText: "Delete",
-    okButtonProps: {
-      style: { backgroundColor: "#8B0000", borderColor: "#8B0000", color: "#fff" },
-    },
-    cancelText: "Cancel",
-    onOk: async () => {
-      try {
-        const res = await deleteRoom(id);
-        if (res?.data?.success === false) {
-          const { message, dependencies } = res.data;
-          if (dependencies?.length) {
-            Modal.error({
-              title: "Cannot Delete",
-              icon: null,
-              content: (
-                <div>
-                  <p className="text-gray-600 mb-3">{message}</p>
-                  <div className="space-y-2">
-                    {dependencies.map((dep, i) => (
-                      <div key={i} className="py-2 px-3 bg-gray-50 rounded-lg text-sm">
-                        <p className="text-gray-800 font-semibold">{dep.name}</p>
-                        {dep.detail && (
-                          <p className="text-gray-500 text-xs mt-0.5">{dep.detail}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ),
-              okText: "OK",
-              okButtonProps: { className: "bg-mainPrimary" },
-            });
-          } else {
-            Modal.error({
-              title: "Cannot Delete",
-              icon: null,
-              content: (
-                <p className="text-gray-600">
-                  {message || "Cannot delete. It may have active bookings."}
-                </p>
-              ),
-              okText: "OK",
-              okButtonProps: { className: "bg-mainPrimary" },
-            });
-          }
-          return;
-        }
-        openNotification("success", "Deleted successfully");
-        onDelete && onDelete(id);
-      } catch (err) {
-        openNotification("error", err?.response?.data?.message || "Failed to delete");
-      }
-    },
-  });
-};
+  };
 
   return (
     <div
@@ -123,37 +123,31 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
         />
       </div>
 
-      <div className="flex flex-col flex-1 ">
+      <div className="flex flex-col flex-1  min-w-0">
         <div>
-          <div className="flex justify-between  items-start mb-0">
-            <div>
-              <span className="text-[14px] font-medium text-gray-800">
+          <div className="flex justify-between items-start gap-4 mb-2 min-w-0">
+
+            {/* Left Side: Room Number & Title (min-w-0 aur flex-1 zaroori hai) */}
+            <div className="min-w-0 flex-1">
+              <span className="text-[14px] font-medium text-gray-800 block">
                 Room No: {room.roomNumber ?? 0}
               </span>
-              <h3>{room?.roomName || room?.roomType?.title || room?.type || "N/A"}</h3>
+              <h3 className="truncate text-lg font-semibold text-gray-800" title={room?.roomName || room?.roomType?.title || room?.type}>
+                {room?.roomName || room?.roomType?.title || room?.type || "N/A"}
+              </h3>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-sm  ${room.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}  px-2 py-1 rounded-lg  font-medium`}
-              >
-                {/* {room.status ?? 0} */}
-                {room.status
-                  ? room.status.charAt(0).toUpperCase() + room.status.slice(1)
-                  : "N/A"}
+
+            {/* Right Side: Status & Menu (shrink-0 zaroori hai taake ye title ko push na kare) */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={`text-sm ${room.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"} px-2 py-1 rounded-lg font-medium`}>
+                {room.status ? room.status.charAt(0).toUpperCase() + room.status.slice(1) : "N/A"}
               </span>
 
               {/* Three Dots Menu */}
               <div className="relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMenu(!showMenu);
-                  }}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                >
+                <button onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
                   <MoreVertical className="w-6 h-6 text-gray-600" />
                 </button>
-
                 {showMenu && (
                   <div className="absolute right-0 mt-2 w-36 bg-white border border-lightSeconday rounded-xl z-10 py-2 px-2">
                     <button className="flex items-center gap-3 w-full py-2 text-sm text-black font-semibold px-2" onClick={handleEditClick}>Edit</button>
@@ -193,7 +187,7 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
             </div>
           </div>
           {/* Description */}
-          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0 line-clamp-2 overflow-hidden">
+          <p className="text-[#1F2937] text-[14px] font-medium leading-relaxed mb-0 line-clamp-2 break-words">
             {room?.description ?? "N/A"}
           </p>
         </div>

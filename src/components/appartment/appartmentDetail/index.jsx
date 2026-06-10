@@ -77,7 +77,7 @@ const [mainImage, setMainImage] = useState(null);
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-4">
+      <div className="flex flex-col  md:justify-between md:items-center gap-2 mb-4">
         <div className="flex justify-center    items-center gap-2 md:gap-4">
           <h1 className="text-2xl md:text-md font-semibold text-extradark leading-tight">
             {data?.apartmentName || data?.type || "N/A"}
@@ -157,8 +157,11 @@ const [mainImage, setMainImage] = useState(null);
           <img src={gests} alt="" /> {data.maxAdults ?? "N/A"}
         </span>
       </div>
-
+{/* 
       <p className="text-lightSeconday   leading-relaxed my-4 text-sm md:text-sm">
+        {data?.description ?? "N/A"}
+      </p> */}
+      <p className="text-[#7C8DB5] leading-relaxed my-4 text-sm md:text-sm break-words">
         {data?.description ?? "N/A"}
       </p>
 

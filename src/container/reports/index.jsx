@@ -7,6 +7,7 @@ import { openNotification } from "../../network/notification";
 import { Select, DatePicker, Button, Table, Input } from "antd";
 import { DownloadOutlined, FilterOutlined, ReloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { ConfigProvider } from "antd";
 
 const { RangePicker } = DatePicker;
 
@@ -72,7 +73,10 @@ const Reports = () => {
         data = data.filter((b) => b.hotel?.id === filters.hotelId);
       }
       if (filters.hostId) {
-        data = data.filter((b) => b.hotel?.host?.id === filters.hostId);
+        data = data.filter((b) =>
+          b.room?.host?.id === filters.hostId ||
+          b.apartment?.host?.id === filters.hostId
+        );
       }
       if (filters.status) {
         data = data.filter((b) => b.status?.toLowerCase() === filters.status.toLowerCase());
@@ -310,6 +314,8 @@ const Reports = () => {
     { label: "Checked-Out", value: "checked-out" },
     { label: "Completed", value: "completed" },
     { label: "Cancelled", value: "cancelled" },
+    { label: "Booked", value: "booked" },
+
   ];
 
   const bookingTypeOptions = [
@@ -342,7 +348,7 @@ const Reports = () => {
               type="primary"
               icon={<FilterOutlined />}
               onClick={handleApplyFilters}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue hover:!bg-red"
             >
               Apply Filters
             </Button>
@@ -411,28 +417,35 @@ const Reports = () => {
               allowClear
             />
           </div>
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: "#DC2626", // Ye apka red color hai (Tailwind red-600)
+              },
+            }}
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Check-In From</label>
+              <DatePicker
+                className="w-full"
+                placeholder="Select check-in date"
+                value={filters.checkIn ? dayjs(filters.checkIn) : null}
+                // yahan .toISOString() ko .format("YYYY-MM-DD") se replace kiya hai
+                onChange={(date) => handleFilterChange("checkIn", date ? date.format("YYYY-MM-DD") : null)}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Check-In From</label>
-            <DatePicker
-              className="w-full"
-              placeholder="Select check-in date"
-              value={filters.checkIn ? dayjs(filters.checkIn) : null}
-              // yahan .toISOString() ko .format("YYYY-MM-DD") se replace kiya hai
-              onChange={(date) => handleFilterChange("checkIn", date ? date.format("YYYY-MM-DD") : null)}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Check-Out Until</label>
+              <DatePicker
+                className="w-full"
+                placeholder="Select check-out date"
+                value={filters.checkOut ? dayjs(filters.checkOut) : null}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Check-Out Until</label>
-            <DatePicker
-              className="w-full"
-              placeholder="Select check-out date"
-              value={filters.checkOut ? dayjs(filters.checkOut) : null}
-
-              onChange={(date) => handleFilterChange("checkOut", date ? date.format("YYYY-MM-DD") : null)}
-            />
-          </div>
+                onChange={(date) => handleFilterChange("checkOut", date ? date.format("YYYY-MM-DD") : null)}
+              />
+            </div>
+          </ConfigProvider>
         </div>
       </div>
 
@@ -455,7 +468,13 @@ const Reports = () => {
             Export to CSV
           </Button>
         </div>
-
+<ConfigProvider
+  theme={{
+    token: {
+      colorPrimary: "#8B0002", // Yahan apna red color set karein
+    },
+  }}
+>
         <Table
           columns={columns}
           dataSource={bookings}
@@ -479,6 +498,7 @@ const Reports = () => {
           className="report-table"
           childrenColumnName="nestedData"
         />
+        </ConfigProvider>
       </div>
     </div>
   );

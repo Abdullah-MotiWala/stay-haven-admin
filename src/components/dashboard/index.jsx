@@ -28,7 +28,7 @@ const DashboardPage = ({ cardsData, bookingStatistics, recentBookings, bookingSt
           <BookingStatus bookingStatus={bookingStatus} height={'h-full'} />
         </div>
       </div> */}
-      // DashboardPage.jsx
+      
 <MatrixCard showshadow="true" data={cardsData} />
 
 {/* Typo fixed: items-stretch */}
