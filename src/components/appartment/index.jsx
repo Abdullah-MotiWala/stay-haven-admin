@@ -89,7 +89,10 @@ export default function Appartments() {
           itemsPerPage,
           status,
           search,
-          sort
+          sort,
+            "All",
+          null,
+          true
         );
       } else {
         // Filter by type
@@ -209,7 +212,7 @@ export default function Appartments() {
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
-      <div className="p-1 ml-0 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
+      <div className="p-1 ml-0 mt-6 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
         {appartmentTypes.map((type, index) => (
           <button
             key={type.label}
@@ -268,30 +271,30 @@ export default function Appartments() {
 
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-2 py-2">
                   <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                  <Select
-                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                    defaultValue="sort"
-                    onChange={(value) => setSort(value)}
-                    suffixIcon={<img src={right_arrow} alt="" />}
-                  >
-                    <Option value="sort" disabled>Sort by hotel name</Option>
-                    <Option value="ASC">A â†’ Z</Option>
-                    <Option value="DESC">Z â†’ A</Option>
-                  </Select>
-                  <Select
-                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                    defaultValue="sort"
-                    onChange={(value) => setStatus(value)}
-                    suffixIcon={<img src={right_arrow} alt="" />}
-                  >
-                    <Option value="sort" disabled>Sort by Status</Option>
-                    <Option value="available">Available</Option>
-                    <Option value="active">Active</Option>
-                    <Option value="occupied">Occupied</Option>
-                    <Option value="maintenance">Maintenance</Option>
-                    <Option value="inactive">Inactive</Option>
-                  </Select>
-                </div>
+                    <Select
+                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                      defaultValue="sort"
+                      onChange={(value) => setSort(value)}
+                      suffixIcon={<img src={right_arrow} alt="" />}
+                    >
+                      <Option value="sort" disabled>Sort by hotel name</Option>
+                      <Option value="ASC">A â†’ Z</Option>
+                      <Option value="DESC">Z â†’ A</Option>
+                    </Select>
+                    <Select
+                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                      defaultValue="sort"
+                      onChange={(value) => setStatus(value)}
+                      suffixIcon={<img src={right_arrow} alt="" />}
+                    >
+                      <Option value="sort" disabled>Sort by Status</Option>
+                      <Option value="available">Available</Option>
+                      <Option value="active">Active</Option>
+                      <Option value="occupied">Occupied</Option>
+                      <Option value="maintenance">Maintenance</Option>
+                      <Option value="inactive">Inactive</Option>
+                    </Select>
+                  </div>
                   <button
                     onClick={() => fetchData()}
                     className="bg-blue hover:bg-blue text-white px-2 py-2.5 w-36 rounded-md font-semibold transition-all text-sm h-11"

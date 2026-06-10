@@ -192,7 +192,7 @@ const HotelDirectory = ({
     // Sirf agar status bilkul nahi hai toh dates se derive karo
     if (!s && row.checkInOut) return deriveBookingStatus(row.checkInOut);
 
-    return row.status || "â€”";
+    return row.status || "Unknown";
   };
 
   const getColumnMaxClass = (col) => {
@@ -328,7 +328,7 @@ const HotelDirectory = ({
                 className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
               >
                 {status}
-                <span className="text-[10px]">â–¾</span>
+                <span className="text-[10px]"></span>
               </button>
               {rowActionOpen === `status-${index}` && (
                 <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">

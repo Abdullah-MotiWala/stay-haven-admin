@@ -123,7 +123,7 @@ export default function HostelListing() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await getStats();
+        const res = await getStats(true);
         setStats(res.data.data);
       } catch (err) {
         console.error("Failed to load stats:", err);
@@ -197,7 +197,7 @@ export default function HostelListing() {
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
       {/* Hostel Type Filter Tabs */}
-      <div className="p-1 ml-0 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
+      <div className="p-1 ml-0 mt-5 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
         {hostelTypes.map((type, index) => (
           <button
             key={type.label}

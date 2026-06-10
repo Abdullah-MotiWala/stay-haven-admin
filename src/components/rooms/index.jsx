@@ -87,7 +87,10 @@ export default function Rooms() {
           itemsPerPage,
           status,
           search,
-          sort
+          sort,
+          "All Rooms",  // ✅ activeType
+          null,         // ✅ hostId
+          true
         );
       } else {
         // FILTERED ROOMS
@@ -96,7 +99,7 @@ export default function Rooms() {
 
       // Filter out hostels (isHostel=true)
       const filteredData = (res?.data?.data || []).filter((r) => r.isHostel === false);
-      
+
       setRooms(res?.data ? { ...res.data, data: filteredData } : res?.data);
 
       if (filteredData.length > 0) {
@@ -143,7 +146,7 @@ export default function Rooms() {
       openNotification("success", "Status updated");
       fetchData();
       // Refresh stats after status change
-      const res = await getStats();
+      const res = await getStats(false);
       setStats(res.data.data);
     } catch {
       openNotification("error", "Failed to update status");
@@ -210,7 +213,7 @@ export default function Rooms() {
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
-      <div className="p-1 ml-0 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
+      <div className="p-1 ml-0 mt-6 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
         {roomTypes.map((type, index) => (
           <button
             key={type.label}

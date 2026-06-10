@@ -159,7 +159,7 @@ const Booking = () => {
       <Breadcrumb title="Booking" />
       <MatrixCard data={cardsData} />
 
-      <div className="p-0 ml-3 gap-[2px] inline-flex overflow-hidden rounded-lg">
+      <div className="p-0 mt-6 ml-3 gap-[2px] inline-flex overflow-hidden rounded-lg">
         {roomTypes.map((type) => (
           <button
             key={type}

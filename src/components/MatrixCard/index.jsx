@@ -6,7 +6,7 @@ const MatrixCard = ({ data = [], loading = false, showShadow, showshadow, icon, 
   if (loading) return <MatrixCardSkeleton />;
 
   return (
-    <div className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-sm mb-6 overflow-hidden">
+    <div className="w-full bg-white p-3 sm:p-4 rounded-3xl shadow-sm m-0 mb-6 overflow-hidden ">
       <div
         className={`grid gap-3 ${
           data.length === 5

@@ -8,10 +8,12 @@ export const getAllApartments = async (
   sort = "asc",
   activeType = "All",
   hostId = null,
+  isAdmin = false,
 ) => {
   const hostParam = hostId ? `&hostId=${hostId}` : "";
+  const adminParam = isAdmin ? `&adminPanel=true` : ""; 
   return Api.get(
-    `/apartments?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
+    `/apartments?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}${adminParam}`,
   );
 };
 export const createAppartment = async (data) => {

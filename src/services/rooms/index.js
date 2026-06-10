@@ -8,10 +8,12 @@ export const getAllRooms = async (
   sort = "asc",
   activeType = "All Rooms",
   hostId = null,
+  isAdmin = false
 ) => {
   const hostParam = hostId ? `&hostId=${hostId}` : "";
+  const adminParam = isAdmin ? `&adminPanel=true` : "";
   return Api.get(
-    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}`,
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}&type=${activeType}${hostParam}${adminParam}`,
   );
 };
 
@@ -44,8 +46,13 @@ export const getBedtypeId = async (id) => {
 export const deleteRoom = async (id, data) => {
   return Api.delete(`rooms/${id}`, data);
 };
-export const getStats = async (data) => {
-  return Api.get("rooms/stats", data);
+// export const getStats = async (data) => {
+//   return Api.get("rooms/stats", data);
+// };
+
+export const getStats = async (isHostel) => {
+  const param = isHostel !== undefined ? `?isHostel=${isHostel}` : "";
+  return Api.get(`rooms/stats${param}`);
 };
 export const updateRoomStatus = async (id, status, reason = "") => {
   return Api.patch(`rooms/${id}/status`, { status, ...(reason ? { reason } : {}) });
