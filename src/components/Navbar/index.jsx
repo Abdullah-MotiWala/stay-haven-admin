@@ -7,6 +7,7 @@ import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
 import { Dropdown, Input, Modal, Badge } from "antd";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { getAllNotifications } from "../../services/notification";
+import { getProfile } from "../../services/profile/index"
 import socket from "../../services/socket";
 
 const Navbar = () => {
@@ -14,7 +15,7 @@ const Navbar = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [profileImage, setProfileImage] = useState()
   const fetchUnreadCount = async () => {
     try {
       const res = await getAllNotifications();
@@ -45,6 +46,13 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(async () => {
+    const profile = await getProfile();
+    const res = profile.data.data
+    setProfileImage(res.profileImage)
+    console.log("profile log ", res)
+
+  }, [])
   const currentDate = new Date().toLocaleDateString("en-GB", {
     weekday: "short",
     day: "2-digit",
@@ -116,12 +124,12 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center flex-shrink-0 gap-1">
-            <Badge 
-              count={unreadCount} 
+            <Badge
+              count={unreadCount}
               offset={[-5, 15]}
               style={{ backgroundColor: '#8B0000' }}
             >
-              <button 
+              <button
                 onClick={() => navigate("/admin/notifications")}
                 className="relative bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50"
               >
@@ -137,7 +145,7 @@ const Navbar = () => {
               placement="bottomRight"
             >
               <img
-                src={DEFAULT_IMAGE}
+                src={profileImage || DEFAULT_IMAGE}
                 alt="profile"
                 className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer hover:opacity-80 transition"
               />

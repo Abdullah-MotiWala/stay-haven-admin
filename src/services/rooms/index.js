@@ -27,7 +27,7 @@ export const getAllHostels = async (
 ) => {
   const hostParam = hostId ? `&hostId=${hostId}` : "";
   return Api.get(
-    `/rooms?page=${currentPage}&limit=${itemsPerPage}&isHostel=true&status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}${hostParam}`,
+    `/rooms?page=${currentPage}&limit=${itemsPerPage}&isHostel= &status=${status ?? ""}&search=${search ?? ""}&sortByHotel=${sort ?? "asc"}${hostParam}`,
   );
 };
 

@@ -75,7 +75,7 @@ const BookingView = () => {
         return isNaN(n) ? "0.00" : n.toFixed(2);
     };
 
-    const roomCharges = b.paymentSummary?.roomCharges
+    const roomCharges = b.paymentSummary?.pricePerNight
         ?? (parseFloat(b.pricePerNight || 0) * parseFloat(b.duration || 1));
 
     const paymentSummary = [

@@ -121,7 +121,7 @@ const BookingComp = ({ guestInfo, stayDetails, paymentSummary, status: initialSt
                         {guestInfo.map((item, i) => (
                             <div key={i} className="flex flex-col gap-1">
                                 <span className="text-lightSeconday text-sm font-normal">{item.label}</span>
-                                <span className="text-dark text-base font-medium">{item.value}</span>
+                                <span className="text-dark text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis">{item.value}</span>
                             </div>
                         ))}
                     </div>
