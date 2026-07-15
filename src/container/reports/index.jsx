@@ -256,13 +256,17 @@ const Reports = () => {
       render: (text) => `${text || 0} days`,
       width: 100,
     },
-    {
-      title: "Amount",
-      dataIndex: "paidAmount",
-      key: "paidAmount",
-      render: (amount) => `$${amount || 0}`,
-      width: 100,
-    },
+   {
+  title: "Amount",
+  key: "paidAmount",
+  render: (_, record) => {
+    const currency =
+      record.pricePerNightFormatted?.split(" ")[0] || "Rs";
+
+    return `${currency} ${record.paidAmount || 0}`;
+  },
+  width: 120,
+},
     {
       title: "Status",
       dataIndex: "status",
