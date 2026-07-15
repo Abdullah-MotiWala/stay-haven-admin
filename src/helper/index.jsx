@@ -73,7 +73,6 @@ export const convertFirestoreTimestampToDate = (timestamp) => {
   return date.toLocaleDateString('en-US', options);
 };
 export const getNamesExcludingId = (data, excludedId) => {
-  console.log(data, excludedId, "asdlknasdlnksa")
   if(data){
   return Object?.entries(data)?.filter(([id]) => id !== excludedId)
     .map(([, value]) => value.name);
@@ -93,3 +92,32 @@ export const calculateNonZeroPercentage = (data)  => {
     
     return percentage.toFixed(1);
 }
+
+
+export const deriveBookingStatus = (checkInOut) => {
+  if (!checkInOut) return "Booked";
+
+  const [checkInStr, checkOutStr] = checkInOut.split(" - ");
+
+  if (!checkInStr || !checkOutStr) return "Booked";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const checkIn = new Date(checkInStr);
+  const checkOut = new Date(checkOutStr);
+
+  if (today < checkIn) {
+    return "Booked";
+  }
+
+  if (today >= checkIn && today <= checkOut) {
+    return "Checked-In";
+  }
+
+  if (today > checkOut) {
+    return "Checked-Out";
+  }
+
+  return "Booked";
+};

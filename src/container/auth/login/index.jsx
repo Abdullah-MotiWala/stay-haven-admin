@@ -2,32 +2,46 @@ import React from "react";
 import { Form, Input, Button, Card, Checkbox } from "antd";
 import { loginApi } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { openNotification } from "../../../network/notification";
+import { Authenticate, SelfUser } from "../../../redux/features/authSlice";
+import { useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
   const handleLogin = async (values) => {
+    setLoading(true);
     try {
-      const payload = {
-        ...values,
-        userType: "admin",
-      };
-      console.log("Login successful:", payload);
+      const payload = { ...values, userType: "admin" };
       const res = await loginApi(payload);
-      console.log("Login successful:", res);
-      if(!res.data.token){
-        throw new Error("Login failed");
-      }else{
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("userType", res.userType);
-        localStorage.setItem("fullName", res.fullName);
-        navigate("/admin/hotels", { replace: true });
 
+      const userData = res.data.data;
+      if (!userData.token) {
+        throw new Error("Login failed");
       }
 
+      // Only allow admin userType to login to this panel
+      if (userData.userType !== "admin") {
+        openNotification("error", "Access denied. Only admin accounts can login here.");
+        setLoading(false);
+        return;
+      }
 
+      localStorage.setItem("token", userData.token);
+      localStorage.setItem("userType", userData.userType);
+      localStorage.setItem("fullName", userData.name || userData.fullName);
+
+      dispatch(Authenticate({ token: userData.token }));
+      dispatch(SelfUser(userData));
+
+      openNotification("success", "Welcome back, " + (userData.name || "Admin"));
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
-      console.error(err);
-      alert("Invalid email or password");
+      const errorMsg = err.response?.data?.message || "Invalid email or password";
+      openNotification("error", errorMsg);
+      setLoading(false);
     }
   };
   return (
@@ -56,31 +70,31 @@ const Login = () => {
                 className="rounded-xl h-12"
               />
             </Form.Item>
-            <Checkbox className="mt-1 text-xs">
+            {/* <Checkbox className="mt-1 text-xs">
               I have read and agree to the{" "}
               <span className="text-blue">Terms </span>and
               <span className="text-blue"> Conditions</span>
-            </Checkbox>
+            </Checkbox> */}
 
             <Button
               // type="submit"
-                htmlType="submit"
-
+              htmlType="submit"
               block
-              className="bg-blue text-white h-14 rounded-xl text-lg font-bold mt-4 shadow-blue-200 shadow-lg"
+              loading={loading}
+              className="w-full bg-mainPrimary hover:!bg-mainPrimary text-white text-sm text-white h-14 rounded-xl text-lg font-bold mt-4  shadow-lg"
             >
-              Login
+              {loading ? "Logining..." : "Login"}
             </Button>
-            <div className="mt-3 text-center">
+            {/* <div className="mt-3 text-center">
               <a href="" className="text-center text-blue pt-2 underline">
                 Forget Password ?
               </a>
-            </div>
+            </div> */}
 
-            <div className="text-center mt-2">
+            {/* <div className="text-center mt-2">
               <p className="mb-0">Don’t have an account yet?</p>
-              <a href="">Sign up Now</a>
-            </div>
+              <a href="/auth/signup">Sign up Now</a>
+            </div> */}
           </Form>
         </Card>
       </div>

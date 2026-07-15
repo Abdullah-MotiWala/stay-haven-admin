@@ -1,5 +1,6 @@
 import React from "react"; 
 import { Breadcrumb } from "antd";
+import boxIcon from '../../assets/images/boxIcon.svg'
 
 const App = ({ title, subtitle }) => {
   // Build breadcrumb items
@@ -9,7 +10,7 @@ const App = ({ title, subtitle }) => {
       title: (
         <div className="flex items-center gap-2 cursor-pointer hover:bg-transparent">
           <img
-            src="/assets/icons/dashboardIcon.png"
+            src={boxIcon}
             alt="dashboardIcon"
             className="w-4 h-4 !hover:bg-transparent"
           />

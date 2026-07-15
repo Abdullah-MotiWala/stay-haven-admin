@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Layout, Menu, Button, Drawer } from "antd";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Layout, Menu, Button, Drawer, Modal } from "antd";
 
 import {
   AppstoreOutlined,
@@ -11,42 +11,197 @@ import {
   SettingOutlined,
   LogoutOutlined,
   MenuOutlined,
+  ExclamationCircleOutlined,
+  UserOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
-import logo from "../../assets/images/logo.png";
+
+
+import logo from "../../assets/images/logo-haven.svg";
+import dashboardIcon from "../../assets/images/dashbi.svg";
+import hotelIcon from "../../assets/images/home.svg";
+import roomIcon from "../../assets/images/IconHotel.svg";
+import appartmentIcon from "../../assets/images/appartments.svg";
+import bookingIcon from "../../assets/images/bookings.svg";
+import ticketIcon from "../../assets/images/tickets.svg";
+import settingIcon from "../../assets/images/setting.svg";
+const iconStyle = "w-5 h-5 object-contain";
 
 const menuItems = [
-  { key: "/admin/dashboard", icon: <AppstoreOutlined />, label: <Link to="/admin/dashboard">Dashboard</Link> },
-  { key: "/admin/hotels", icon: <ShopOutlined />, label: <Link to="/admin/hotels">Hotels</Link> },
-  { key: "/admin/rooms", icon: <KeyOutlined />, label: <Link to="/admin/rooms">Rooms</Link> },
-  { key: "/admin/bookings", icon: <CalendarOutlined />, label: <Link to="/admin/bookings">Bookings</Link> },
-  { key: "/admin/tickets", icon: <CustomerServiceOutlined />, label: <Link to="/admin/tickets">Tickets</Link> },
-  { key: "/admin/settings", icon: <SettingOutlined />, label: <Link to="/admin/settings">Settings</Link> },
+  {
+    key: "/admin/dashboard",
+    icon: <img src={dashboardIcon} className={iconStyle} alt="dashboard" />,
+    label: <Link to="/admin/dashboard">Dashboard</Link>,
+  },
+  {
+    key: "/admin/hotels",
+    icon: <img src={hotelIcon} className={iconStyle} alt="hotels" />,
+    label: <Link to="/admin/hotels">Hotels</Link>,
+  },
+  {
+    key: "/admin/rooms",
+    icon: <img src={roomIcon} className={iconStyle} alt="rooms" />,
+    label: <Link to="/admin/rooms">Rooms</Link>,
+  },
+  {
+    key: "/admin/appartments",
+    icon: <img src={appartmentIcon} className={iconStyle} alt="appartments" />,
+    label: <Link to="/admin/appartments">Appartments</Link>,
+  },
+  {
+    key: "/admin/hostels",
+    icon: <img src={roomIcon} className={iconStyle} alt="hostels" />,
+    label: <Link to="/admin/hostels">Hostels</Link>,
+  },
+  {
+    key: "/admin/bookings",
+    icon: <img src={bookingIcon} className={iconStyle} alt="bookings" />,
+    label: <Link to="/admin/bookings">Bookings</Link>,
+  },
+  {
+    key: "/admin/reports",
+    icon: <FileTextOutlined className={iconStyle} />,
+    label: <Link to="/admin/reports">Reports</Link>,
+  },
+  {
+    key: "/admin/tickets",
+    icon: <img src={ticketIcon} className={iconStyle} alt="tickets" />,
+    label: <Link to="/admin/tickets">Tickets</Link>,
+  },
+  {
+    key: "/admin/hosts",
+    icon: <UserOutlined className={iconStyle} />,
+    label: <Link to="/admin/hosts">Hosts</Link>,
+  },
+  {
+    key: "/admin/contact-messages",
+    icon: <CustomerServiceOutlined className={iconStyle} />,
+    label: <Link to="/admin/contact-messages">Contact Messages</Link>,
+  },
+  // {
+  //   key: "/admin/contact-messages",
+  //   icon: <CustomerServiceOutlined className={iconStyle} />,
+  //   label: <Link to="/admin/contact-messages">Contact Messages</Link>,
+  // },
+  {
+    key: "/admin/settings",
+    icon: <img src={settingIcon} className={iconStyle} alt="settings" />,
+    label: <Link to="/admin/settings">Settings</Link>,
+  },
 ];
 
-const SidebarContent = ({ location }) => (
-  <div className="flex flex-col h-full">
-    <div className="p-8 flex justify-center">
-      <img src={logo} alt="STAY HAVEN" className="w-32 object-contain" />
-    </div>
 
-    <Menu
-      mode="inline"
-      selectedKeys={[location.pathname]}
-      items={menuItems}
-      className="px-4 sidebar-menu font-medium text-gray-500"
-    />
+// const SidebarContent = ({ location }) => {
+//   const navigate = useNavigate();
 
-    <div className="p-6 mt-auto border-t border-gray-100">
-      <Button
-        icon={<LogoutOutlined />}
-        block
-        className="rounded-xl h-12 bg-gray-50 text-gray-500 font-semibold"
+//   // --- Logout Function ---
+//   const handleLogout = () => {
+//     Modal.confirm({
+//       title: 'Do you want to logout?',
+//       icon: <ExclamationCircleOutlined />,
+//       content: 'You will need to login again to access the dashboard.',
+//       okText: 'Logout',
+//       okType: 'danger',
+//       cancelText: 'Cancel',
+//       onOk() {
+//         // 1. LocalStorage se sab saaf kar dein
+//         localStorage.clear();
+//         // 2. Wapas login page par bhej dein
+//         navigate("/auth/login", { replace: true });
+//       },
+//     });
+//   };
+
+//   return (
+//     <div className="flex flex-col h-full">
+//       <div className="p-2 flex justify-center mb-16 mt-10">
+//         <img src={logo} alt="STAY HAVEN" className=" object-contain" />
+//       </div>
+
+//       <Menu
+//         mode="inline"
+//         selectedKeys={[location.pathname]}
+//         items={menuItems}
+//         className="px-2 sidebar-menu font-medium text-gray-500"
+//       />
+
+//       <div className="p-2 mt-auto border-t border-gray-100">
+//         <Button
+//           icon={<LogoutOutlined />}
+//           block
+//           onClick={handleLogout} // Click handler connect kiya
+//           className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed  hover:!border-blue hover:!text-blue"
+//         >
+//           Logout
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// };
+
+const SidebarContent = ({ location }) => {
+  const navigate = useNavigate();
+
+  // --- Logout Function ---
+  const handleLogout = () => {
+    Modal.confirm({
+      title: 'Do you want to logout?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'You will need to login again to access the dashboard.',
+      okText: 'Logout',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk() {
+        // 1. LocalStorage se sab saaf kar dein
+        localStorage.clear();
+        // 2. Wapas login page par bhej dein
+        navigate("/auth/login", { replace: true });
+      },
+    });
+  };
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden ">
+      {/* 1. Logo Section: Margins kam kiye aur shrink-0 add kiya */}
+      <div className="p-2 flex justify-center mb-6 mt-6 shrink-0">
+        <img src={logo} alt="STAY HAVEN" className=" object-contain" />
+      </div>
+
+      {/* 2. Menu Section: flex-1 aur overflow-y-auto add kiya taake sirf menu scroll ho */}
+      <div 
+        className="flex-1 overflow-y-auto"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
       >
-        Logout
-      </Button>
+        <style>{`
+          .sidebar-menu::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <Menu
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          className="px-2 sidebar-menu font-medium text-gray-500 border-none "
+        />
+      </div>
+
+      {/* 3. Logout Section: shrink-0 add kiya taake bottom fix rahe */}
+      <div className="p-3 mt-auto border-t border-gray-100 shrink-0">
+        <Button
+          icon={<LogoutOutlined />}
+          block
+          onClick={handleLogout}
+          className="rounded-md h-10 m-0 bg-white text-lightRed font-medium border-lightRed hover:!border-blue hover:!text-blue"
+        >
+          Logout
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Sidebar = () => {
   const location = useLocation();
@@ -66,7 +221,6 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile Top Menu Icon */}
       {isMobile && (
         <div className="fixed top-4 left-4 z-50">
           <Button
@@ -77,10 +231,9 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Desktop Sidebar */}
       {!isMobile && (
         <Layout.Sider
-          width={260}
+          width={197}
           theme="light"
           className="h-screen sticky top-0 border-r shadow-sm"
         >

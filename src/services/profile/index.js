@@ -1,9 +1,9 @@
 import Api from "../../network/axiosClients";
 
 export const updateProfile = async (data) => {
-    return Api.put("user/me", data);
+    return Api.put("users/me", data);
 };
 
 export const getProfile = async () => {
-    return Api.get("user/me");
+    return Api.get("users/me");
 };

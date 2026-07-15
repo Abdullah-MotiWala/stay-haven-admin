@@ -1,0 +1,107 @@
+import axios from "axios";
+import { openNotification } from "./notification";
+import { store } from "../redux/store";
+import { FinishLoading, TotalRequest } from "../redux/features/loader";
+import { setupCache } from "axios-cache-interceptor";
+
+const Status = {
+    CREATED: 201,
+    SUCCESS: 200,
+    NOTACCEPTABLEEXCEPTION: 406,
+};
+
+const axiosInstance = axios.create({
+    // baseURL: "http://localhost:3000/api/",
+    baseURL: "https://api.stayhaven.pk/api/",
+    headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data", // 👈 important
+    },
+    withCredentials: true,
+});
+
+const ApiFormData = setupCache(axiosInstance, {
+    methods: [],
+    headerInterpreter: () => null,
+});
+
+ApiFormData.interceptors.request.use(
+    async (config) => {
+        await store?.dispatch(TotalRequest());
+
+        let token = localStorage.getItem("token");
+
+        if (!token) {
+            const persistRoot = JSON.parse(
+                localStorage.getItem("persist:root") || "{}"
+            );
+            const userState = JSON.parse(persistRoot.user || "{}");
+            token = userState?.token;
+        }
+
+        if (token) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    async (error) => {
+        await store?.dispatch(FinishLoading());
+        return Promise.reject(error);
+    }
+);
+
+ApiFormData.interceptors.response.use(
+    async (response) => {
+        await store?.dispatch(FinishLoading());
+        const { meta } = response.data;
+
+        if (
+            meta?.statusCode == Status.CREATED ||
+            meta?.statusCode == Status.SUCCESS
+        ) {
+            response.data.success = true;
+        }
+
+        return response;
+    },
+    async (error) => {
+        const res = error?.response;
+        const AUTH_DISABLED_NOTIFICATION_ENDPOINTS = [
+            "users/me",
+            "users/verify-hash",
+        ];
+
+        await store?.dispatch(FinishLoading());
+
+        let message =
+            res?.data?.error || res?.data?.meta?.message || res?.meta?.error;
+
+        if (Array.isArray(res?.data?.meta?.message)) {
+            message = res.data.meta.message[0];
+        }
+
+        if (
+            !(
+                window.location.href.includes("auth") &&
+                AUTH_DISABLED_NOTIFICATION_ENDPOINTS.some((endpoint) =>
+                    res?.request?.responseURL?.includes(endpoint)
+                )
+            )
+        ) {
+            openNotification("error", message);
+        }
+
+        res.data = { ...res.data, success: false };
+
+        if (res?.status === 401 && !window.location.href.includes("auth")) {
+            window.location.href = "/auth";
+        } else if (res?.status === 410) {
+            window.location.href = "/dashboard";
+        }
+
+        return res;
+    }
+);
+
+export default ApiFormData;

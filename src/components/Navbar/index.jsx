@@ -1,66 +1,178 @@
-import React from "react";
-import { Search, Calendar, Moon, Bell, Plus } from "lucide-react"; // Plus icon add kiya
-import { useNavigate } from "react-router-dom"; // Navigation ke liye
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import bellIcon from "../../assets/icons/bellIcon.png";
+import calendarIcon from "../../assets/icons/Calendar.png";
+import search from "../../assets/icons/search.svg";
+import { DEFAULT_IMAGE, PAGE_CONFIG } from "../../shared/constant";
+import { Dropdown, Input, Modal, Badge } from "antd";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { getAllNotifications } from "../../services/notification";
+import { getProfile } from "../../services/profile/index"
+import socket from "../../services/socket";
 
 const Navbar = () => {
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [profileImage, setProfileImage] = useState()
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await getAllNotifications();
+      const count = (res?.data?.data || []).filter(n => !n.isRead).length;
+      setUnreadCount(count);
+    } catch (err) {
+      console.error("Failed to fetch unread count", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+
+    // Realtime: socket se notification aaye to count update karo
+    const handleNewNotification = (data) => {
+      // If backend sends count directly use it, otherwise refetch
+      if (data?.count !== undefined) {
+        setUnreadCount(data.count);
+      } else {
+        fetchUnreadCount();
+      }
+    };
+
+    socket.on("notification-received", handleNewNotification);
+
+    return () => {
+      socket.off("notification-received", handleNewNotification);
+    };
+  }, []);
+
+  useEffect(async () => {
+    const profile = await getProfile();
+    const res = profile.data.data
+    setProfileImage(res.profileImage)
+    console.log("profile log ", res)
+
+  }, [])
+  const currentDate = new Date().toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  const currentConfig = PAGE_CONFIG[location.pathname];
+
+  const logout = () => {
+    localStorage.clear();
+    navigate("/auth/login", { replace: true });
+  };
+
+  const userMenuItems = [
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: "My Profile",
+      onClick: () => navigate("/admin/profile"),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: logout,
+    },
+  ];
 
   return (
-    <header className="w-full px-3 ">
-      <div
-        className="flex items-center justify-between gap-4
-        bg-transparent  py-3"
-      >
-        {/* Search */}
-        <div className="flex items-center gap-2 bg-white/70 rounded-md px-4 py-2 w-full max-w-xs shadow-sm">
-          <Search size={18} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-transparent outline-none text-sm w-full text-gray-700 placeholder-gray-500"
-          />
-        </div>
+    <header className="w-full px-3">
+      <div className="flex items-center justify-between bg-transparent py-3">
 
-        {/* Right Section */}
-        <div className="flex items-center gap-3 md:gap-4">
-          
-          {/* List Hotel / Room Button (Naya Button) */}
-          <button 
-            onClick={() => navigate("/admin/hotel/add")} // Aapka add hotel route
-            className="hidden lg:flex items-center gap-2 bg-[#0A5BE2] text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95"
-          >
-            <Plus size={16} />
-            <span>Add New Hotel</span>
-          </button>
-
-          {/* Date */}
-          <div className="hidden md:flex items-center gap-2 bg-white/60 px-4 py-2.5 rounded-full text-sm text-gray-700 font-medium shadow-sm border border-white/50">
-            <Calendar size={16} />
-            <span>Mon, 02 Jan 2026</span>
-          </div>
-
-          {/* Icons Group */}
-          <div className="flex items-center gap-2">
-            <button className="bg-white/60 p-2.5 rounded-full hover:bg-white/80 transition shadow-sm border border-white/50">
-              <Moon size={18} />
-            </button>
-
-            <button className="relative bg-white/60 p-2.5 rounded-full hover:bg-white/80 transition shadow-sm border border-white/50">
-              <Bell size={18} />
-              <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-            </button>
-          </div>
-
-          {/* Profile Section */}
-          <div className="flex items-center border-l border-gray-300 pl-4 ml-1">
-            <img
-              src="https://i.pravatar.cc/40"
-              alt="profile"
-              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer hover:opacity-80 transition"
+        {/* Search Section */}
+        {/* <div className="flex-1 md:max-w-md lg:max-w-lg min-w-0 transition-all duration-300">
+          <div className="hidden md:block">
+            <Input
+              placeholder="Search"
+              prefix={<img src={search} className="w-4 h-4" />}
+              // 'w-full' se ye container ki width lega, aur container screen ke mutabiq adjust hoga
+              className="searchInput w-full p-2 border border-lightSeconday rounded-xl font-medium focus:border-mainPrimary hover:border-mainPrimary transition-all"
             />
+          </div>
+
+          <button
+            onClick={() => setIsSearchModalOpen(true)}
+            className="md:hidden bg-white p-2.5 rounded-full shadow-sm border border-white/50 active:scale-95 transition-all"
+          >
+            <img src={search} className="w-5 h-5" alt="search" />
+          </button>
+        </div> */}
+
+        <div className="flex items-center gap-2 ml-2">
+          {currentConfig && (
+            <button
+              onClick={() => navigate(currentConfig.navigateTo)}
+              className="hidden lg:flex items-center gap-2 bg-mainPrimary text-white px-4 py-2.5 rounded-3xl text-sm font-medium hover:bg-blue-700 transition-all shadow-md active:scale-95"
+            >
+              {currentConfig.buttonText}
+            </button>
+          )}
+
+          <div className="hidden md:flex items-center gap-2 bg-white px-4 py-2.5 rounded-full text-sm text-lightDark font-medium shadow-sm border border-white/50">
+            <img src={calendarIcon ?? DEFAULT_IMAGE} alt="calendar" />
+            <span>{currentDate}</span>
+          </div>
+
+          <div className="flex items-center flex-shrink-0 gap-1">
+            <Badge
+              count={unreadCount}
+              offset={[-5, 15]}
+              style={{ backgroundColor: '#8B0000' }}
+            >
+              <button
+                onClick={() => navigate("/admin/notifications")}
+                className="relative bg-white p-2.5 rounded-full hover:bg-white transition shadow-sm border border-white/50"
+              >
+                <img src={bellIcon ?? DEFAULT_IMAGE} alt="notifications" className="w-5 h-5" />
+              </button>
+            </Badge>
+          </div>
+
+          <div className="flex items-center border-l border-[#AEB2C9] pl-4 ml-1">
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <img
+                src={profileImage || DEFAULT_IMAGE}
+                alt="profile"
+                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer hover:opacity-80 transition"
+              />
+            </Dropdown>
           </div>
         </div>
       </div>
+
+      {/* Mobile Search Modal */}
+      <Modal
+        title="Search"
+        open={isSearchModalOpen}
+        onCancel={() => setIsSearchModalOpen(false)}
+        footer={null}
+        centered
+        closeIcon={true}
+        className="mobile-search-modal"
+      >
+        <div className="py-4">
+          <Input
+            autoFocus
+            placeholder="Search here..."
+            prefix={<img src={search} className="w-4 h-4" />}
+            className="w-full p-3 border border-lightSeconday rounded-xl font-medium"
+          />
+        </div>
+      </Modal>
     </header>
   );
 };
