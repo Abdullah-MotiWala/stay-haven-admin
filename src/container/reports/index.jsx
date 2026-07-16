@@ -258,10 +258,14 @@ const Reports = () => {
     },
     {
       title: "Amount",
-      dataIndex: "paidAmount",
       key: "paidAmount",
-      render: (amount) => `$${amount || 0}`,
-      width: 100,
+      render: (_, record) => {
+        const currency =
+          record.pricePerNightFormatted?.split(" ")[0] || "Rs";
+
+        return `${currency} ${record.paidAmount || 0}`;
+      },
+      width: 120,
     },
     {
       title: "Status",
@@ -468,36 +472,36 @@ const Reports = () => {
             Export to CSV
           </Button>
         </div>
-<ConfigProvider
-  theme={{
-    token: {
-      colorPrimary: "#8B0002", // Yahan apna red color set karein
-    },
-  }}
->
-        <Table
-          columns={columns}
-          dataSource={bookings}
-          loading={loading}
-          rowKey={(record) => record.id}
-          scroll={{ x: 1200 }}
-          pagination={{
-            current: currentPage,
-            pageSize: pageSize, // Ab yeh state se aayega
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} bookings`,
-            pageSizeOptions: ["10", "20", "50", "100"],
-            onChange: (page, size) => {
-              setCurrentPage(page);
-              setPageSize(size); // Jab user size badlega, toh yeh state update karega
-
-              // Yahan aap apni API call ka function laga sakte hain
-              // fetchBookings(page, size); 
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#8B0002", // Yahan apna red color set karein
             },
           }}
-          className="report-table"
-          childrenColumnName="nestedData"
-        />
+        >
+          <Table
+            columns={columns}
+            dataSource={bookings}
+            loading={loading}
+            rowKey={(record) => record.id}
+            scroll={{ x: 1200 }}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize, // Ab yeh state se aayega
+              showSizeChanger: true,
+              showTotal: (total) => `Total ${total} bookings`,
+              pageSizeOptions: ["10", "20", "50", "100"],
+              onChange: (page, size) => {
+                setCurrentPage(page);
+                setPageSize(size); // Jab user size badlega, toh yeh state update karega
+
+                // Yahan aap apni API call ka function laga sakte hain
+                // fetchBookings(page, size); 
+              },
+            }}
+            className="report-table"
+            childrenColumnName="nestedData"
+          />
         </ConfigProvider>
       </div>
     </div>

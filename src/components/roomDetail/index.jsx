@@ -20,21 +20,26 @@ import {
   Coffee,
   Star,
   HelpCircle,
+  Shield, 
+  HandPlatter
 } from "lucide-react";
 import Rooms from "../rooms";
 
 function RoomDetail({ room, editPath }) {
-  const AMENITY_ICON_BY_NAME = {
-    "break fast": Coffee,
-    breakfast: Coffee,
-    wifi: Wifi,
-    free_wifi: Wifi,
-    pool: Waves,
-    SwimmingPool: Waves,
-    dinner: Utensils,
-    parking: ParkingCircle,
-    "cold / warm water": Droplets,
-  };
+ const AMENITY_ICON_BY_NAME = {
+   breakfast: Coffee,
+   complimentary_breakfast: Coffee,   // 👈 add
+   wifi: Wifi,
+   free_wifi: Wifi,
+   pool: Waves,
+   swimming_pool: Waves,              // 👈 add (actual DB key)
+   dinner: Utensils,
+   parking: ParkingCircle,
+   hot_cold_water: Droplets,          // 👈 add (actual DB key)
+   hot_cold_water_facility: Droplets, // 👈 ye bhi dekha data mein — ROOM_FACILITY type mein hai
+   safety_box:Shield ,
+   room_service:HandPlatter,
+ };
   let id = room?.id
   const [mainImage, setMainImage] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
@@ -101,7 +106,7 @@ function RoomDetail({ room, editPath }) {
         {/* Right Side: Price (Added shrink-0 taake ye kabhi chhota na ho) */}
         <div className="flex items-baseline gap-1 shrink-0">
           <span className="text-xl md:text-[24px] font-bold text-[#111827]">
-            ${room.pricePerNight ?? 0}
+            {room.pricePerNightFormatted ?? 0}
           </span>
           <span className="text-[#7C8DB5] text-xs md:text-lg font-medium">
             /night

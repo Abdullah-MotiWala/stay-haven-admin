@@ -9,22 +9,27 @@ import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { getAllNotifications } from "../../services/notification";
 import { getProfile } from "../../services/profile/index"
 import socket from "../../services/socket";
-
+import { useSelector } from "react-redux";
+import { getUnreadCount } from "../../redux/features/notification";
 const Navbar = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  // const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const [profileImage, setProfileImage] = useState()
+  const unreadCount = useSelector(getUnreadCount);
+
   const fetchUnreadCount = async () => {
     try {
       const res = await getAllNotifications();
       const count = (res?.data?.data || []).filter(n => !n.isRead).length;
-      setUnreadCount(count);
+      // setUnreadCount(count);
     } catch (err) {
       console.error("Failed to fetch unread count", err);
     }
   };
+
+  
 
   useEffect(() => {
     fetchUnreadCount();
@@ -33,7 +38,7 @@ const Navbar = () => {
     const handleNewNotification = (data) => {
       // If backend sends count directly use it, otherwise refetch
       if (data?.count !== undefined) {
-        setUnreadCount(data.count);
+        // setUnreadCount(data.count);
       } else {
         fetchUnreadCount();
       }

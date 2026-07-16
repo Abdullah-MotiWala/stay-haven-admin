@@ -2,15 +2,21 @@ import React, { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ConfigProvider, App as AntdApp } from "antd";
-import appRoutes from "./routes"; 
+import appRoutes from "./routes";
 import AppLoader from "./components/shared/appLoader/index";
-import { getLoadStatus, getTotalRequest } from "./redux/features/loader"; 
+import { getLoadStatus, getTotalRequest } from "./redux/features/loader";
 // Path check karein: Agar App.js src mein hai to "./assets/..." use karein
-import bgImage from "./assets/images/background.png"; 
+import bgImage from "./assets/images/background.png";
 import { initializeFCM, onMessageListener } from "./services/fcm";
 import { openNotification } from "./network/notification";
 import { saveFcmToken } from "./services/notification";
+import { useDispatch } from "react-redux";
+import socket from "./services/socket";
+import { fetchNotifications } from "./redux/features/notification";
 export let staticNotify = null;
+
+
+
 
 const ContextGetter = () => {
   const { notification } = AntdApp.useApp();
@@ -21,7 +27,16 @@ const ContextGetter = () => {
 function App() {
   const loading = useSelector(getLoadStatus);
   const totalRequest = useSelector(getTotalRequest);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchNotifications());
+
+    const handleNewNotification = () => dispatch(fetchNotifications());
+
+    socket.on("notification-received", handleNewNotification);
+    return () => socket.off("notification-received", handleNewNotification);
+  }, [dispatch]);
   useEffect(() => {
     // Initialize Firebase Cloud Messaging
     // Uncomment after adding VAPID key to .env
@@ -68,16 +83,16 @@ function App() {
     >
       {/* Background Wrapper */}
       <AntdApp>
-      <div className="App">
-        <ContextGetter />
-        
-        {loading < totalRequest && <AppLoader />}
-        
-        {/* Router Provider */}
-        <div className="relative z-10 w-full min-h-screen">
+        <div className="App">
+          <ContextGetter />
+
+          {loading < totalRequest && <AppLoader />}
+
+          {/* Router Provider */}
+          <div className="relative z-10 w-full min-h-screen">
             <RouterProvider router={appRoutes} />
+          </div>
         </div>
-      </div>
       </AntdApp>
     </ConfigProvider>
   );

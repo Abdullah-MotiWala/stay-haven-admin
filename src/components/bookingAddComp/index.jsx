@@ -69,6 +69,7 @@ const BookingAddComp = () => {
     numGuests: "01 Adult",
     checkIn: "", checkOut: "", duration: 0,
     pricePerNight: 0, taxes: 10, discount: 0,
+    pricePerNightFormatted: "",
     paymentMethod: "Cash", status: "Booked",
     isApartment: false, infants: 0,
   });
@@ -107,6 +108,7 @@ const BookingAddComp = () => {
           : (booking.room?.roomType || booking.roomType || "");
 
         const pricePerNight = Number(booking.paymentSummary?.pricePerNight || booking.pricePerNight || 0);
+        const pricePerNightFormatted = booking.paymentSummary?.pricePerNightFormatted || booking.pricePerNightFormatted || "";
         const taxes = Number(booking.paymentSummary?.taxes || booking.taxes || 0);
         const discount = Number(booking.paymentSummary?.discount || booking.discount || 0);
 
@@ -149,6 +151,7 @@ const BookingAddComp = () => {
           checkOut: booking.stayDetails?.checkOut || booking.checkOut || "",
           duration,
           pricePerNight,
+          pricePerNightFormatted,
           taxes,
           discount,
           paymentMethod: booking.paymentMethod || "Cash",
@@ -178,6 +181,24 @@ const BookingAddComp = () => {
     fetch();
   }, []);
 
+  // ✅ Total Nights auto-calculate hoga jab bhi checkIn ya checkOut change ho
+  useEffect(() => {
+    if (formData.checkIn && formData.checkOut) {
+      const start = new Date(formData.checkIn);
+      const end = new Date(formData.checkOut);
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      // Agar checkOut, checkIn se pehle ya same date ho to 0 rakho (invalid range)
+      const nights = diffDays > 0 ? diffDays : 0;
+
+      setFormData((prev) => {
+        if (prev.duration === nights) return prev; // unnecessary re-render se bacho
+        return { ...prev, duration: nights };
+      });
+    }
+  }, [formData.checkIn, formData.checkOut]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     const isApartment = formData.bookingType === "Apartment";
@@ -200,7 +221,7 @@ const BookingAddComp = () => {
     if (name === "roomNumber") {
       const src = isApartment ? apartment : rooms;
       const obj = src.find((item) => isApartment ? item.apartmentNumber === value : item.roomNumber === value);
-      setFormData((prev) => ({ ...prev, roomNumber: value, roomId: !isApartment ? obj?.id || "" : "", apartmentId: isApartment ? obj?.id || "" : "", pricePerNight: obj?.price || obj?.pricePerNight || 0 }));
+      setFormData((prev) => ({ ...prev, roomNumber: value, roomId: !isApartment ? obj?.id || "" : "", apartmentId: isApartment ? obj?.id || "" : "", pricePerNight: obj?.price || obj?.pricePerNight || 0, pricePerNightFormatted: obj?.priceFormatted || obj?.pricePerNightFormatted || "", pricePerNightFormatted: obj?.priceFormatted || obj?.pricePerNightFormatted || "" }));
       return;
     }
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -238,13 +259,20 @@ const BookingAddComp = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const finalPayload = { ...formData, isApartment: formData.bookingType === "Apartment" };
+      const finalPayload = {
+        ...formData, isApartment: formData.bookingType === "Apartment", guestEmail: formData.email,      // ✅ backend entity field name se match
+        guestPhone: formData.phone,
+        guestIdCard: formData.cnic,
+      };
       const res = isEditMode ? await updateBooking(id, finalPayload) : await createBooking(finalPayload);
       if (res.status === 200 || res.status === 201) {
         openNotification("success", isEditMode ? "Booking updated!" : "Booking created!");
         setIsModalOpen(true);
       }
-    } catch { openNotification("error", "Error saving booking"); }
+    } catch (err) {
+      console.log("Catch triggered:", err.data.message); // ye add karo
+      openNotification("error", err?.data?.message ||err?.response?.data?.error || err?.message || "Failed to save booking");
+    }
     finally { setLoading(false); }
   };
 
@@ -255,6 +283,10 @@ const BookingAddComp = () => {
   const totalPayable = basePriceTotal + taxes - discount;
   const summaryName = isApt ? (formData.apartmentName || formData.hotelName || "Not Selected") : (formData.hotelName || "Not Selected");
   const summaryNumber = isApt ? formData.apartmentNumber : formData.roomNumber;
+
+  const currencySign = formData.pricePerNightFormatted
+    ? formData.pricePerNightFormatted.replace(/[0-9.,\s]/g, "") || "$"
+    : "$";
 
   return (
     <>
@@ -370,7 +402,9 @@ const BookingAddComp = () => {
                       placeholder={isApt ? "Select Apartment No." : "Select Room No."}
                       value={(isApt ? formData.apartmentNumber : formData.roomNumber) || undefined}
                       onChange={(val) => handleChange({ target: { name: "roomNumber", value: val } })}
-                      suffixIcon={<ChevronDown size={16} className="text-gray-400" />} showSearch>
+                      suffixIcon={<ChevronDown size={16} className="text-gray-400" />}
+                      showSearch
+                      disabled={isEditMode}>
                       {getNumberOptions().map((num, i) => <Option key={i} value={num}>{num}</Option>)}
                     </Select>
                   </SelectWrap>
@@ -397,21 +431,50 @@ const BookingAddComp = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Checked in Date</label>
-                  <div className="relative"><img src={tablecalender} alt="cal" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10" /><input type="date" name="checkIn" value={formData.checkIn} onChange={handleChange} required className={inputCls} /></div>
+                  <div className="relative">
+                    <img src={tablecalender} alt="cal" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10" />
+                    <input
+                      type="date"
+                      name="checkIn"
+                      value={formData.checkIn}
+                      onChange={handleChange}
+                      required
+                      className={inputCls}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className={labelCls}>Checked out Date</label>
-                  <div className="relative"><img src={tablecalender} alt="cal" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10" /><input type="date" name="checkOut" value={formData.checkOut} onChange={handleChange} required className={inputCls} /></div>
+                  <div className="relative">
+                    <img src={tablecalender} alt="cal" className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none z-10" />
+                    <input
+                      type="date"
+                      name="checkOut"
+                      value={formData.checkOut}
+                      onChange={handleChange}
+                      required
+                      className={inputCls}
+                    />
+                  </div>
                 </div>
-                <div><label className={labelCls}>Total Nights</label><input type="number" name="duration" value={formData.duration} onChange={handleChange} required placeholder="1" className={inputCls} /></div>
+                <div>
+                  <label className={labelCls}>Total Nights</label>
+                  <input
+                    type="number"
+                    name="duration"
+                    value={formData.duration}
+                    readOnly
+                    placeholder="Auto-calculated"
+                    className={`${inputCls} bg-gray-50 cursor-not-allowed`}
+                  />
+                </div>
               </div>
             </div>
-
             {/* Pricing & Payment */}
             <div className={sectionCls}>
               <h3 className="font-bold text-gray-900 text-base mb-4">Pricing & Payment</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label className={labelCls}>Price per Night</label><input type="number" readOnly name="pricePerNight" value={formData.pricePerNight} placeholder="Auto-filled" className={`${inputCls} bg-gray-50 cursor-not-allowed`} /></div>
+                <div><label className={labelCls}>Price per Night</label><input type="number" readOnly name="pricePerNight" value={formData.pricePerNight || `${currencySign} ${formData.pricePerNight}`} placeholder="Auto-filled" className={`${inputCls} bg-gray-50 cursor-not-allowed`} /></div>
                 <div><label className={labelCls}>Taxes & Fee</label><input type="number" name="taxes" value={formData.taxes} onChange={handleChange} className={inputCls} /></div>
                 <div><label className={labelCls}>Discount</label><input type="number" name="discount" value={formData.discount} onChange={handleChange} className={inputCls} /></div>
                 <div>
@@ -466,14 +529,14 @@ const BookingAddComp = () => {
                 </div>
                 <div className="border-t border-[#107326]/20 pt-3 space-y-2">
                   <p className="text-gray-500 text-xs font-bold uppercase tracking-wide">Pricing Breakdown</p>
-                  <div className="flex justify-between text-sm"><span className="text-gray-600">Base Price {formData.duration}n (${Number(formData.pricePerNight).toFixed(2)} × {formData.duration})</span><span className="font-bold text-dark">${basePriceTotal.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-gray-600">Taxes & Service Fees</span><span className="font-bold text-dark">${taxes.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-gray-600">Discount</span><span className="font-bold text-red">-${discount.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-600">Base Price {formData.duration}n ({currencySign}{Number(formData.pricePerNight).toFixed(2)} × {formData.duration})</span><span className="font-bold text-dark">{currencySign}{basePriceTotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-600">Taxes & Service Fees</span><span className="font-bold text-dark">{currencySign}{taxes.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-600">Discount</span><span className="font-bold text-red">-{currencySign}{discount.toFixed(2)}</span></div>
                 </div>
                 <div className="border-t border-[#107326]/20 pt-3 space-y-2.5">
-                  <div className="flex justify-between items-center"><span className="font-bold text-dark text-sm">Total Payable</span><span className="text-xl font-bold text-blue">${totalPayable.toFixed(2)}</span></div>
-                  <div className="flex justify-between items-center"><span className="text-gray-600 text-sm">Amount Paid</span><span className="font-bold text-dark text-sm border border-gray-200 rounded-lg px-3 py-1 bg-white">${totalPayable.toFixed(2)}</span></div>
-                  <div className="flex justify-between items-center"><span className="text-gray-600 text-sm">Remaining Balance</span><span className="font-bold text-dark text-sm">$0.00</span></div>
+                  <div className="flex justify-between items-center"><span className="font-bold text-dark text-sm">Total Payable</span><span className="text-xl font-bold text-blue">{currencySign}{totalPayable.toFixed(2)}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-gray-600 text-sm">Amount Paid</span><span className="font-bold text-dark text-sm border border-gray-200 rounded-lg px-3 py-1 bg-white">{currencySign}{totalPayable.toFixed(2)}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-gray-600 text-sm">Remaining Balance</span><span className="font-bold text-dark text-sm">{currencySign}0.00</span></div>
                 </div>
                 <div className="flex gap-2 text-xs text-gray-400 pt-1">
                   <Info size={14} className="text-[#48BB78] shrink-0 mt-0.5" />

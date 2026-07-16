@@ -11,9 +11,9 @@ const Status = {
 };
 
 const axiosInstance = axios.create({
-  // baseURL: "http://localhost:3000/api/",
+  baseURL: "http://localhost:3000/api/",
 
-  baseURL: "https://api.stayhaven.pk/api/",
+  // baseURL: "https://api.stayhaven.pk/api/",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -111,7 +111,7 @@ Api.interceptors.response.use(
       window.location.href = "/admin/dashboard";
     }
 
-    return res;
+    return Promise.reject(res);
   },
 );
 

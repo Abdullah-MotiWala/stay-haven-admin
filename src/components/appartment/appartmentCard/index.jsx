@@ -194,7 +194,7 @@ function AppartmentCard({ data, active, onClick, onStatusChange, onDelete }) {
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-[24px] font-bold text-gray-900">
-              ${data?.pricePerNight ?? 0}
+               {data?.pricePerNightFormatted ?? 0}
             </span>
             <span className="text-[#7C8DB5] text-xl font-medium">/night</span>
           </div>
