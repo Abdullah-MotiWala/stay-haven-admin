@@ -29,7 +29,7 @@ const BookingView = () => {
         { label: "Name",            value: b.guestName  || b.guestInfo?.name  || "-" },
         { label: "Phone Number",    value: b.guestPhone || b.guestInfo?.phone || "-" },
         { label: "Email",           value: b.guestEmail || b.guestInfo?.email || "-" },
-        { label: "ID Card",         value: b.guestInfo?.idCard || b.guestIdCard || "-" },
+        // { label: "ID Card",         value: b.guestInfo?.idCard || b.guestIdCard || "-" },
         { label: "Document Type",   value: b.guestInfo?.documentType  || b.documentType  || "-" },
         { label: "Document Number", value: b.guestInfo?.documentNumber || b.documentNumber || "-" },
     ];
