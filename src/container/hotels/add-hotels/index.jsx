@@ -1,22 +1,94 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createHotel, getHotelById, lastHotelId, updateHotel } from "../../../services/hotel";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
+// import { PAKISTAN_CITIES } from "../../../shared/pakistanCities";
 import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
+import MapPicker from "../../../components/shared/MapPicker";
 import { Form, Input, Select, Checkbox } from "antd";
+import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import { uploadSingleMedia } from "../../../services/uploads";
 import { getSettingsApi } from "../../../services/setting";
 import { getAllUsers } from "../../../services/user";
+import { PAKISTAN_CITIES } from "../../../components/shared/pakistanCities";
+
+const GOOGLE_MAP_LIBRARIES = ["places"];
+
+const AUTOCOMPLETE_OPTIONS = {
+  componentRestrictions: { country: "pk" },
+  fields: ["formatted_address", "geometry", "name"],
+};
+
+const fieldLabel = (text) => (
+  <span className="text-[15px] font-medium text-gray-700">{text}</span>
+);
+
+const SectionHeader = ({ title, subtitle }) => (
+  <div className="mb-6 mt-12 first:mt-0">
+    <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+    {subtitle && <p className="text-sm text-gray-400 mt-0.5">{subtitle}</p>}
+    <hr className="mt-3 border-gray-100" />
+  </div>
+);
+
+const AddressAutocomplete = ({ value, onChange, onPlaceSelected, isLoaded }) => {
+  const autocompleteRef = useRef(null);
+
+  if (!isLoaded) {
+    return (
+      <Input
+        size="large"
+        className="rounded-lg"
+        placeholder="e.g. Plot 5, Block 4, Clifton"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+      />
+    );
+  }
+
+  return (
+    <Autocomplete
+      onLoad={(autocomplete) => {
+        autocompleteRef.current = autocomplete;
+      }}
+      onPlaceChanged={() => {
+        const place = autocompleteRef.current?.getPlace();
+        if (!place?.geometry?.location) return;
+        const address = place.formatted_address || place.name || "";
+        onChange?.(address);
+        onPlaceSelected?.({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+          address,
+        });
+      }}
+      options={AUTOCOMPLETE_OPTIONS}
+    >
+      <Input
+        size="large"
+        className="rounded-lg"
+        placeholder="e.g. Plot 5, Block 4, Clifton"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+      />
+    </Autocomplete>
+  );
+};
 
 const HotelForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const [form] = Form.useForm();
-  const { Option } = Select;
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAP_LIBRARIES,
+  });
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -33,6 +105,14 @@ const HotelForm = () => {
 
   const selectedRooms = Form.useWatch("rooms", form) || [];
   const selectedAmenities = Form.useWatch("amenities", form) || [];
+  const latitude = Form.useWatch("latitude", form);
+  const longitude = Form.useWatch("longitude", form);
+
+  useEffect(() => {
+    if (loadError) {
+      openNotification("error", "Failed to load Google Maps. Check the API key.");
+    }
+  }, [loadError]);
 
   useEffect(() => {
     const fetchLastId = async () => {
@@ -46,29 +126,22 @@ const HotelForm = () => {
     fetchLastId();
   }, []);
 
-
- useEffect(() => {
-  const fetchSettings = async () => {
-    try {
-      const res = await getSettingsApi();
-      const data = res?.data?.data;
-
-      const policy = data?.cancellationPolicy || "";
-      setSettingsPolicy(policy);
-
-      if (!isEditMode) {
-        form.setFieldsValue({
-          cancellation_policy: policy,
-        });
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await getSettingsApi();
+        const data = res?.data?.data;
+        const policy = data?.cancellationPolicy || "";
+        setSettingsPolicy(policy);
+        if (!isEditMode) {
+          form.setFieldsValue({ cancellation_policy: policy });
+        }
+      } catch {
+        openNotification("error", "Failed to load settings");
       }
-
-    } catch {
-      openNotification("error", "Failed to load settings");
-    }
-  };
-
-  fetchSettings();
-}, [form, isEditMode]);
+    };
+    fetchSettings();
+  }, [form, isEditMode]);
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -92,6 +165,8 @@ const HotelForm = () => {
           hostId: hotelData.hostId || hotelData.host?.id || undefined,
           amenities: hotelData.amenities?.map((a) => a.id) || [],
           rooms: hotelData.roomsIncluded?.map((r) => r.id) || [],
+          latitude: hotelData.latitude != null ? Number(hotelData.latitude) : undefined,
+          longitude: hotelData.longitude != null ? Number(hotelData.longitude) : undefined,
         });
       } catch {
         openNotification("error", "Failed to load hotel");
@@ -157,6 +232,18 @@ const HotelForm = () => {
     }
   };
 
+  const handlePlaceSelected = ({ lat, lng, address }) => {
+    form.setFieldsValue({ address, latitude: lat, longitude: lng });
+  };
+
+  const handleMapChange = ({ lat, lng, address }) => {
+    form.setFieldsValue({
+      latitude: lat,
+      longitude: lng,
+      ...(address ? { address } : {}),
+    });
+  };
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -173,6 +260,8 @@ const HotelForm = () => {
         status: values.isActive,
         isFeatured: values.isFeatured ?? false,
         hostId: values.hostId,
+        latitude: values.latitude != null ? Number(values.latitude) : null,
+        longitude: values.longitude != null ? Number(values.longitude) : null,
         featureIds: [...(values.amenities || []), ...(values.rooms || [])],
         ...(imageUrl ? { imageUrl } : {}),
       };
@@ -199,14 +288,13 @@ const HotelForm = () => {
 
   return (
     <>
-        <Form
+      <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
+        requiredMark={false}
         className="min-h-screen w-full md:p-8 font-sans"
       >
- 
-        {/* Back Button */}
         <div>
           <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate(-1)}>
             <img src={arrowImg} alt="arrowImg" />
@@ -214,43 +302,33 @@ const HotelForm = () => {
           </div>
           <hr className="-mt-4" />
         </div>
- 
-        {/* Page Title */}
+
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{isEditMode ? "Edit Hotel" : "Add Hotel"}</h1>
           <p className="text-lg text-darkGray font-medium">
             {isEditMode ? "Edit hotel details and amenities" : "Add hotel details and amenities"}
           </p>
         </div>
- 
+
         <div className="bg-white rounded-[24px] shadow-sm border border-gray-100">
-          {/* Card Header */}
-          <div className="px-6 py-4 mb-6">
-            <h2 className="text-lg font-semibold text-black">Hotel Profile</h2>
-            <hr />
-          </div>
- 
-          {/* Card Body — was px-36, now responsive */}
-          <div className="p-4 sm:p-6 lg:px-36 pb-14">
- 
-            {/* Image Upload + Hotel ID Row */}
-            {/* 
-              FIX: Was `flex justify-between` which caused overflow on small screens.
-              Now stacks vertically on mobile, goes side-by-side on large screens.
-            */}
-            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
- 
-              {/* Image Upload */}
+          <div className="p-4 sm:p-8 lg:px-16 xl:px-24 pb-14">
+
+            <SectionHeader
+              title="Hotel Image"
+              subtitle="This photo appears on listings and search results"
+            />
+
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="relative w-full sm:w-[260px] lg:w-[330px] h-[152px] flex-shrink-0">
+                <div className="relative w-full sm:w-[280px] h-[160px] flex-shrink-0">
                   <img
                     src={imagePreview}
-                    className="w-full h-full rounded-[16px] object-cover border"
+                    className="w-full h-full rounded-2xl object-cover border border-gray-200"
                     alt="hotel"
                   />
                   <label
                     htmlFor="image-upload"
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-[16px] opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10"
+                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10"
                   >
                     <span className="text-white text-sm font-medium">
                       {uploading ? "Uploading..." : "Change Image"}
@@ -266,111 +344,156 @@ const HotelForm = () => {
                   />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-blue">Upload Hotel Image</h2>
-                  <p className="text-lightSeconday">Make sure image is clear</p>
-                  <p className="text-xs text-gray-400 mt-2">Max size: 5MB | Format: JPG, PNG, GIF</p>
+                  <p className="text-base font-semibold text-gray-800">Upload a clear, high quality photo</p>
+                  <p className="text-sm text-gray-400 mt-1">Hover the image to change it</p>
+                  <p className="text-xs text-gray-400 mt-2">Max size 5MB · JPG, PNG or GIF</p>
                 </div>
               </div>
- 
-              {/* Hotel ID */}
-              <div className="flex items-center gap-4 flex-shrink-0">
-                <span className="text-black font-semibold underline whitespace-nowrap">Hotel ID</span>
-                <div className="w-24 text-center border py-3 rounded-md bg-havengray text-extradark border-lightSeconday cursor-not-allowed opacity-70 pointer-events-none">
-                  <span className="select-none">
-                    {isEditMode ? hotel.hotelId : lastId?.displayId}
-                  </span>
-                </div>
+
+              <div className="flex items-center gap-3 flex-shrink-0 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
+                <span className="text-sm font-medium text-gray-500">Hotel ID</span>
+                <span className="text-base font-semibold text-gray-800 select-none">
+                  {isEditMode ? `#${hotel.hotelId}` : lastId?.displayId || "—"}
+                </span>
               </div>
             </div>
- 
-            {/* Form Fields Grid */}
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Hotel Name</label>
-                <Form.Item name="name" rules={[{ required: true, message: "Hotel name is required" }]}>
-                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter hotel name" />
-                </Form.Item>
-              </div>
- 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">City</label>
-                <Form.Item name="city" rules={[{ required: true, message: "City is required" }]}>
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select City" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-                    <Option value="Karachi">Karachi</Option>
-                    <Option value="Lahore">Lahore</Option>
-                    <Option value="Islamabad">Islamabad</Option>
-                  </Select>
-                </Form.Item>
-              </div>
- 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Hotel Location</label>
-                <Form.Item name="address" rules={[{ required: true, message: "Address is required" }]}>
-                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter address" />
-                </Form.Item>
-              </div>
- 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Hotel Email</label>
-                <Form.Item name="email" rules={[{ required: true }, { type: "email", message: "Invalid email" }]}>
-                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter email" />
-                </Form.Item>
-              </div>
- 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Cancellation Policy</label>
-                <Form.Item name="cancellation_policy" rules={[{ required: true, message: "Cancellation policy is required" }]}>
-                  <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"  placeholder="Enter cancellation policy"
-  disabled />
-                </Form.Item>
-              </div>
- 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Status</label>
-                <Form.Item name="isActive">
-                  <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Status" showSearch>
-                    <Option value="active">Active</Option>
-                    <Option value="inactive">Inactive</Option>
-                    <Option value="maintenance">Maintenance</Option>
-                  </Select>
-                </Form.Item>
-              </div>
 
-              <div className="w-full">
-                <label className="text-base text-lightSeconday font-medium">Assign Host</label>
-                <Form.Item name="hostId" rules={[{ required: true, message: "Please assign a host" }]}>
-                  <Select
-                    className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
-                    placeholder="Select Host"
-                    showSearch
-                    optionFilterProp="label"
-                    options={hostsList.map((host) => ({
-                      label: `${host.name}${host.email ? ` (${host.email})` : ""}`,
-                      value: host.id,
-                    }))}
-                  />
-                </Form.Item>
-              </div>
+            <SectionHeader
+              title="Basic Information"
+              subtitle="Core details shown to guests"
+            />
 
-              <div className="w-full flex items-center gap-3 pt-6">
-                <Form.Item name="isFeatured" valuePropName="checked" className="mb-0">
-                  <Checkbox>Mark as Featured Hotel</Checkbox>
-                </Form.Item>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              <Form.Item
+                label={fieldLabel("Hotel Name")}
+                name="name"
+                rules={[{ required: true, message: "Hotel name is required" }]}
+              >
+                <Input size="large" placeholder="e.g. Pearl Continental" className="rounded-lg" />
+              </Form.Item>
+
+              <Form.Item
+                label={fieldLabel("City")}
+                name="city"
+                rules={[{ required: true, message: "City is required" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Select city"
+                  showSearch
+                  options={PAKISTAN_CITIES.map((city) => ({ label: city, value: city }))}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={fieldLabel("Hotel Email")}
+                name="email"
+                rules={[
+                  { required: true, message: "Email is required" },
+                  { type: "email", message: "Enter a valid email" },
+                ]}
+              >
+                <Input size="large" placeholder="e.g. bookings@hotel.com" className="rounded-lg" />
+              </Form.Item>
+
+              <Form.Item
+                label={fieldLabel("Assign Host")}
+                name="hostId"
+                rules={[{ required: true, message: "Please assign a host" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder="Select host"
+                  showSearch
+                  optionFilterProp="label"
+                  options={hostsList.map((host) => ({
+                    label: `${host.name}${host.email ? ` (${host.email})` : ""}`,
+                    value: host.id,
+                  }))}
+                />
+              </Form.Item>
             </div>
- 
-            {/* 
-              AMENITIES SECTION
-              FIX: Checkbox items were merging/overlapping because grid gap was too small
-              and Checkbox.Group had no proper item sizing.
-              
-              Solution:
-              - Each checkbox wrapped in a styled card-like container
-              - `min-w-0` prevents flex children from overflowing
-              - Responsive grid: 1 col mobile → 2 col sm → 3 col md → 4 col lg
-              - Label truncation with `truncate` for long text
-            */}
-            <h3 className="font-semibold mb-4">Amenities Included</h3>
+
+            <SectionHeader
+              title="Location"
+              subtitle="Start typing the address and pick a suggestion, or click on the map to drop a pin"
+            />
+
+            <Form.Item
+              label={fieldLabel("Hotel Address")}
+              name="address"
+              rules={[{ required: true, message: "Address is required" }]}
+            >
+              <AddressAutocomplete
+                isLoaded={isLoaded}
+                onPlaceSelected={handlePlaceSelected}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="latitude"
+              className="mb-0 h-0"
+              rules={[{ required: true, message: "Please set the hotel location on the map" }]}
+            >
+              <Input type="hidden" />
+            </Form.Item>
+            <Form.Item name="longitude" className="mb-0 h-0">
+              <Input type="hidden" />
+            </Form.Item>
+
+            <MapPicker
+              isLoaded={isLoaded}
+              value={
+                latitude != null && longitude != null
+                  ? { lat: latitude, lng: longitude }
+                  : null
+              }
+              onChange={handleMapChange}
+            />
+
+            <SectionHeader
+              title="Policies & Status"
+              subtitle="Booking rules and listing visibility"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              <Form.Item
+                label={fieldLabel("Cancellation Policy")}
+                name="cancellation_policy"
+                rules={[{ required: true, message: "Cancellation policy is required" }]}
+                extra={<span className="text-xs text-gray-400">Managed globally from Settings</span>}
+              >
+                <Input size="large" className="rounded-lg" disabled />
+              </Form.Item>
+
+              <Form.Item label={fieldLabel("Status")} name="isActive">
+                <Select
+                  size="large"
+                  placeholder="Select status"
+                  options={[
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
+                    { label: "Maintenance", value: "maintenance" },
+                  ]}
+                />
+              </Form.Item>
+            </div>
+
+            <div className="flex items-center justify-between border border-gray-200 rounded-xl px-5 py-4 mt-2">
+              <div>
+                <p className="text-[15px] font-medium text-gray-700">Featured Hotel</p>
+                <p className="text-sm text-gray-400">Featured hotels appear at the top of the homepage</p>
+              </div>
+              <Form.Item name="isFeatured" valuePropName="checked" className="mb-0">
+                <Checkbox />
+              </Form.Item>
+            </div>
+
+            <SectionHeader
+              title="Amenities"
+              subtitle="Select everything this hotel offers"
+            />
+
             <Form.Item
               name="amenities"
               className="w-full"
@@ -378,16 +501,18 @@ const HotelForm = () => {
             >
               <Checkbox.Group className="w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full">
-                 {(Array.isArray(amenitiesList) ? amenitiesList : []).map((a) => (
+                  {(Array.isArray(amenitiesList) ? amenitiesList : []).map((a) => (
                     <label
                       key={a.id}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all min-w-0
-                       `}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all min-w-0
+                        ${selectedAmenities.includes(a.id)
+                          ? "border-blue bg-blue/5"
+                          : "border-gray-200 hover:border-gray-300"}`}
                     >
                       <Checkbox value={a.id} className="flex-shrink-0" />
                       <span
                         className={`text-sm font-medium truncate min-w-0
-                          ${selectedAmenities.includes(a.id) ? "text-blue" : "text-lightText"}`}
+                          ${selectedAmenities.includes(a.id) ? "text-blue" : "text-gray-600"}`}
                       >
                         {a.title}
                       </span>
@@ -396,12 +521,12 @@ const HotelForm = () => {
                 </div>
               </Checkbox.Group>
             </Form.Item>
- 
-            {/* 
-              ROOMS SECTION
-              Same fix as amenities above
-            */}
-            <h3 className="font-semibold mb-4 mt-6">Rooms Included</h3>
+
+            <SectionHeader
+              title="Room Types"
+              subtitle="Select the room categories available at this hotel"
+            />
+
             <Form.Item
               name="rooms"
               className="w-full"
@@ -412,13 +537,15 @@ const HotelForm = () => {
                   {roomsList.map((r) => (
                     <label
                       key={r.id}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl  cursor-pointer transition-all min-w-0
-                       `}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all min-w-0
+                        ${selectedRooms.includes(r.id)
+                          ? "border-blue bg-blue/5"
+                          : "border-gray-200 hover:border-gray-300"}`}
                     >
                       <Checkbox value={r.id} className="flex-shrink-0" />
                       <span
                         className={`text-sm font-medium truncate min-w-0
-                          ${selectedRooms.includes(r.id) ? "text-blue" : "text-lightText"}`}
+                          ${selectedRooms.includes(r.id) ? "text-blue" : "text-gray-600"}`}
                       >
                         {r.title}
                       </span>
@@ -427,29 +554,28 @@ const HotelForm = () => {
                 </div>
               </Checkbox.Group>
             </Form.Item>
- 
+
           </div>
         </div>
- 
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4 mt-6">
+
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 mt-6">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="border-2 border-lightSeconday bg-myWhite px-10 text-lightSeconday rounded-md py-2 font-medium hover:bg-gray-50 transition-all"
+            className="m-0 h-12 px-10 border border-gray-300 bg-white text-gray-600 rounded-lg font-medium hover:bg-gray-50 transition-all"
           >
-            Back
+            Cancel
           </button>
           <button
             type="submit"
             disabled={loading || uploading}
-            className={`px-10 py-2 bg-blue text-white rounded-md ${loading || uploading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`m-0 h-12 px-10 bg-blue text-white rounded-lg font-medium transition-all ${loading || uploading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
           >
-            {uploading ? "Uploading..." : loading ? "Saving..." : isEditMode ? "Save Changes" : "Save"}
+            {uploading ? "Uploading..." : loading ? "Saving..." : isEditMode ? "Save Changes" : "Save Hotel"}
           </button>
         </div>
       </Form>
- 
+
       {isModalOpen && (
         <SuccessModal
           open={true}

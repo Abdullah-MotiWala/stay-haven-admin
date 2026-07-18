@@ -155,21 +155,21 @@ const HotelsListing = () => {
   };
 
   const cardsData = [
-    { title: "Total Hotels",    value: stats?.totalHotels,   bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, trend: `${stats?.growth?.isPositive ? "+" : "-"}${stats?.growth?.percentage ?? 0}%`, trendText: "vs last week", showTrend: true },
-    { title: "Active Hotels",   value: stats?.activeHotels,  bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Total Hotels", value: stats?.totalHotels, bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, trend: `${stats?.growth?.isPositive ? "+" : "-"}${stats?.growth?.percentage ?? 0}%`, trendText: "vs last week", showTrend: true },
+    { title: "Active Hotels", value: stats?.activeHotels, bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
     { title: "Inactive Hotels", value: stats?.inactiveHotels, bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
-    { title: "In Draft",        value: stats?.inDraft,       bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
+    { title: "In Draft", value: stats?.inDraft, bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
   ];
 
   const columns = [
-    { key: "uiHotelId",      label: "Hotel ID",        type: "text" },
-    { key: "name",           label: "Hotel Name",      type: "hotel" },
-    { key: "totalRooms",     label: "Total Rooms",     type: "number" },
+    { key: "uiHotelId", label: "Hotel ID", type: "text" },
+    { key: "name", label: "Hotel Name", type: "hotel" },
+    { key: "totalRooms", label: "Total Rooms", type: "number" },
     { key: "roomsAvailable", label: "Rooms Available", type: "number" },
-    { key: "roomsOccupied",  label: "Rooms Occupied",  type: "number" },
-    { key: "reserved",       label: "Reserved",        type: "number" },
-    { key: "status",         label: "Status",          type: "status" },
-    { key: "actions",        label: "Actions",         type: "actions" },
+    { key: "roomsOccupied", label: "Rooms Occupied", type: "number" },
+    { key: "reserved", label: "Reserved", type: "number" },
+    { key: "status", label: "Status", type: "status" },
+    { key: "actions", label: "Actions", type: "actions" },
   ];
 
   const onPageChange = (page, pageSize) => {
@@ -191,19 +191,21 @@ const HotelsListing = () => {
         {loading ? (
           <TableSkeleton rows={5} cols={8} />
         ) : (
-          <HotelDirectory
-            data={hotels?.data}
-            onDelete={handleDelete}
-            title="Hotels Directory"
-            columns={columns}
-            setRefresh={setRefresh}
-            lastId={lastId?.nextNumericId}
-            path={`/admin/hotel/edit`}
-            viewpath={`/admin/hotel/view`}
-            view={true}
-            hoteloptions={true}
-            onStatusToggle={(id, newStatus) => handleStatusToggle(id, newStatus)}
-          />
+          <div className="overflow-x-auto">
+            <HotelDirectory
+              data={hotels?.data}
+              onDelete={handleDelete}
+              title="Hotels Directory"
+              columns={columns}
+              setRefresh={setRefresh}
+              lastId={lastId?.nextNumericId}
+              path={`/admin/hotel/edit`}
+              viewpath={`/admin/hotel/view`}
+              view={true}
+              hoteloptions={true}
+              onStatusToggle={(id, newStatus) => handleStatusToggle(id, newStatus)}
+            />
+          </div>
         )}
 
         <div className="mt-4 flex justify-between">

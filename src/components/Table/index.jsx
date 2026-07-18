@@ -1,5 +1,5 @@
-﻿import React, { useState, useMemo, useRef } from "react";
-import { MoreVertical, Filter, ChevronDown, Upload } from "lucide-react";
+﻿import React, { useState, useMemo } from "react";
+import { MoreVertical, Filter, ChevronDown, Upload, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BASE_HOTEL_CODE, DEFAULT_IMAGE } from "../../shared/constant";
 import { bulkActionApi } from "../../services/hotel";
@@ -8,7 +8,6 @@ import { exportToExcel } from "../../utils/exportExcel";
 import { exportToCsv, slugifyFileName } from "../../utils/exportCsv";
 import { deriveBookingStatus } from "../../helper";
 import search from "../../assets/icons/search.png";
-import { RotateCcw } from "lucide-react";
 import tablecalender from "../../assets/icons/tablecalender.png";
 import { Select } from "antd";
 
@@ -73,7 +72,6 @@ const HotelDirectory = ({
         item.hotel?.name === filters.hotelName ||
         item.name === filters.hotelName;
 
-      // â”€â”€ Status filter: use actual row.status, not derived â”€â”€
       const actualStatus = item.status?.toLowerCase() || "";
       const matchesStatus =
         !filters.status ||
@@ -138,27 +136,11 @@ const HotelDirectory = ({
       case "cancelled":
       case "canceled": return "bg-lightRed text-red";
       case "delete": return "bg-red-100 text-red-600";
+      case "pending approval":
+      case "pending_approval": return "bg-gray-100 text-gray-600";
       default: return "bg-gray-100 text-gray-600";
-      //   case "reserved": return "bg-lightYellow text-black";
-      //   case "checked-in":
-      //   case "checkin": return "bg-lightGreenOne text-darkGreen";
-      //   case "checked-out":
-      //   case "checkout":
-      //   case "completed": return "bg-shadeGreen text-black";
-      //   case "maintenance": return "bg-lightYellow text-lightSeconday";
-      //   case "draft": return "bg-lightBrown text-lightSeconday";
-      //   case "inactive":
-      //   case "deactivate": return "bg-lightBlue text-blue";
-      //   case "active":
-      //   case "available": return "bg-lightGreenOne text-darkGreen";
-      //   case "occupied": return "bg-lightYellow text-black";
-      //   case "cancelled":
-      //   case "canceled": return "bg-lightRed text-red";
-      //   case "delete": return "bg-red-100 text-red-600";
-      //   default: return "bg-gray-100 text-gray-600";
-      // }
-    };
-  }
+    }
+  };
 
   const getRoomTypeStyle = (type) => {
     switch (type) {
@@ -168,11 +150,9 @@ const HotelDirectory = ({
     }
   };
 
-  // â”€â”€ FIXED: actual status pehle, dates se derive sirf fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRowStatus = (row) => {
     const s = row.status?.toLowerCase();
 
-    // Pehle actual API status check karo
     if (s === "cancelled" || s === "canceled") return "Cancelled";
     if (s === "checked-in" || s === "checkin") return "Checked-In";
     if (s === "checked-out" || s === "checkout") return "Checked-Out";
@@ -180,7 +160,6 @@ const HotelDirectory = ({
     if (s === "booked") return "Booked";
     if (s === "reserved") return "Reserved";
 
-    // Hotel/room statuses
     if (row.isDeleted) return "Deleted";
     if (s === "active") return "Active";
     if (s === "available") return "Available";
@@ -188,23 +167,11 @@ const HotelDirectory = ({
     if (s === "maintenance") return "Maintenance";
     if (s === "deactivate" || s === "inactive") return "Inactive";
     if (s === "draft") return "Draft";
+    if (s === "pending_approval") return "Pending Approval";
 
-    // Sirf agar status bilkul nahi hai toh dates se derive karo
     if (!s && row.checkInOut) return deriveBookingStatus(row.checkInOut);
 
     return row.status || "Unknown";
-  };
-
-  const getColumnMaxClass = (col) => {
-    if (col.maxWidth) return col.maxWidth;
-    if (col.type === "actions") return "w-14 max-w-[3.5rem]";
-    if (col.type === "status") return "max-w-[7.5rem]";
-    if (col.type === "hotel" || col.type === "hotelCell") return "max-w-[10rem]";
-    if (col.key === "guestName") return "max-w-[11rem]";
-    if (col.key === "checkInOut" || col.type === "dateRange") return "max-w-[10rem]";
-    if (col.key === "bookingId") return "max-w-[7rem]";
-    if (col.type === "roomType") return "max-w-[8rem]";
-    return "max-w-[9rem]";
   };
 
   const toggleRow = (id) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
@@ -226,19 +193,15 @@ const HotelDirectory = ({
     exportToExcel({ data: rowsToExport, columns, fileName: "hotels.xlsx" });
   };
 
-  // Server-side CSV export using provided endpoint
   const handleExportServer = () => {
-    const params = new URLSearchParams({
-      ...filters,
-    });
-    // Convert filter object values to strings, ignore empty
+    const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => {
       if (v) params.append(k, v);
     });
     const url = `${exportEndpoint}?${params.toString()}`;
-    // Navigate to URL to trigger download
     window.location.href = url;
   };
+
   const resolveExportFileName = () =>
     exportFileName || slugifyFileName(title);
 
@@ -270,9 +233,9 @@ const HotelDirectory = ({
               className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
               alt=""
             />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 m-0 truncate">
-                {row.hotelName || row.hotel?.name || "â€”"}
+            <div className="min-w-0 text-left">
+              <p className="text-sm font-semibold text-gray-900 m-0 max-w-[16rem] truncate">
+                {row.hotelName || row.hotel?.name || "—"}
               </p>
               {row.hotel?.city && (
                 <p className="text-xs text-gray-400 m-0">{row.hotel.city}</p>
@@ -282,24 +245,24 @@ const HotelDirectory = ({
         );
 
       case "text": return col.getValue ? col.getValue(row) : (row[col.key] ?? "—");
-       case "number": return row[col.key] ?? 0;
+      case "number": return row[col.key] ?? 0;
 
       case "hotel":
         return (
           <div className="flex items-center gap-3">
-            <img src={row.imageUrl ?? DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover" alt={row.name} />
-            <div>
-              <div className="text-sm font-semibold text-gray-900">{row.name ?? "N/A"}</div>
-              <div className="text-xs text-gray-400">{row.city ?? "N/A"}</div>
+            <img src={row.imageUrl ?? DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" alt={row.name} />
+            <div className="min-w-0 text-left">
+              <div className="text-sm font-semibold text-gray-900 max-w-[16rem] truncate">{row.name ?? "N/A"}</div>
+              <div className="text-xs text-gray-400 max-w-[16rem] truncate">{row.city ?? "N/A"}</div>
             </div>
           </div>
         );
 
       case "roomType": {
-       const raw = col.getValue ? col.getValue(row) : row[col.key];
-    const typeLabel = typeof raw === "object" ? raw?.title : raw;
+        const raw = col.getValue ? col.getValue(row) : row[col.key];
+        const typeLabel = typeof raw === "object" ? raw?.title : raw;
         return (
-          <span className={`px-2 py-1 rounded-full text-xs font-medium inline-block w-full text-center ${getRoomTypeStyle(typeLabel)}`}>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium inline-block whitespace-nowrap ${getRoomTypeStyle(typeLabel)}`}>
             {typeLabel ?? "N/A"}
           </span>
         );
@@ -308,7 +271,7 @@ const HotelDirectory = ({
       case "fallback": return "-";
 
       case "dateRange":
-        return <span className="text-sm text-gray-900 text-center">{row.checkInOut ?? "-"}</span>;
+        return <span className="text-sm text-gray-900 whitespace-nowrap">{row.checkInOut ?? "-"}</span>;
 
       case "status": {
         const status = getRowStatus(row);
@@ -328,7 +291,6 @@ const HotelDirectory = ({
                 className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
               >
                 {status}
-                <span className="text-[10px]"></span>
               </button>
               {rowActionOpen === `status-${index}` && (
                 <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">
@@ -370,7 +332,6 @@ const HotelDirectory = ({
 
   return (
     <div className="w-full">
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
@@ -395,42 +356,22 @@ const HotelDirectory = ({
               <button className="p-2 border rounded-lg hover:bg-gray-50" onClick={() => setShowFilter(!showFilter)}>
                 <Filter size={16} />
               </button>
-              {/* {!onlyFilter && (
-                <>
-                  <div className="relative">
-                    <button onClick={() => setBulkOpen(!bulkOpen)} className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1">
-                      Bulk Actions <ChevronDown size={14} />
-                    </button>
-                    {bulkOpen && (
-                      <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-                        {["Active", "InActive", "Delete", "Draft", "Maintenance"].map((item) => (
-                          <button key={item} onClick={() => { handleBulkAction(item.split(" ")[0].toLowerCase()); setBulkOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )} */}
 
               {!onlyFilter && !hostOptions && (
-                <>
-                  <div className="relative">
-                    <button onClick={() => setBulkOpen(!bulkOpen)} className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1">
-                      Bulk Actions <ChevronDown size={14} />
-                    </button>
-                    {bulkOpen && (
-                      <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
-                        {["Active", "InActive", "Delete", "Draft", "Maintenance"].map((item) => (
-                          <button key={item} onClick={() => { handleBulkAction(item.split(" ")[0].toLowerCase()); setBulkOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </>
+                <div className="relative">
+                  <button onClick={() => setBulkOpen(!bulkOpen)} className="px-3 py-2 border rounded-lg text-sm flex items-center gap-1">
+                    Bulk Actions <ChevronDown size={14} />
+                  </button>
+                  {bulkOpen && (
+                    <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-md z-50">
+                      {["Active", "InActive", "Delete", "Draft", "Maintenance"].map((item) => (
+                        <button key={item} onClick={() => { handleBulkAction(item.split(" ")[0].toLowerCase()); setBulkOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -445,7 +386,6 @@ const HotelDirectory = ({
         </div>
       </div>
 
-      {/* FILTER PANEL */}
       {showFilter && (
         <div className="flex justify-end w-full">
           <div className="bg-white border rounded-2xl p-6 shadow-sm w-full mb-6">
@@ -515,20 +455,18 @@ const HotelDirectory = ({
         </div>
       )}
 
-      {/* TABLE */}
-      {/* TABLE - Desktop */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full border-collapse">
+      <div className="hidden md:block overflow-x-auto pb-2">
+        <table className="w-full min-w-max border-collapse">
           <thead>
             <tr>
               {checkbox && (
-                <th className="w-10 border-b border-t border-r border-dashed">
+                <th className="w-10 px-3 border-b border-t border-r border-dashed">
                   <input type="checkbox" checked={selectedIds.length === data.length && data.length > 0} onChange={toggleAll} className="checked:accent-blue" />
                 </th>
               )}
               {columns.map((col) => (
-                <th key={col.key} className={`px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue border-b border-t border-l border-dashed border-gray-200 ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-center"}`}>
-                  <span className="block truncate">{col.label}</span>
+                <th key={col.key} className="px-4 py-4 text-xs font-semibold uppercase tracking-wide text-blue text-center whitespace-nowrap border-b border-t border-l border-dashed border-gray-200">
+                  {col.label}
                 </th>
               ))}
             </tr>
@@ -547,35 +485,33 @@ const HotelDirectory = ({
                     onClick={() => { if (view) navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
                   >
                     {checkbox && (
-                      <td className="border-b border-t border-r border-dashed">
+                      <td className="px-3 border-b border-t border-r border-dashed text-center">
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(row.id)}
                           onChange={(e) => {
-                            e.stopPropagation(); // Event ko row tak jane se roke ga
+                            e.stopPropagation();
                             toggleRow(row.id);
                           }}
-                          onClick={(e) => e.stopPropagation()} // Click ko bhi prevent karein
+                          onClick={(e) => e.stopPropagation()}
                           className="checked:accent-blue"
-                        />                      </td>
+                        />
+                      </td>
                     )}
                     {columns.map((col) => (
                       <td key={col.key}
                         data-label={col.label}
-                        className={`px-4 py-4 text-sm border-b border-t border-l border-dashed relative ${getColumnMaxClass(col)} ${col.type === "status" || col.type === "actions" ? "text-center" : "text-center"}`}
+                        className="px-4 py-4 text-sm whitespace-nowrap border-b border-t border-l border-dashed relative text-center"
                         onClick={(e) => { if (col.type === "actions" || col.type === "status") e.stopPropagation(); }}
                       >
-                        <div className={`flex items-center min-w-0 ${col.type === "status" || col.type === "actions" ? "justify-center" : "justify-start"}`}>
-                          <div className={`min-w-0 w-full ${col.type !== "actions" && col.type !== "status" ? "truncate" : ""}`}>
-                            {renderCell(enrichedRow, col, index)}
-                          </div>
+                        <div className={`flex items-center ${col.type === "hotel" || col.type === "hotelCell" ? "justify-start" : "justify-center"}`}>
+                          {renderCell(enrichedRow, col, index)}
                         </div>
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50">
+                          <div className="absolute right-2 top-12 w-44 bg-white border rounded-lg shadow-lg z-50 text-left">
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
-                            {/* ✅ Status Update — hostOptions ho to action dropdown mein show karo */}
                             {hostOptions && onStatusToggle && (() => {
                               const STATUS_OPTIONS = ["active", "inactive"];
                               return (
@@ -591,8 +527,7 @@ const HotelDirectory = ({
                                         setRowActionOpen(null);
                                         onStatusToggle(row.id, opt);
                                       }}
-                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"
-                                        }`}
+                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
                                     >
                                       {opt.charAt(0).toUpperCase() + opt.slice(1)}
                                     </button>
@@ -633,7 +568,6 @@ const HotelDirectory = ({
         </table>
       </div>
 
-      {/* MOBILE CARD VIEW */}
       <div className="md:hidden space-y-3">
         {!Array.isArray(filteredData) || filteredData.length === 0 ? (
           <div className="py-12 text-center text-sm text-gray-500">No data found</div>
@@ -650,7 +584,6 @@ const HotelDirectory = ({
                 className={`bg-white rounded-2xl border border-dashed border-gray-200 p-4 shadow-sm ${view ? "cursor-pointer active:bg-blue-50" : ""}`}
                 onClick={() => { if (view) navigate(`${viewpath || path}/${row.id}`, { state: { lastId, fromTab: activeType } }); }}
               >
-                {/* Card Top Row: Checkbox + Booking ID + Status + Action */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     {checkbox && (
@@ -667,13 +600,11 @@ const HotelDirectory = ({
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* Status */}
                     {columns.find(c => c.type === "status") && (
                       <div onClick={e => e.stopPropagation()}>
                         {renderCell(enrichedRow, columns.find(c => c.type === "status"), index)}
                       </div>
                     )}
-                    {/* Action Button */}
                     {actionCols.map(col => (
                       <div key={col.key} className="relative" onClick={e => e.stopPropagation()}>
                         {renderCell(enrichedRow, col, index)}
@@ -682,7 +613,6 @@ const HotelDirectory = ({
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
-
                             {hostOptions && onStatusToggle && (() => {
                               const STATUS_OPTIONS = ["active", "inactive"];
                               return (
@@ -698,8 +628,7 @@ const HotelDirectory = ({
                                         setRowActionOpen(null);
                                         onStatusToggle(row.id, opt);
                                       }}
-                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"
-                                        }`}
+                                      className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
                                     >
                                       {opt.charAt(0).toUpperCase() + opt.slice(1)}
                                     </button>
@@ -727,7 +656,6 @@ const HotelDirectory = ({
                   </div>
                 </div>
 
-                {/* Card Data Grid — 2 columns */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                   {dataCols
                     .filter(c => c.type !== "status" && c.key !== "bookingId")

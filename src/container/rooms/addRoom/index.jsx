@@ -74,7 +74,7 @@ const AddNewRoom = () => {
 
         form.setFieldsValue({
           name: room.roomName || "",
-          roomNumber: room.roomNumber || "",
+          roomNumber: room.roomNumber != null ? String(room.roomNumber) : "",
           type: room.roomType?.id || room.roomTypeId,
           bedType: room.bedType || "",
           roomSize: room.roomSize || "",
@@ -94,7 +94,6 @@ const AddNewRoom = () => {
         if (room.mainImage) setMainImagePreview(room.mainImage);
         if (room.galleryImages?.length) setGalleryPreviews(room.galleryImages);
 
-        // Set room types from hotel's features
         if (room.hotel?.id) {
           const hotelsRes = await getHotelNamesList();
           const hotels = hotelsRes?.data?.data || hotelsRes?.data || [];
@@ -136,7 +135,7 @@ const AddNewRoom = () => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 1 * 1024 * 1024) {
-      openNotification("error", "Image size must be under 2 MB");
+      openNotification("error", "Image size must be under 1 MB");
       e.target.value = "";
       return;
     }
@@ -158,7 +157,7 @@ const AddNewRoom = () => {
     }
     const oversized = files.filter((f) => f.size > 1 * 1024 * 1024);
     if (oversized.length) {
-      openNotification("error", `${oversized.length} image(s) exceed 2 MB limit`);
+      openNotification("error", `${oversized.length} image(s) exceed 1 MB limit`);
       e.target.value = "";
       return;
     }
@@ -183,6 +182,23 @@ const AddNewRoom = () => {
 
   const onBack = () => setCurrentStep(currentStep - 1);
 
+  const handleBackendError = (err) => {
+    const msg = err?.response?.data?.message || err?.message || "Internal Server Error";
+    const lower = msg.toLowerCase();
+
+    if (lower.includes("room number")) {
+      setCurrentStep(0);
+      form.setFields([{ name: "roomNumber", errors: [msg] }]);
+      form.scrollToField("roomNumber");
+    } else if (lower.includes("room name")) {
+      setCurrentStep(0);
+      form.setFields([{ name: "name", errors: [msg] }]);
+      form.scrollToField("name");
+    }
+
+    openNotification("error", msg);
+  };
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -205,7 +221,7 @@ const AddNewRoom = () => {
 
       const payload = {
         roomName: values.name,
-        roomNumber: values.roomNumber,
+        roomNumber: Number(values.roomNumber),
         hotelId: values.hotel,
         roomTypeId: values.type,
         bedType: values.bedType,
@@ -239,7 +255,7 @@ const AddNewRoom = () => {
       openNotification("success", isEditMode ? "Room updated successfully" : "Room created successfully");
       setIsModalOpen(true);
     } catch (err) {
-      openNotification("error", err?.response?.data?.message || "Internal Server Error");
+      handleBackendError(err);
     } finally {
       setLoading(false);
     }
@@ -285,8 +301,27 @@ const AddNewRoom = () => {
 
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Room Number</label>
-                  <Form.Item preserve={true} name="roomNumber" rules={[{ required: true, message: "Room Number is required" }]}>
-                    <Input className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter room number" />
+                  <Form.Item
+                    preserve={true}
+                    name="roomNumber"
+                    rules={[
+                      { required: true, message: "Room Number is required" },
+                      { pattern: /^[0-9]+$/, message: "Room number must contain digits only" },
+                    ]}
+                  >
+                    <Input
+                      className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                      placeholder="Enter room number (e.g. 101)"
+                      inputMode="numeric"
+                      maxLength={6}
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) e.preventDefault();
+                      }}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData.getData("text");
+                        if (!/^[0-9]+$/.test(pasted)) e.preventDefault();
+                      }}
+                    />
                   </Form.Item>
                 </div>
 
@@ -327,7 +362,7 @@ const AddNewRoom = () => {
                   <label className="text-base text-lightSeconday font-medium">Room Size</label>
                   <Form.Item preserve={true} name="roomSize" rules={[{ required: true, message: "Room Size is required" }]}>
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Room Size" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
-                      {[{ label: "e.g. 25 m²", value: "e.g. 25 m²" }, { label: "e.g. 30 m²", value: "e.g. 30 m²" }, { label: "e.g. 35 m²", value: "e.g. 35 m²" }].map((item) => (
+                      {[{ label: "25 m²", value: "25 m²" }, { label: "30 m²", value: "30 m²" }, { label: "35 m²", value: "35 m²" }].map((item) => (
                         <Option key={item.value} value={item.value}>{item.label}</Option>
                       ))}
                     </Select>
@@ -348,7 +383,7 @@ const AddNewRoom = () => {
                 </div>
 
                 <div className="w-full">
-                  <label className="text-base text-lightSeconday font-medium">Childrens</label>
+                  <label className="text-base text-lightSeconday font-medium">Children</label>
                   <Form.Item preserve={true} name="childrens" rules={[{ required: true, message: "Children is required" }]}>
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Children" showSearch filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}>
                       {["0", "1", "2", "3", "4", "5", "6", "7", "8"].map((v) => (
@@ -361,13 +396,13 @@ const AddNewRoom = () => {
 
               <div className="w-full">
                 <div className="w-full">
-                  <label className="text-base text-lightSeconday font-medium">Max in fants</label>
-                  <Form.Item preserve={true} name="maxinfants" rules={[{ required: true, message: "maxinfants is required" }]}>
+                  <label className="text-base text-lightSeconday font-medium">Max Infants</label>
+                  <Form.Item preserve={true} name="maxinfants" rules={[{ required: true, message: "Max Infants is required" }]}>
                     <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Infants" showSearch filterOption={(input, option) =>
                       String(option?.children ?? "").toLowerCase().includes(input.toLowerCase())
                     }>
                       {["0", "1", "2", "3", "4", "5", "6"].map((v) => (
-                        <Option key={v} value={v}>{v} Maxinfants</Option>
+                        <Option key={v} value={v}>{v}</Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -383,9 +418,19 @@ const AddNewRoom = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Price Per Night</label>
-                  <Form.Item preserve={true} name="pricePerNight" rules={[{ required: true, message: "Price Per Night is required" }]}>
-                    <Input className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter price per night" />
-                  </Form.Item>
+                 <Input
+  className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+  placeholder="Enter price per night"
+  inputMode="decimal"
+  onKeyPress={(e) => {
+    if (!/[0-9.]/.test(e.key)) e.preventDefault();
+    if (e.key === "." && e.target.value.includes(".")) e.preventDefault();
+  }}
+  onPaste={(e) => {
+    const pasted = e.clipboardData.getData("text");
+    if (!/^\d+(\.\d{1,2})?$/.test(pasted)) e.preventDefault();
+  }}
+/>
                 </div>
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Status</label>
@@ -418,7 +463,7 @@ const AddNewRoom = () => {
                   validateTrigger="none"
                   rules={[
                     {
-                      validator: (_, value) => {
+                      validator: () => {
                         if (mainImagePreview) return Promise.resolve();
                         return Promise.reject(new Error("Main image is required"));
                       },
@@ -453,7 +498,6 @@ const AddNewRoom = () => {
                           alt="Main Preview"
                           className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200"
                         />
-                        {/* ✅ Black overlay + centered trash icon — same as appartment style */}
                         <div
                           className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-[15px] flex items-center justify-center cursor-pointer"
                           onClick={removeMainImage}
@@ -464,7 +508,6 @@ const AddNewRoom = () => {
                     )}
                   </div>
                 </Form.Item>
-
 
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-gray-900">Gallery (Optional)</label>
@@ -528,7 +571,7 @@ const AddNewRoom = () => {
           <div>
             {[
               { title: "Room Features", name: "features", list: featuresList, selected: selectedFeatures, label: "Select Room Features" },
-              { title: "Ameneties", name: "amenities", list: amenitiesList, selected: selectedAmenities, label: "Select Ameneties" },
+              { title: "Amenities", name: "amenities", list: amenitiesList, selected: selectedAmenities, label: "Select Amenities" },
               { title: "Policy", name: "policy", list: policyList, selected: selectedPolicy, label: "Select Policy" },
               { title: "Room Facilities", name: "facility", list: facilityList, selected: selectedFacility, label: "Select Room Facilities" },
             ].map(({ title, name, list, selected, label }) => (
@@ -582,7 +625,7 @@ const AddNewRoom = () => {
         initialValues={{
           name: "Deluxe",
           bedType: "Single Bed",
-          roomSize: "e.g. 25 m²",
+          roomSize: "25 m²",
           guests: "1",
           childrens: "0",
           status: "available",
