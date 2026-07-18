@@ -5,9 +5,9 @@ import filter from "../../assets/icons/filter.png";
 import MatrixCard from "../../components/MatrixCard";
 import home from "../../assets/icons/home.png";
 import searchImg from "../../assets/icons/search.svg";
-import right_arrow from "../../assets/icons/rightArrow.svg";
 import { Pagination, Input, Select } from "antd";
-import { getAllHostels, getStats, deleteRoom, updateRoomStatus, getBedtypeId } from "../../services/rooms";
+import { Upload } from "lucide-react";
+import { getAllHostels, getStats, deleteRoom, updateRoomStatus } from "../../services/rooms";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
 import home3 from "../../assets/icons/home-3.png";
@@ -16,8 +16,8 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../../components/shared/statusReasonModal";
 import { RoomCardSkeleton } from "../../components/shared/skeletons";
-import ExportCsvButton from "../../components/shared/ExportCsvButton";
 import { getAllFeature } from "../../services/features";
+import { exportToCsv } from "../../utils/exportCsv";
 
 const HOSTEL_EXPORT_COLUMNS = [
   { key: "roomNumber", label: "Bed/Room Number" },
@@ -27,6 +27,26 @@ const HOSTEL_EXPORT_COLUMNS = [
   { key: "pricePerNight", label: "Price/Night" },
   { key: "bedType", label: "Bed Type" },
 ];
+
+const SORT_OPTIONS = [
+  { label: "Name (A to Z)", value: "ASC" },
+  { label: "Name (Z to A)", value: "DESC" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Available", value: "available" },
+  { label: "Active", value: "active" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Maintenance", value: "maintenance" },
+  { label: "Inactive", value: "inactive" },
+  { label: "Booked", value: "booked" },
+  { label: "Pending Approval", value: "pending_approval" },
+];
+
+const matchesType = (hostel, typeId) => {
+  const roomTypeId = hostel.roomType?.id || hostel.roomTypeId || hostel.bedTypeId;
+  return String(roomTypeId) === String(typeId);
+};
 
 export default function HostelListing() {
   const [hostelTypes, setHostelTypes] = useState([]);
@@ -44,10 +64,8 @@ export default function HostelListing() {
   const [reason, setReason] = useState("");
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
-  const { Option } = Select;
-
-  // Fetch hostel types (same ROOM_TYPE features, deduped)
   useEffect(() => {
     const fetchHostelTypes = async () => {
       try {
@@ -69,28 +87,17 @@ export default function HostelListing() {
     fetchHostelTypes();
   }, []);
 
- const fetchData = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       let res;
       if (activeType.typeId === null) {
-        // "All Hostels" tab — normal API, isHostel filter server side handle karega
         res = await getAllHostels(currentPage, itemsPerPage, status, search, sort);
         setHostelsData(res?.data);
       } else {
-        // Specific type selected — pehle saare hostels lo, phir client side type match karo
         const allRes = await getAllHostels(1, 9999, status, search, sort);
         const allHostels = allRes?.data?.data || [];
-
-        // isHostel true AND roomType/bedType ID match karo
-        const filtered = allHostels.filter((r) => {
-          if (!r.isHostel) return false;
-          // roomType feature ID match
-          const roomTypeId = r.roomType?.id || r.roomTypeId || r.bedTypeId;
-          return String(roomTypeId) === String(activeType.typeId);
-        });
-
-        // Fake response structure bana do pagination ke liye
+        const filtered = allHostels.filter((r) => r.isHostel && matchesType(r, activeType.typeId));
         res = {
           data: {
             data: filtered,
@@ -107,7 +114,6 @@ export default function HostelListing() {
       const currentData = res?.data?.data || [];
       if (currentData.length > 0) setSelectedHostel(currentData[0]);
       else setSelectedHostel(null);
-
     } catch (err) {
       console.error("Data fetch error", err);
     } finally {
@@ -115,22 +121,51 @@ export default function HostelListing() {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const res = await getStats(true);
+      setStats(res.data.data);
+    } catch (err) {
+      console.error("Failed to load stats:", err);
+    }
+  };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, itemsPerPage, search, activeType]);
+  }, [currentPage, itemsPerPage, search, activeType, status, sort]);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await getStats(true);
-        setStats(res.data.data);
-      } catch (err) {
-        console.error("Failed to load stats:", err);
-      }
-    };
+    setCurrentPage(1);
+  }, [search, activeType, status, sort]);
+
+  useEffect(() => {
     fetchStats();
   }, []);
+
+  const resetFilters = () => {
+    setSort(null);
+    setStatus(null);
+  };
+
+  const handleExportAll = async () => {
+    setExporting(true);
+    try {
+      const res = await getAllHostels(1, 10000, status, search, sort);
+      let rows = res?.data?.data || [];
+      if (activeType.typeId !== null) {
+        rows = rows.filter((r) => r.isHostel && matchesType(r, activeType.typeId));
+      }
+      if (!rows.length) {
+        openNotification("info", "No data to export");
+        return;
+      }
+      exportToCsv({ data: rows, columns: HOSTEL_EXPORT_COLUMNS, fileName: "hostels" });
+    } catch {
+      openNotification("error", "Failed to export hostels");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleStatusChange = (id, newStatus) => {
     if (needsReason(newStatus)) {
@@ -146,9 +181,7 @@ export default function HostelListing() {
       await updateRoomStatus(id, newStatus, reasonText);
       openNotification("success", "Status updated");
       fetchData();
-      // Refresh stats after status change
-      const res = await getStats();
-      setStats(res.data.data);
+      fetchStats();
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
@@ -164,6 +197,7 @@ export default function HostelListing() {
         await deleteRoom(id);
         setHostelsData((prev) => ({ ...prev, data: prev.data.filter((h) => h.id !== id) }));
         openNotification("success", "Hostel deleted successfully");
+        fetchStats();
       } catch (err) {
         const msg = err?.response?.data?.message || "Cannot delete hostel. It may have active bookings.";
         openNotification("error", msg);
@@ -192,18 +226,19 @@ export default function HostelListing() {
     setItemsPerPage(pageSize);
   };
 
+  const activeFilterCount = [sort, status].filter(Boolean).length;
+
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
 
-      {/* Hostel Type Filter Tabs */}
       <div className="p-1 ml-0 mt-5 sm:ml-3 gap-[2px] flex flex-wrap items-center rounded-lg overflow-x-auto">
-        {hostelTypes.map((type, index) => (
+        {hostelTypes.map((type) => (
           <button
             key={type.label}
             onClick={() => setActiveType(type)}
             className={`px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200 rounded-0 m-0 ${
-              activeType === type
+              activeType.typeId === type.typeId
                 ? "bg-blue text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
@@ -225,65 +260,67 @@ export default function HostelListing() {
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white">
               <div className="w-full sm:max-w-96">
                 <Input
-                  placeholder="Search"
+                  placeholder="Search by hostel, hotel, or city"
+                  allowClear
                   onChange={(e) => setSearch(e.target.value)}
-                  prefix={<img src={searchImg} className="w-4 h-4" />}
+                  prefix={<img src={searchImg} className="w-4 h-4" alt="" />}
                   className="w-full p-2 border border-lightSeconday rounded-xl font-medium"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <ExportCsvButton
-                  data={hostelsData?.data || []}
-                  columns={HOSTEL_EXPORT_COLUMNS}
-                  fileName="hostels.csv"
-                />
+                <button
+                  onClick={handleExportAll}
+                  disabled={exporting}
+                  className={`px-4 py-2 border rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 ${exporting ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <Upload size={16} /> {exporting ? "Exporting..." : "Export CSV"}
+                </button>
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className="border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
+                  className="relative border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
                 >
                   <img src={filter} alt="filter" className="w-4 h-4" />
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-blue text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
 
             {showFilter && (
               <div className="bg-white p-3 rounded-xlg shadow-md border border-lightSeconday animate-in fade-in slide-in-from-top-2 duration-300">
-                <h3 className="text-[18px] font-medium">Apply Filter</h3>
-                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                    <Select
-                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setSort(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[18px] font-medium">Apply Filter</h3>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-sm text-gray-500 hover:text-gray-700 font-medium"
                     >
-                      <Option value="sort" disabled>Sort by name</Option>
-                      <Option value="ASC">A → Z</Option>
-                      <Option value="DESC">Z → A</Option>
-                    </Select>
-                    <Select
-                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setStatus(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
-                    >
-                      <Option value="sort" disabled>Sort by Status</Option>
-                      <Option value="available">Available</Option>
-                      <Option value="active">Active</Option>
-                      <Option value="occupied">Occupied</Option>
-                      <Option value="maintenance">Maintenance</Option>
-                      <Option value="inactive">Inactive</Option>
-                      <Option value="booked">Booked</Option>
-
-                    </Select>
-                  </div>
-                  <button
-                    onClick={() => fetchData()}
-                    className="bg-blue text-white px-2 py-2.5 w-36 rounded-md font-semibold text-sm h-11"
-                  >
-                    Apply
-                  </button>
+                      Reset
+                    </button>
+                  )}
                 </div>
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                  <Select
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    placeholder="Sort by name"
+                    allowClear
+                    value={sort || undefined}
+                    onChange={(value) => setSort(value ?? null)}
+                    options={SORT_OPTIONS}
+                  />
+                  <Select
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    placeholder="Filter by status"
+                    allowClear
+                    value={status || undefined}
+                    onChange={(value) => setStatus(value ?? null)}
+                    options={STATUS_OPTIONS}
+                  />
+                </div>
+                <p className="text-xs text-gray-400 mt-3">Filters apply automatically</p>
               </div>
             )}
 
@@ -301,7 +338,7 @@ export default function HostelListing() {
                         onClick={() => setSelectedHostel(hostel)}
                         onStatusChange={handleStatusChange}
                         editPath="/admin/hostels/edit"
-                        onDelete={() => fetchData()}
+                        onDelete={() => { fetchData(); fetchStats(); }}
                       />
                     ))}
                   </div>
@@ -325,7 +362,12 @@ export default function HostelListing() {
                   </div>
                 </>
               ) : (
-                <div className="py-16 text-center text-gray-400 font-medium">No data found</div>
+                <div className="py-16 text-center text-gray-400 font-medium">
+                  No hostels found
+                  {(search || status || sort) && (
+                    <p className="text-sm mt-1">Try clearing the search or filters</p>
+                  )}
+                </div>
               )}
             </div>
           </div>

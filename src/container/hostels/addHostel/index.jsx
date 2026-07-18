@@ -6,7 +6,7 @@ import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
-import { Form, Input, Select, Checkbox } from "antd";
+import { Form, Input, Select, Checkbox, Image } from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
 import { createRoom, getById, updateRoom } from "../../../services/rooms";
 import { uploadMultipleMedia, uploadSingleMedia } from "../../../services/uploads";
@@ -112,7 +112,6 @@ const AddHostel = () => {
                 if (room.mainImage) setMainImagePreview(room.mainImage);
                 if (room.galleryImages?.length) setGalleryPreviews(room.galleryImages);
 
-                // Set room types from hotel's features
                 if (room.hotel?.id) {
                     const hotelsRes = await getHotelNamesList();
                     const hotels = hotelsRes?.data?.data || hotelsRes?.data || [];
@@ -120,7 +119,6 @@ const AddHostel = () => {
                     const hotel = hotels.find((h) => h.id === room.hotel.id);
                     const types = (hotel?.features || []).filter((f) => f.type === "ROOM_TYPE");
                     setRoomTypesList(types);
-                    // Set roomTypeId AFTER types are loaded
                     form.setFieldValue("roomTypeId", room.roomTypeId || undefined);
                 }
             } catch {
@@ -186,7 +184,7 @@ const AddHostel = () => {
                 description: values.description,
                 pricePerNight: Number(values.pricePerNight),
                 status: values.status,
-                isHostel: true,  // key difference
+                isHostel: true,
                 featureIds: [...new Set([
                     ...(values.features || []),
                     ...(values.amenities || []),
@@ -219,7 +217,6 @@ const AddHostel = () => {
                 onFinish={handleSubmit}
                 className="min-h-screen w-full md:p-8 font-sans"
             >
-                {/* Step 1 */}
                 <div style={{ display: currentStep === 0 ? "block" : "none" }}>
                     <div className="flex items-center gap-4 cursor-pointer mb-4" onClick={() => navigate(-1)}>
                         <img src={arrowImg} alt="back" />
@@ -286,7 +283,7 @@ const AddHostel = () => {
                                 <div>
                                     <label className="text-base text-lightSeconday font-medium">Max Guests</label>
                                     <Form.Item name="guests" rules={[{ required: true, message: "Required" }]}>
-                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Guests" showSearch  optionFilterProp="children">
+                                        <Select className="w-full h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Select Max Guests" showSearch optionFilterProp="children">
                                             {["1","2","3","4","5","6","8","10","12","20"].map((v) => <Option key={v} value={v}>{v} Guests</Option>)}
                                         </Select>
                                     </Form.Item>
@@ -299,7 +296,6 @@ const AddHostel = () => {
                                         </Select>
                                     </Form.Item>
                                 </div>
-                               
                             </div>
 
                             <div className="mb-6">
@@ -329,7 +325,6 @@ const AddHostel = () => {
                         </div>
                     </div>
 
-                    {/* Images */}
                     <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 mb-6">
                         <div className="px-6 py-3 border-b border-gray-100">
                             <h2 className="text-lg font-semibold text-gray-900">Hostel Images</h2>
@@ -340,15 +335,26 @@ const AddHostel = () => {
                                     <label className="text-sm font-semibold text-gray-900 mb-2 block">Main Image</label>
                                     {!mainImagePreview ? (
                                         <div className="relative w-full h-[100px] border-2 border-dashed border-blue rounded-[15px] bg-[#EFF6FF] flex flex-col items-center justify-center cursor-pointer">
-                                            <img src={cloudimg} className="w-6 h-6 mb-1" />
+                                            <img src={cloudimg} className="w-6 h-6 mb-1" alt="" />
                                             <p className="text-sm text-gray-600">Drop or <span className="text-blue underline">Browse</span></p>
                                             <p className="text-xs text-gray-400">JPG/PNG under 1 MB</p>
                                             <input type="file" accept="image/*" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                                         </div>
                                     ) : (
                                         <div className="relative">
-                                            <img src={mainImagePreview} className="w-full h-[180px] object-cover rounded-[15px] border" />
-                                            <button type="button" onClick={() => { setMainImage(null); setMainImagePreview(null); }} className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5">
+                                            <Image
+                                                src={mainImagePreview}
+                                                alt="Main Preview"
+                                                width="100%"
+                                                height={180}
+                                                style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 15, border: "1px solid #e5e7eb" }}
+                                                preview={{ mask: <span className="text-sm font-medium">View</span> }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => { setMainImage(null); setMainImagePreview(null); }}
+                                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition z-10"
+                                            >
                                                 <Trash2 size={14} />
                                             </button>
                                         </div>
@@ -358,22 +364,35 @@ const AddHostel = () => {
                                     <label className="text-sm font-semibold text-gray-900 mb-2 block">Gallery (max 5)</label>
                                     {galleryPreviews.length < 5 && (
                                         <div className="relative w-full h-[100px] border-2 border-dashed border-blue rounded-[15px] bg-[#EFF6FF] flex flex-col items-center justify-center cursor-pointer">
-                                            <img src={cloudimg} className="w-6 h-6 mb-1" />
+                                            <img src={cloudimg} className="w-6 h-6 mb-1" alt="" />
                                             <p className="text-sm text-gray-600">Upload multiple</p>
                                             <input type="file" multiple accept="image/*" onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                                         </div>
                                     )}
                                     {galleryPreviews.length > 0 && (
-                                        <div className="grid grid-cols-3 gap-2 mt-2">
-                                            {galleryPreviews.map((p, i) => (
-                                                <div key={i} className="relative">
-                                                    <img src={p} className="w-full h-[80px] object-cover rounded-[10px] border" />
-                                                    <button type="button" onClick={() => { setGallery((g) => g.filter((_, j) => j !== i)); setGalleryPreviews((g) => g.filter((_, j) => j !== i)); }} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
-                                                        <Trash2 size={12} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <Image.PreviewGroup>
+                                            <div className="grid grid-cols-3 gap-2 mt-2">
+                                                {galleryPreviews.map((p, i) => (
+                                                    <div key={i} className="relative">
+                                                        <Image
+                                                            src={p}
+                                                            alt={`Gallery ${i + 1}`}
+                                                            width="100%"
+                                                            height={80}
+                                                            style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 10, border: "1px solid #e5e7eb" }}
+                                                            preview={{ mask: <span className="text-xs font-medium">View</span> }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setGallery((g) => g.filter((_, j) => j !== i)); setGalleryPreviews((g) => g.filter((_, j) => j !== i)); }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition z-10"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </Image.PreviewGroup>
                                     )}
                                 </div>
                             </div>
@@ -386,7 +405,6 @@ const AddHostel = () => {
                     </div>
                 </div>
 
-                {/* Step 2 - Features */}
                 <div style={{ display: currentStep === 1 ? "block" : "none" }}>
                     <div className="flex items-center gap-4 cursor-pointer mb-4" onClick={() => setCurrentStep(0)}>
                         <img src={arrowImg} alt="back" />

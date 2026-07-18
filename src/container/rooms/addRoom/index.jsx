@@ -7,7 +7,7 @@ import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
-import { Form, Input, Select, Checkbox } from "antd";
+import { Form, Input, InputNumber, Select, Checkbox, Image } from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
 import { createRoom, getById, updateRoom } from "../../../services/rooms";
 import { uploadMultipleMedia, uploadSingleMedia } from "../../../services/uploads";
@@ -80,7 +80,7 @@ const AddNewRoom = () => {
           roomSize: room.roomSize || "",
           guests: String(room.maxAdults || 1),
           childrens: String(room.maxChildren || 0),
-          pricePerNight: room.pricePerNight || 0.0,
+          pricePerNight: room.pricePerNight != null && room.pricePerNight !== "" ? Number(room.pricePerNight) : undefined,
           status: room.status || "available",
           description: room.description || "",
           hotel: room.hotel?.id,
@@ -418,24 +418,23 @@ const AddNewRoom = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Price Per Night</label>
-                  {/* FIX: Form.Item wrapper lagaya aur name="pricePerNight" specify kiya */}
                   <Form.Item
                     preserve={true}
                     name="pricePerNight"
-                    rules={[{ required: true, message: "Price per night is required" }]}
+                    rules={[
+                      { required: true, message: "Price per night is required" },
+                      { type: "number", min: 1, message: "Price must be greater than 0" },
+                    ]}
                   >
-                    <Input
-                      className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                    <InputNumber
+                      className="w-full h-12 border border-lightSeconday rounded-md font-medium flex items-center"
                       placeholder="Enter price per night"
-                      inputMode="decimal"
-                      onKeyPress={(e) => {
-                        if (!/[0-9.]/.test(e.key)) e.preventDefault();
-                        if (e.key === "." && e.target.value.includes(".")) e.preventDefault();
-                      }}
-                      onPaste={(e) => {
-                        const pasted = e.clipboardData.getData("text");
-                        if (!/^\d+(\.\d{1,2})?$/.test(pasted)) e.preventDefault();
-                      }}
+                      min={0}
+                      precision={2}
+                      controls={false}
+                      keyboard={false}
+                      style={{ width: "100%" }}
+                      parser={(value) => value?.replace(/[^\d.]/g, "")}
                     />
                   </Form.Item>
                 </div>
@@ -499,18 +498,22 @@ const AddNewRoom = () => {
                         />
                       </div>
                     ) : (
-                      <div className="relative w-full group">
-                        <img
+                      <div className="relative w-full">
+                        <Image
                           src={mainImagePreview}
                           alt="Main Preview"
-                          className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200"
+                          width="100%"
+                          height={180}
+                          style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 15, border: "1px solid #e5e7eb" }}
+                          preview={{ mask: <span className="text-sm font-medium">View</span> }}
                         />
-                        <div
-                          className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-[15px] flex items-center justify-center cursor-pointer"
+                        <button
+                          type="button"
                           onClick={removeMainImage}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition z-10"
                         >
-                          <Trash2 size={40} className="text-white" />
-                        </div>
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     )}
                   </div>
@@ -529,16 +532,29 @@ const AddNewRoom = () => {
                     </div>
                   )}
                   {galleryPreviews.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {galleryPreviews.map((preview, index) => (
-                        <div key={index} className="relative">
-                          <img src={preview} alt={`Gallery ${index + 1}`} className="w-full h-[80px] object-cover rounded-[10px] border border-gray-200" />
-                          <button type="button" onClick={() => removeGalleryImage(index)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition">
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <Image.PreviewGroup>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        {galleryPreviews.map((preview, index) => (
+                          <div key={index} className="relative">
+                            <Image
+                              src={preview}
+                              alt={`Gallery ${index + 1}`}
+                              width="100%"
+                              height={80}
+                              style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 10, border: "1px solid #e5e7eb" }}
+                              preview={{ mask: <span className="text-xs font-medium">View</span> }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition z-10"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </Image.PreviewGroup>
                   )}
                 </div>
               </div>
@@ -636,7 +652,6 @@ const AddNewRoom = () => {
           guests: "1",
           childrens: "0",
           status: "available",
-          pricePerNight: 0,
           features: [],
           amenities: [],
           facility: [],

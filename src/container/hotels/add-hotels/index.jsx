@@ -2,13 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createHotel, getHotelById, lastHotelId, updateHotel } from "../../../services/hotel";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
-// import { PAKISTAN_CITIES } from "../../../shared/pakistanCities";
 import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
 import MapPicker from "../../../components/shared/MapPicker";
-import { Form, Input, Select, Checkbox } from "antd";
+import { Form, Input, Select, Checkbox, Image } from "antd";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import { uploadSingleMedia } from "../../../services/uploads";
 import { getSettingsApi } from "../../../services/setting";
@@ -321,18 +320,19 @@ const HotelForm = () => {
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 <div className="relative w-full sm:w-[280px] h-[160px] flex-shrink-0">
-                  <img
+                  <Image
                     src={imagePreview}
-                    className="w-full h-full rounded-2xl object-cover border border-gray-200"
                     alt="hotel"
+                    width="100%"
+                    height={160}
+                    style={{ width: "100%", height: 160, objectFit: "cover", borderRadius: 16, border: "1px solid #e5e7eb" }}
+                    preview={{ mask: <span className="text-sm font-medium">View</span> }}
                   />
                   <label
                     htmlFor="image-upload"
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10"
+                    className={`absolute bottom-2 right-2 bg-blue text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow z-10 ${uploading ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:opacity-90"}`}
                   >
-                    <span className="text-white text-sm font-medium">
-                      {uploading ? "Uploading..." : "Change Image"}
-                    </span>
+                    {uploading ? "Uploading..." : "Change"}
                   </label>
                   <input
                     id="image-upload"
@@ -345,7 +345,7 @@ const HotelForm = () => {
                 </div>
                 <div>
                   <p className="text-base font-semibold text-gray-800">Upload a clear, high quality photo</p>
-                  <p className="text-sm text-gray-400 mt-1">Hover the image to change it</p>
+                  <p className="text-sm text-gray-400 mt-1">Click the image to view it, or use Change to replace</p>
                   <p className="text-xs text-gray-400 mt-2">Max size 5MB · JPG, PNG or GIF</p>
                 </div>
               </div>

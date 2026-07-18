@@ -6,9 +6,8 @@ import arrowImg from "../../../assets/icons/arrow.png";
 import { getAllFeature } from "../../../services/features";
 import { openNotification } from "../../../network/notification";
 import SuccessModal from "../../../components/shared/successModal";
-import { Form, Input, Select, Checkbox, Avatar } from "antd";
+import { Form, Input, InputNumber, Select, Checkbox, Avatar, Image } from "antd";
 import cloudimg from "../../../assets/icons/cloud-upload.png";
-import { DeleteFilled } from "@ant-design/icons";
 import editIcon from "../../../assets/icons/editIcon.svg";
 import { Trash2 } from "lucide-react";
 import { createAppartment, getById, updateAppartment } from "../../../services/appartments";
@@ -128,7 +127,7 @@ const AddNewAppartment = () => {
           maxAdults: String(apt.maxAdults || "1"),
           maxChildren: String(apt.maxChildren || "0"),
           maxinfants: String(apt.maxInfants || "0"),
-          pricePerNight: apt.pricePerNight || 0,
+          pricePerNight: apt.pricePerNight != null && apt.pricePerNight !== "" ? Number(apt.pricePerNight) : undefined,
           status: apt.status || "available",
           description: apt.description || "",
           hotel: apt.hotel?.id,
@@ -197,7 +196,7 @@ const AddNewAppartment = () => {
 
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files);
-    if (galleryFiles.length + files.length > 5) { openNotification("error", "Maximum 5 gallery images allowed"); return; }
+    if (galleryPreviews.length + files.length > 5) { openNotification("error", "Maximum 5 gallery images allowed"); return; }
     const validFiles = files.filter(f => {
       if (f.size > 1 * 1024 * 1024) { openNotification("error", `${f.name} should be less than 1MB`); return false; }
       if (!f.type.startsWith("image/")) { openNotification("error", `${f.name} is not an image`); return false; }
@@ -214,7 +213,10 @@ const AddNewAppartment = () => {
   };
 
   const removeGalleryImage = (index) => {
-    setGalleryFiles(prev => prev.filter((_, i) => i !== index));
+    const existingCount = galleryPreviews.length - galleryFiles.length;
+    if (index >= existingCount) {
+      setGalleryFiles(prev => prev.filter((_, i) => i !== index - existingCount));
+    }
     setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -249,7 +251,7 @@ const AddNewAppartment = () => {
       const fd = new FormData();
       galleryFiles.forEach(f => fd.append("images", f));
       const res = await uploadMultipleMedia(fd);
-      return res?.data?.data?.url || [];
+      return res?.data?.data?.map((item) => item.url) || [];
     } catch { openNotification("error", "Failed to upload gallery images"); return []; }
     finally { setUploading(false); }
   };
@@ -315,8 +317,9 @@ const AddNewAppartment = () => {
     if (mainImageUrl) payload.mainImage = mainImageUrl;
     else if (isEditMode && mainImagePreview) payload.mainImage = mainImagePreview;
 
-    if (galleryUrls.length > 0) payload.galleryImages = galleryUrls;
-    else if (isEditMode && galleryPreviews.length > 0) payload.galleryImages = galleryPreviews;
+    const existingGalleryUrls = galleryPreviews.filter((p) => typeof p === "string" && p.startsWith("http"));
+    const combinedGallery = [...existingGalleryUrls, ...galleryUrls];
+    if (combinedGallery.length > 0) payload.galleryImages = combinedGallery;
 
     try {
       let res;
@@ -362,7 +365,6 @@ const AddNewAppartment = () => {
             </div>
             <div className="p-6 px-36 pb-14">
 
-              {/* ── All fields in ONE grid ── */}
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
 
                 <div className="w-full">
@@ -464,7 +466,6 @@ const AddNewAppartment = () => {
                   </Form.Item>
                 </div>
 
-                {/* Max Infants — grid ke andar, full 2 cols span nahi, sirf ek col */}
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Max Infants</label>
                   <Form.Item preserve name="maxinfants" rules={[{ required: true, message: "Max Infants is required" }]}>
@@ -477,7 +478,6 @@ const AddNewAppartment = () => {
                 </div>
 
               </div>
-              {/* ── grid end ── */}
 
               <div className="w-full mb-6">
                 <label className="text-base text-lightSeconday font-medium">Apartment Description</label>
@@ -490,8 +490,24 @@ const AddNewAppartment = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Price Per Night</label>
-                  <Form.Item preserve name="pricePerNight" rules={[{ required: true, message: "Price Per Night is required" }]}>
-                    <Input className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter price per night" />
+                  <Form.Item
+                    preserve
+                    name="pricePerNight"
+                    rules={[
+                      { required: true, message: "Price Per Night is required" },
+                      { type: "number", min: 1, message: "Price must be greater than 0" },
+                    ]}
+                  >
+                    <InputNumber
+                      className="w-full h-12 border border-lightSeconday rounded-md font-medium flex items-center"
+                      placeholder="Enter price per night"
+                      min={0}
+                      precision={2}
+                      controls={false}
+                      keyboard={false}
+                      style={{ width: "100%" }}
+                      parser={(value) => value?.replace(/[^\d.]/g, "")}
+                    />
                   </Form.Item>
                 </div>
                 <div className="w-full">
@@ -515,7 +531,6 @@ const AddNewAppartment = () => {
             </div>
           </div>
 
-          {/* Images */}
           <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 mt-6 overflow-hidden">
             <div className="px-6 py-3 border-b border-gray-100">
               <h2 className="text-[18px] mb-0 font-semibold text-gray-900">Apartment Images</h2>
@@ -539,11 +554,22 @@ const AddNewAppartment = () => {
                         <input type="file" onChange={handleMainImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                       </div>
                     ) : (
-                      <div className="relative w-full group">
-                        <img src={mainImagePreview} alt="Main Preview" className="w-full h-[180px] object-cover rounded-[15px] border border-gray-200" />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-[15px] flex items-center justify-center cursor-pointer" onClick={removeMainImage}>
-                          <Trash2 size={40} className="text-white" />
-                        </div>
+                      <div className="relative w-full">
+                        <Image
+                          src={mainImagePreview}
+                          alt="Main Preview"
+                          width="100%"
+                          height={180}
+                          style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 15, border: "1px solid #e5e7eb" }}
+                          preview={{ mask: <span className="text-sm font-medium">View</span> }}
+                        />
+                        <button
+                          type="button"
+                          onClick={removeMainImage}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition z-10"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     )}
                   </div>
@@ -551,28 +577,42 @@ const AddNewAppartment = () => {
 
                 <div className="flex flex-col gap-4">
                   <label className="text-[15px] font-semibold text-dark">Gallery (Optional) - Max 5 images</label>
-                  <div className="relative group w-full h-[100px] border-2 border-dashed border-blue rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
-                    <div className="flex justify-center mt-4">
-                      <img src={cloudimg} alt="" className="w-6 h-6" />
-                      <p className="text-sm text-gray-700 font-medium text-center px-4">Click to upload multiple images</p>
-                    </div>
-                    <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 1 MB each</p>
-                    <input type="file" multiple accept="image/*" onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  </div>
-                  {galleryPreviews.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-4 max-h-[200px] overflow-y-auto p-2">
-                      {galleryPreviews.map((preview, index) => (
-                        <div key={index} className="relative group">
-                          <img src={preview} alt={`Gallery ${index}`} className="w-full h-20 object-cover rounded-lg border border-gray-200" />
-                          <button type="button" onClick={() => removeGalleryImage(index)}
-                            className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                            <DeleteFilled />
-                          </button>
-                        </div>
-                      ))}
+                  {galleryPreviews.length < 5 && (
+                    <div className="relative group w-full h-[100px] border-2 border-dashed border-blue rounded-[15px] bg-[#EFF6FF] hover:bg-[#EBF3FF] transition-all cursor-pointer flex flex-col items-center justify-center">
+                      <div className="flex justify-center mt-4">
+                        <img src={cloudimg} alt="" className="w-6 h-6" />
+                        <p className="text-sm text-gray-700 font-medium text-center px-4">Click to upload multiple images</p>
+                      </div>
+                      <p className="text-[11px] text-gray-400">Only JPG/PNG Files under 1 MB each</p>
+                      <input type="file" multiple accept="image/*" onChange={handleGalleryChange} className="absolute inset-0 opacity-0 cursor-pointer" />
                     </div>
                   )}
-                  <p className="text-xs text-gray-400">{galleryFiles.length}/5 images selected</p>
+                  {galleryPreviews.length > 0 && (
+                    <Image.PreviewGroup>
+                      <div className="grid grid-cols-3 gap-2 mt-4 max-h-[200px] overflow-y-auto p-2">
+                        {galleryPreviews.map((preview, index) => (
+                          <div key={index} className="relative">
+                            <Image
+                              src={preview}
+                              alt={`Gallery ${index + 1}`}
+                              width="100%"
+                              height={80}
+                              style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb" }}
+                              preview={{ mask: <span className="text-xs font-medium">View</span> }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition z-10"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </Image.PreviewGroup>
+                  )}
+                  <p className="text-xs text-gray-400">{galleryPreviews.length}/5 images selected</p>
                 </div>
 
               </div>
@@ -631,13 +671,24 @@ const AddNewAppartment = () => {
                 <Form.Item name="hostImageUpload"
                   rules={[{ validator: () => hostImagePreview !== DEFAULT_IMAGE ? Promise.resolve() : Promise.reject(new Error("Host image is required")) }]}>
                   <div className="flex items-center gap-10 mb-14">
-                    <div className="relative inline-block group">
+                    <div className="relative inline-block">
                       {hostImagePreview !== DEFAULT_IMAGE ? (
                         <div className="relative">
-                          <Avatar size={120} src={hostImagePreview} className="cursor-pointer" />
-                          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity rounded-full flex items-center justify-center cursor-pointer" onClick={removeHostImage}>
-                            <Trash2 size={30} className="text-white" />
-                          </div>
+                          <Image
+                            src={hostImagePreview}
+                            alt="Host"
+                            width={120}
+                            height={120}
+                            style={{ width: 120, height: 120, objectFit: "cover", borderRadius: "50%", border: "1px solid #e5e7eb" }}
+                            preview={{ mask: <span className="text-xs font-medium">View</span> }}
+                          />
+                          <button
+                            type="button"
+                            onClick={removeHostImage}
+                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition z-10"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       ) : (
                         <label htmlFor="host-image-upload" className="cursor-pointer">
@@ -668,7 +719,7 @@ const AddNewAppartment = () => {
                   </div>
                   <div className="w-full">
                     <label className="text-base text-lightSeconday font-medium">Email</label>
-                    <Form.Item preserve name="email" rules={[{ required: true, message: "Email is required" }]}>
+                    <Form.Item preserve name="email" rules={[{ required: true, message: "Email is required" }, { type: "email", message: "Enter a valid email" }]}>
                       <Input className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium" placeholder="Enter email" />
                     </Form.Item>
                   </div>

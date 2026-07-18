@@ -5,10 +5,10 @@ import filter from "../../assets/icons/filter.png";
 import MatrixCard from "../MatrixCard";
 import home from "../../assets/icons/home.png";
 import searchImg from "../../assets/icons/search.svg";
-import right_arrow from "../../assets/icons/rightArrow.svg";
-import { Pagination, ConfigProvider, Input, Select } from "antd";
+import { Pagination, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getAllRooms, getStats, deleteRoom, getBedtypeId, updateRoomStatus } from "../../services/rooms";
+import { Upload } from "lucide-react";
+import { getAllRooms, getStats, deleteRoom, updateRoomStatus } from "../../services/rooms";
 import { getAllFeature } from "../../services/features";
 import home1 from "../../assets/icons/home-1.png";
 import home2 from "../../assets//icons/home-2.png";
@@ -18,7 +18,7 @@ import { openNotification } from "../../network/notification";
 import { ENTIRES_PER_PAGE_OPTION } from "../../shared/constant";
 import StatusReasonModal, { needsReason } from "../shared/statusReasonModal";
 import { RoomCardSkeleton } from "../shared/skeletons";
-import ExportCsvButton from "../shared/ExportCsvButton";
+import { exportToCsv } from "../../utils/exportCsv";
 
 const ROOM_EXPORT_COLUMNS = [
   { key: "roomNumber", label: "Room Number" },
@@ -30,17 +30,29 @@ const ROOM_EXPORT_COLUMNS = [
   { key: "host", label: "Host", getValue: (r) => r.host?.name || "" },
 ];
 
+const SORT_OPTIONS = [
+  { label: "Hotel Name (A to Z)", value: "ASC" },
+  { label: "Hotel Name (Z to A)", value: "DESC" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Available", value: "available" },
+  { label: "Active", value: "active" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Maintenance", value: "maintenance" },
+  { label: "Inactive", value: "inactive" },
+  { label: "Pending Approval", value: "pending_approval" },
+];
+
 export default function Rooms() {
   const [roomTypes, setRoomTypes] = useState([]);
   const [activeType, setActiveType] = useState({ label: "All Rooms", typeId: null });
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
-  const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
   const [roomsdata, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refresh, setRefresh] = useState(true);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -50,8 +62,7 @@ export default function Rooms() {
   const [reasonModal, setReasonModal] = useState({ open: false, id: null, status: "" });
   const [reason, setReason] = useState("");
   const [statusUpdating, setStatusUpdating] = useState(false);
-
-  const { Option } = Select;
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -78,58 +89,84 @@ export default function Rooms() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      let res;
+      const res = await getAllRooms(
+        currentPage,
+        itemsPerPage,
+        status,
+        search,
+        sort,
+        activeType.typeId ?? "All Rooms",
+        null,
+        true
+      );
 
-      if (activeType.typeId === null) {
-        // ALL ROOMS
-        res = await getAllRooms(
-          currentPage,
-          itemsPerPage,
-          status,
-          search,
-          sort,
-          "All Rooms",  // ✅ activeType
-          null,         // ✅ hostId
-          true
-        );
-      } else {
-        // FILTERED ROOMS
-        res = await getBedtypeId(activeType.typeId);
-      }
-
-      // Filter out hostels (isHostel=true)
       const filteredData = (res?.data?.data || []).filter((r) => r.isHostel === false);
-
       setRooms(res?.data ? { ...res.data, data: filteredData } : res?.data);
 
       if (filteredData.length > 0) {
         setSelectedRoom(filteredData[0]);
+      } else {
+        setSelectedRoom(null);
       }
-
     } catch (err) {
       console.error("Data fetch error", err);
     } finally {
       setLoading(false);
     }
   };
-  useEffect(() => {
 
+  const fetchStats = async () => {
+    try {
+      const res = await getStats(false);
+      setStats(res.data.data);
+    } catch (err) {
+      console.error("Failed to load stats:", err);
+      openNotification("error", "Failed to load stats");
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [currentPage, itemsPerPage, search, activeType]);
+  }, [currentPage, itemsPerPage, search, activeType, status, sort]);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await getStats();
-        setStats(res.data.data);
-      } catch (err) {
-        console.error("Failed to load stats:", err);
-        openNotification("error", "Failed to load stats");
-      }
-    };
+    setCurrentPage(1);
+  }, [search, activeType, status, sort]);
 
+  useEffect(() => {
     fetchStats();
   }, []);
+
+  const resetFilters = () => {
+    setSort(null);
+    setStatus(null);
+  };
+
+  const handleExportAll = async () => {
+    setExporting(true);
+    try {
+      const res = await getAllRooms(
+        1,
+        10000,
+        status,
+        search,
+        sort,
+        activeType.typeId ?? "All Rooms",
+        null,
+        true
+      );
+      const rows = (res?.data?.data || []).filter((r) => r.isHostel === false);
+      if (!rows.length) {
+        openNotification("info", "No data to export");
+        return;
+      }
+      exportToCsv({ data: rows, columns: ROOM_EXPORT_COLUMNS, fileName: "rooms" });
+    } catch {
+      openNotification("error", "Failed to export rooms");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleStatusChange = (id, newStatus) => {
     if (needsReason(newStatus)) {
@@ -145,9 +182,7 @@ export default function Rooms() {
       await updateRoomStatus(id, newStatus, reasonText);
       openNotification("success", "Status updated");
       fetchData();
-      // Refresh stats after status change
-      const res = await getStats(false);
-      setStats(res.data.data);
+      fetchStats();
     } catch {
       openNotification("error", "Failed to update status");
     } finally {
@@ -163,6 +198,7 @@ export default function Rooms() {
         await deleteRoom(id);
         setRooms(prev => ({ ...prev, data: prev.data.filter((r) => r.id !== id) }));
         openNotification("success", "Room deleted successfully");
+        fetchStats();
       } catch (err) {
         const msg = err?.response?.data?.message || "Cannot delete room. It may have active bookings.";
         openNotification("error", msg);
@@ -209,6 +245,8 @@ export default function Rooms() {
     setItemsPerPage(pageSize);
   };
 
+  const activeFilterCount = [sort, status].filter(Boolean).length;
+
   return (
     <>
       <MatrixCard showshadow="true" data={cardsData} icon={home} loading={!stats} />
@@ -221,7 +259,7 @@ export default function Rooms() {
             className={`
         px-2 py-2 text-sm font-medium whitespace-nowrap
         transition-colors duration-200  m-0
-        ${activeType === type
+        ${activeType.typeId === type.typeId
                 ? "bg-blue text-white"
                 : "bg-white text-extradark hover:bg-gray-50"
               }
@@ -234,79 +272,78 @@ export default function Rooms() {
         ))}
       </div>
 
-
-
-
       <div className="p-3 sm:p-4 md:p-6 bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <div className="lg:col-span-2 space-y-4">
             <h2 className="font-semibold text-[#000000] text-lg">
-              All Rooms ({roomsdata?.meta?.totalItems ?? roomsdata?.data?.length ?? 0})
+              {activeType.label} ({roomsdata?.meta?.totalItems ?? roomsdata?.data?.length ?? 0})
             </h2>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white">
               <div className="w-full sm:max-w-96">
                 <Input
-                  placeholder="Search"
+                  placeholder="Search by room, hotel, or city"
+                  allowClear
                   onChange={(e) => setSearch(e.target.value)}
-                  prefix={<img src={searchImg} className="w-4 h-4" />}
+                  prefix={<img src={searchImg} className="w-4 h-4" alt="" />}
                   className="w-full p-2 border border-lightSeconday rounded-xl font-medium"
                 />
               </div>
 
               <div className="flex items-center gap-2">
-                <ExportCsvButton
-                  data={roomsdata?.data || []}
-                  columns={ROOM_EXPORT_COLUMNS}
-                  fileName="rooms.csv"
-                />
+                <button
+                  onClick={handleExportAll}
+                  disabled={exporting}
+                  className={`px-4 py-2 border rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 ${exporting ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <Upload size={16} /> {exporting ? "Exporting..." : "Export CSV"}
+                </button>
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className="border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
+                  className="relative border px-2 py-2 text-sm transition-all flex items-center gap-2 rounded-lg"
                 >
                   <img src={filter} alt="filter" className="w-4 h-4" />
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-blue text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
 
             {showFilter && (
               <div className="bg-white p-3 rounded-xlg shadow-md border border-lightSeconday animate-in fade-in slide-in-from-top-2 duration-300">
-                <h3 className="text-[18px] font-medium">Apply Filter</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[18px] font-medium">Apply Filter</h3>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-sm text-gray-500 hover:text-gray-700 font-medium"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
 
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-                    <Select
-                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setSort(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
-                    >
-                      <Option value="sort" disabled>
-                        Sort by hotel name
-                      </Option>
-                      <Option value="ASC">A â†’ Z</Option>
-                      <Option value="DESC">Z â†’ A</Option>
-                    </Select>
-                    <Select
-                      className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
-                      defaultValue="sort"
-                      onChange={(value) => setStatus(value)}
-                      suffixIcon={<img src={right_arrow} alt="" />}
-                    >
-                      <Option value="sort" disabled>Sort by Status</Option>
-                      <Option value="available">Available</Option>
-                      <Option value="active">Active</Option>
-                      <Option value="occupied">Occupied</Option>
-                      <Option value="maintenance">Maintenance</Option>
-                      <Option value="inactive">Inactive</Option>
-                    </Select>
-                  </div>
-                  <button
-                    onClick={() => fetchData()}
-                    className="bg-blue hover:bg-blue text-white px-2 py-2.5 w-36 rounded-md font-semibold transition-all text-sm h-11"
-                  >
-                    Apply
-                  </button>
+                  <Select
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    placeholder="Sort by hotel name"
+                    allowClear
+                    value={sort || undefined}
+                    onChange={(value) => setSort(value ?? null)}
+                    options={SORT_OPTIONS}
+                  />
+                  <Select
+                    className="w-full sm:w-72 h-12 border border-lightSeconday rounded-lg font-medium"
+                    placeholder="Filter by status"
+                    allowClear
+                    value={status || undefined}
+                    onChange={(value) => setStatus(value ?? null)}
+                    options={STATUS_OPTIONS}
+                  />
                 </div>
+                <p className="text-xs text-gray-400 mt-3">Filters apply automatically</p>
               </div>
             )}
 
@@ -323,9 +360,8 @@ export default function Rooms() {
                         active={selectedRoom?.id === room.id}
                         onClick={() => setSelectedRoom(room)}
                         onStatusChange={handleStatusChange}
-                        onDelete={() => fetchData()}
+                        onDelete={() => { fetchData(); fetchStats(); }}
                       />
-
                     ))}
                   </div>
 
@@ -356,7 +392,10 @@ export default function Rooms() {
                 </>
               ) : (
                 <div className="py-16 text-center text-gray-400 font-medium">
-                  No data found
+                  No rooms found
+                  {(search || status || sort) && (
+                    <p className="text-sm mt-1">Try clearing the search or filters</p>
+                  )}
                 </div>
               )}
             </div>
