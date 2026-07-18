@@ -144,8 +144,8 @@ const Booking = () => {
 
   const cardsData = [
     { title: "Total Bookings",     value: stats?.totalBookings ?? "—", bg: "#F3F7EE", iconBg: "#D1E1BC", image: home1, showTrend: false },
-    { title: "Today's Check-ins",  value: stats ? checkedInCount  : "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
-    { title: "Today's Check-outs", value: stats ? checkedOutCount : "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
+    { title: "Today's Check-in",  value: stats ? checkedInCount  : "—", bg: "#EFF9FF", iconBg: "#C7DAE7", image: home2 },
+    { title: "Today's Check-out", value: stats ? checkedOutCount : "—", bg: "#F7EFFF", iconBg: "#DED0EC", image: home3 },
     { title: "Cancelled Booking",  value: stats ? cancelledCount  : "—", bg: "#F3F4FB", iconBg: "#CBCEE7", image: home4 },
   ];
 

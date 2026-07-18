@@ -47,6 +47,7 @@ const HotelDirectory = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
+  const [actionDropdownUp, setActionDropdownUp] = useState(false);
   const [filters, setFilters] = useState({
     roomType: "",
     hotelName: "",
@@ -319,9 +320,25 @@ const HotelDirectory = ({
         );
       }
 
+      // case "actions":
+      //   return (
+      //     <button onClick={() => setRowActionOpen(rowActionOpen === index ? null : index)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100">
+      //       <MoreVertical size={16} />
+      //     </button>
+      //   );
+
       case "actions":
         return (
-          <button onClick={() => setRowActionOpen(rowActionOpen === index ? null : index)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100">
+          <button
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const spaceBelow = window.innerHeight - rect.bottom;
+              const dropdownEstimatedHeight = 220; // action items ki approx height
+              setActionDropdownUp(spaceBelow < dropdownEstimatedHeight);
+              setRowActionOpen(rowActionOpen === index ? null : index);
+            }}
+            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100"
+          >
             <MoreVertical size={16} />
           </button>
         );
@@ -507,8 +524,10 @@ const HotelDirectory = ({
                         <div className={`flex items-center ${col.type === "hotel" || col.type === "hotelCell" ? "justify-start" : "justify-center"}`}>
                           {renderCell(enrichedRow, col, index)}
                         </div>
+                        {/* {col.type === "actions" && rowActionOpen === index && (
+                          <div className="absolute right-2 top-12 w-44 bg-white border rounded-lg shadow-lg z-50 text-left"> */}
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-2 top-12 w-44 bg-white border rounded-lg shadow-lg z-50 text-left">
+                          <div className={`absolute right-2 ${actionDropdownUp ? "bottom-12" : "top-12"} w-44 bg-white border rounded-lg shadow-lg z-50 text-left flex flex-col`}>
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
@@ -609,7 +628,7 @@ const HotelDirectory = ({
                       <div key={col.key} className="relative" onClick={e => e.stopPropagation()}>
                         {renderCell(enrichedRow, col, index)}
                         {rowActionOpen === index && (
-                          <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+                          <div className={`absolute right-0 w-36 bg-white border rounded-lg shadow-lg flex flex-col z-50 ${actionDropdownUp ? "bottom-full mb-2" : "mt-2"}`}>
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
