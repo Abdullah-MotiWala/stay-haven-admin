@@ -289,12 +289,12 @@ const HotelDirectory = ({
                   e.stopPropagation();
                   setRowActionOpen(rowActionOpen === `status-${index}` ? null : `status-${index}`);
                 }}
-                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex flex-col items-center gap-1 ${getStatusStyle(status)}`}
               >
                 {status}
               </button>
               {rowActionOpen === `status-${index}` && (
-                <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">
+                <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32 flex flex-col">
                   {STATUS_OPTIONS.map(opt => (
                     <button
                       key={opt}
@@ -303,7 +303,7 @@ const HotelDirectory = ({
                         setRowActionOpen(null);
                         onStatusToggle(row.id, opt);
                       }}
-                      className={`w-full text-left px-3 py-2 text-xs capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
+                      className={`w-full text-left px-3 py-2 text-xs   capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
                     >
                       {opt}
                     </button>
