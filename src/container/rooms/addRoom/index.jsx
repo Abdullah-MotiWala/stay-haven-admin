@@ -418,19 +418,26 @@ const AddNewRoom = () => {
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Price Per Night</label>
-                 <Input
-  className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
-  placeholder="Enter price per night"
-  inputMode="decimal"
-  onKeyPress={(e) => {
-    if (!/[0-9.]/.test(e.key)) e.preventDefault();
-    if (e.key === "." && e.target.value.includes(".")) e.preventDefault();
-  }}
-  onPaste={(e) => {
-    const pasted = e.clipboardData.getData("text");
-    if (!/^\d+(\.\d{1,2})?$/.test(pasted)) e.preventDefault();
-  }}
-/>
+                  {/* FIX: Form.Item wrapper lagaya aur name="pricePerNight" specify kiya */}
+                  <Form.Item
+                    preserve={true}
+                    name="pricePerNight"
+                    rules={[{ required: true, message: "Price per night is required" }]}
+                  >
+                    <Input
+                      className="flex-1 h-12 p-2 border border-lightSeconday rounded-md font-medium"
+                      placeholder="Enter price per night"
+                      inputMode="decimal"
+                      onKeyPress={(e) => {
+                        if (!/[0-9.]/.test(e.key)) e.preventDefault();
+                        if (e.key === "." && e.target.value.includes(".")) e.preventDefault();
+                      }}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData.getData("text");
+                        if (!/^\d+(\.\d{1,2})?$/.test(pasted)) e.preventDefault();
+                      }}
+                    />
+                  </Form.Item>
                 </div>
                 <div className="w-full">
                   <label className="text-base text-lightSeconday font-medium">Status</label>
@@ -629,6 +636,7 @@ const AddNewRoom = () => {
           guests: "1",
           childrens: "0",
           status: "available",
+          pricePerNight: 0,
           features: [],
           amenities: [],
           facility: [],
