@@ -178,15 +178,19 @@ const HotelDirectory = ({
   const toggleRow = (id) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   const toggleAll = () => setSelectedIds(selectedIds.length === data.length ? [] : data.map((row) => row.id));
 
-  const handleBulkAction = async (action) => {
-    if (selectedIds.length === 0) { openNotification("info", "Please select at least one row"); return; }
-    try {
-      await bulkActionApi({ ids: selectedIds, action });
-      setSelectedIds([]);
-      setBulkOpen(false);
-      setRefresh(true);
-    } catch (err) { console.error("Bulk action failed", err); }
-  };
+const handleBulkAction = async (action) => {
+  if (selectedIds.length === 0) { openNotification("info", "Please select at least one row"); return; }
+  try {
+    const res = await bulkActionApi({ ids: selectedIds, action });
+    const msg = res?.data?.message;
+    if (msg) openNotification(res?.data?.success === false ? "error" : "success", msg);
+    setSelectedIds([]);
+    setBulkOpen(false);
+    setRefresh(true);
+  } catch (err) {
+    openNotification("error", err?.response?.data?.message || "Bulk action failed");
+  }
+};
 
   const handleExportExcel = () => {
     const rowsToExport = selectedIds.length > 0 ? data.filter((row) => selectedIds.includes(row.id)) : data;
