@@ -4,7 +4,7 @@ import checkList from "../../../assets/icons/checkList.svg";
 import location from "../../../assets/icons/location.svg";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "antd";
+import { Modal, Image } from "antd";
 import { deleteAppartment } from "../../../services/appartments";
 import { openNotification } from "../../../network/notification";
 
@@ -12,6 +12,18 @@ function AppartmentCard({ data, active, onClick, onStatusChange, onDelete }) {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const STATUS_OPTIONS = ["available", "active", "occupied", "maintenance", "inactive"];
+  const STATUS_STYLE = {
+    available: "bg-lightGreenOne text-darkGreen",
+    active: "bg-lightGreenOne text-darkGreen",
+    occupied: "bg-lightYellow text-black",
+    booked: "bg-lightYellow text-black",
+    maintenance: "bg-orange-100 text-orange-600",
+    inactive: "bg-lightRed text-red",
+    draft: "bg-gray-100 text-gray-600",
+    pending_approval: "bg-orange-100 text-orange-600",
+  };
+  const formatStatus = (value) =>
+    value ? value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "N/A";
   let id = data?.id;
   const handleEditClick = () => { navigate(`/admin/appartment/edit/${id}`); };
 
@@ -104,30 +116,34 @@ function AppartmentCard({ data, active, onClick, onStatusChange, onDelete }) {
         ${active ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-100 hover:border-gray-200"}
       `}
     >
-      <div className="w-full md:w-60 h-50 shrink-0">
-        <img
-          src={data.mainImage ?? DEFAULT_IMAGE}
-          alt={data.title}
-          className="object-cover rounded-lg h-44 w-60"
+      <div className="w-full md:w-60 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <Image
+          src={data.mainImage || DEFAULT_IMAGE}
+          fallback={DEFAULT_IMAGE}
+          alt={data?.apartmentName || "Apartment"}
+          width="100%"
+          height={176}
+          style={{ width: "100%", height: 176, objectFit: "cover", borderRadius: 8 }}
+          preview={{ mask: <span className="text-xs font-medium">View</span> }}
         />
       </div>
 
       <div className="flex flex-col flex-1 ">
         <div>
-          <div className="flex justify-between  items-start mb-0">
-            <div>
-              <span className="text-[14px] font-medium text-gray-800">
+          <div className="flex justify-between items-start gap-4 mb-0 min-w-0">
+            <div className="min-w-0 flex-1">
+              <span className="text-[14px] font-medium text-gray-800 block">
                 Appartment No: {data.apartmentNumber ?? 0}
               </span>
-              <h3>{data?.apartmentName || data?.type || "N/A"}</h3>
+              <h3 className="truncate text-lg font-semibold text-gray-800" title={data?.apartmentName || data?.type}>
+                {data?.apartmentName || data?.type || "N/A"}
+              </h3>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <span
-                className={`text-sm  ${data.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}  px-2 py-1 rounded-lg  font-medium`}
+                className={`text-sm ${STATUS_STYLE[data.status] || "bg-gray-100 text-gray-600"} px-2 py-1 rounded-lg font-medium whitespace-nowrap`}
               >
-                {data.status
-                  ? data.status.charAt(0).toUpperCase() + data.status.slice(1)
-                  : "N/A"}
+                {formatStatus(data.status)}
               </span>
 
               {/* Three Dots Menu */}

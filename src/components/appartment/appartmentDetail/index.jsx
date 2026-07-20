@@ -4,6 +4,7 @@ import gests from "../../../assets/icons/gests.png";
 import { useState } from "react";
 import location from "../../../assets/icons/location.svg";
 import tick from "../../../assets/icons/tick.png";
+import { Image } from "antd";
 import { DEFAULT_IMAGE } from "../../../shared/constant";
 import { useNavigate } from "react-router-dom";
 import editIcon from "../../../assets/icons/editIcon.svg";
@@ -36,34 +37,44 @@ function AppartmentDetail({ data }) {
   room_service:HandPlatter,
 };
 
-const [mainImage, setMainImage] = useState(null);
-  const [currentImages, setCurrentImages] = useState([]);
-  const [hasMore, setHasMore] = useState(false);
+  const STATUS_STYLE = {
+    available: "bg-lightGreenOne text-darkGreen",
+    active: "bg-lightGreenOne text-darkGreen",
+    occupied: "bg-lightYellow text-black",
+    booked: "bg-lightYellow text-black",
+    maintenance: "bg-orange-100 text-orange-600",
+    inactive: "bg-lightRed text-red",
+    draft: "bg-gray-100 text-gray-600",
+    pending_approval: "bg-orange-100 text-orange-600",
+  };
+  const formatStatus = (value) =>
+    value ? value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "N/A";
+
+  const THUMBS_PER_PAGE = 4;
+  const [mainImage, setMainImage] = useState(null);
+  const [visibleThumbs, setVisibleThumbs] = useState(THUMBS_PER_PAGE);
   const navigate = useNavigate();
 
+  const galleryPool = [data?.mainImage, ...(data?.galleryImages || [])].filter(
+    (img, index, arr) => Boolean(img) && arr.indexOf(img) === index
+  );
+
   useEffect(() => {
-    setMainImage(data.mainImage);
-    if (data?.galleryImages?.length > 0) {
-      setCurrentImages(data.galleryImages.slice(0, 4)); 
-      setHasMore(data.galleryImages.length > 4);
-    } else {
-      setMainImage(null);
-      setCurrentImages([]);
-      setHasMore(false);
-    }
-  }, [data]); 
+    setMainImage(data?.mainImage || data?.galleryImages?.[0] || null);
+    setVisibleThumbs(THUMBS_PER_PAGE);
+  }, [data]);
+
+  const allImages = galleryPool.map((src) => ({ src }));
+  const thumbnails = galleryPool.filter((img) => img !== mainImage);
+  const currentImages = thumbnails.slice(0, visibleThumbs);
+  const hasMore = thumbnails.length > visibleThumbs;
 
   const handleImageClick = (image) => {
     setMainImage(image);
   };
 
   const handleShowMoreImages = () => {
-    const nextImages = data?.galleryImages?.slice(
-      currentImages.length,
-      currentImages.length + 4
-    );
-    setCurrentImages((prevImages) => [...prevImages, ...nextImages]);
-    setHasMore(data?.galleryImages?.length > currentImages.length + 4);
+    setVisibleThumbs((prev) => prev + THUMBS_PER_PAGE);
   };
 
   const getAmenityIcon = (name = "") => {
@@ -88,11 +99,9 @@ const [mainImage, setMainImage] = useState(null);
             {data?.apartmentName || data?.type || "N/A"}
           </h1>
           <span
-            className={`text-sm  ${data?.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"}  px-2 py-1 rounded-lg  font-medium`}
+            className={`text-sm ${STATUS_STYLE[data?.status] || "bg-gray-100 text-gray-600"} px-2 py-1 rounded-lg font-medium whitespace-nowrap`}
           >
-            {data?.status
-              ? data?.status.charAt(0).toUpperCase() + data?.status.slice(1)
-              : "N/A"}
+            {formatStatus(data?.status)}
           </span>
         </div>
         <div className="flex items-baseline gap-1">
@@ -113,21 +122,31 @@ const [mainImage, setMainImage] = useState(null);
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+        <Image.PreviewGroup items={allImages}>
         <div className="lg:col-span-3">
-          <img
-            src={mainImage ?? DEFAULT_IMAGE}
+          <Image
+            src={mainImage || DEFAULT_IMAGE}
+            fallback={DEFAULT_IMAGE}
             alt="Main"
-            className="w-full h-full object-cover rounded-3xl"
+            width="100%"
+            height={260}
+            style={{ width: "100%", height: 260, objectFit: "cover", borderRadius: 24 }}
+            preview={{ mask: <span className="text-sm font-medium">View</span> }}
           />
         </div>
-        <div className="hidden lg:flex flex-col gap-3 cursor-pointer">
+        <div className="hidden lg:flex flex-col gap-3">
           {currentImages.map((img, index) => (
-            <img
-              src={img ?? DEFAULT_IMAGE}
-              alt={`Gallery Image ${index}`}
-              className="w-full h-20 object-cover rounded-[15px]"
-            
+            <Image
+              key={index}
+              src={img || DEFAULT_IMAGE}
+              fallback={DEFAULT_IMAGE}
+              alt={`Gallery ${index + 1}`}
+              width="100%"
+              height={80}
+              style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 15 }}
+              preview={false}
               onClick={() => handleImageClick(img)}
+              className="cursor-pointer"
             />
           ))}
           {hasMore && (
@@ -142,12 +161,13 @@ const [mainImage, setMainImage] = useState(null);
               />
               <div className="absolute inset-0 bg-[#A5C9FF]/90  flex items-center justify-center transition-colors group-hover:bg-[#A5C9FF]/100">
                 <span className="text-[#1E40AF] font-bold text-sm">
-                  +{data.galleryImages.length - currentImages.length} more
+                  +{thumbnails.length - currentImages.length} more
                 </span>
               </div>
             </div>
           )}
         </div>
+        </Image.PreviewGroup>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

@@ -9,7 +9,7 @@ import { exportToCsv, slugifyFileName } from "../../utils/exportCsv";
 import { deriveBookingStatus } from "../../helper";
 import search from "../../assets/icons/search.png";
 import tablecalender from "../../assets/icons/tablecalender.png";
-import { Select } from "antd";
+import { Select, Image } from "antd";
 
 const HotelDirectory = ({
   data = [],
@@ -39,15 +39,16 @@ const HotelDirectory = ({
   exportFileName = "",
   showExport = true,
   disableEditStatuses = [],
+  fetchAllForExport,
 }) => {
   const navigate = useNavigate();
+  const [exporting, setExporting] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [rowActionOpen, setRowActionOpen] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { Option } = Select;
-  const [actionDropdownUp, setActionDropdownUp] = useState(false);
   const [filters, setFilters] = useState({
     roomType: "",
     hotelName: "",
@@ -178,19 +179,15 @@ const HotelDirectory = ({
   const toggleRow = (id) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   const toggleAll = () => setSelectedIds(selectedIds.length === data.length ? [] : data.map((row) => row.id));
 
-const handleBulkAction = async (action) => {
-  if (selectedIds.length === 0) { openNotification("info", "Please select at least one row"); return; }
-  try {
-    const res = await bulkActionApi({ ids: selectedIds, action });
-    const msg = res?.data?.message;
-    if (msg) openNotification(res?.data?.success === false ? "error" : "success", msg);
-    setSelectedIds([]);
-    setBulkOpen(false);
-    setRefresh(true);
-  } catch (err) {
-    openNotification("error", err?.response?.data?.message || "Bulk action failed");
-  }
-};
+  const handleBulkAction = async (action) => {
+    if (selectedIds.length === 0) { openNotification("info", "Please select at least one row"); return; }
+    try {
+      await bulkActionApi({ ids: selectedIds, action });
+      setSelectedIds([]);
+      setBulkOpen(false);
+      setRefresh(true);
+    } catch (err) { console.error("Bulk action failed", err); }
+  };
 
   const handleExportExcel = () => {
     const rowsToExport = selectedIds.length > 0 ? data.filter((row) => selectedIds.includes(row.id)) : data;
@@ -210,12 +207,26 @@ const handleBulkAction = async (action) => {
   const resolveExportFileName = () =>
     exportFileName || slugifyFileName(title);
 
-  const handleExportCSV = () => {
-    const source = filteredData.length > 0 || data.length === 0 ? filteredData : data;
-    const rowsToExport =
-      selectedIds.length > 0
-        ? source.filter((row) => selectedIds.includes(row.id))
-        : source;
+  const handleExportCSV = async () => {
+    let rowsToExport;
+
+    if (selectedIds.length > 0) {
+      const source = filteredData.length > 0 || data.length === 0 ? filteredData : data;
+      rowsToExport = source.filter((row) => selectedIds.includes(row.id));
+    } else if (fetchAllForExport) {
+      setExporting(true);
+      try {
+        rowsToExport = (await fetchAllForExport()) || [];
+      } catch {
+        openNotification("error", "Failed to fetch data for export");
+        setExporting(false);
+        return;
+      }
+      setExporting(false);
+    } else {
+      rowsToExport = filteredData.length > 0 || data.length === 0 ? filteredData : data;
+    }
+
     if (rowsToExport.length === 0) {
       openNotification("info", "No data to export");
       return;
@@ -233,11 +244,16 @@ const handleBulkAction = async (action) => {
       case "hotelCell":
         return (
           <div className="flex items-center gap-2">
-            <img
-              src={row.hotel?.imageUrl || DEFAULT_IMAGE}
-              className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
-              alt=""
-            />
+            <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+              <Image
+                src={row.hotel?.imageUrl || DEFAULT_IMAGE}
+                fallback={DEFAULT_IMAGE}
+                width={36}
+                height={36}
+                style={{ width: 36, height: 36, objectFit: "cover", borderRadius: 8 }}
+                preview={{ mask: <span className="text-[10px] font-medium">View</span> }}
+              />
+            </div>
             <div className="min-w-0 text-left">
               <p className="text-sm font-semibold text-gray-900 m-0 max-w-[16rem] truncate">
                 {row.hotelName || row.hotel?.name || "—"}
@@ -255,7 +271,17 @@ const handleBulkAction = async (action) => {
       case "hotel":
         return (
           <div className="flex items-center gap-3">
-            <img src={row.imageUrl ?? DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" alt={row.name} />
+            <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+              <Image
+                src={row.imageUrl || DEFAULT_IMAGE}
+                fallback={DEFAULT_IMAGE}
+                alt={row.name}
+                width={40}
+                height={40}
+                style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 8 }}
+                preview={{ mask: <span className="text-[10px] font-medium">View</span> }}
+              />
+            </div>
             <div className="min-w-0 text-left">
               <div className="text-sm font-semibold text-gray-900 max-w-[16rem] truncate">{row.name ?? "N/A"}</div>
               <div className="text-xs text-gray-400 max-w-[16rem] truncate">{row.city ?? "N/A"}</div>
@@ -293,12 +319,12 @@ const handleBulkAction = async (action) => {
                   e.stopPropagation();
                   setRowActionOpen(rowActionOpen === `status-${index}` ? null : `status-${index}`);
                 }}
-                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex flex-col items-center gap-1 ${getStatusStyle(status)}`}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1 ${getStatusStyle(status)}`}
               >
                 {status}
               </button>
               {rowActionOpen === `status-${index}` && (
-                <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32 flex flex-col">
+                <div className="absolute top-full mt-1 left-0 bg-white border rounded-lg shadow-lg z-50 w-32">
                   {STATUS_OPTIONS.map(opt => (
                     <button
                       key={opt}
@@ -307,7 +333,7 @@ const handleBulkAction = async (action) => {
                         setRowActionOpen(null);
                         onStatusToggle(row.id, opt);
                       }}
-                      className={`w-full text-left px-3 py-2 text-xs   capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
+                      className={`w-full text-left px-3 py-2 text-xs capitalize hover:bg-gray-50 ${row.status?.toLowerCase() === opt ? "font-bold text-blue" : "text-gray-700"}`}
                     >
                       {opt}
                     </button>
@@ -324,25 +350,9 @@ const handleBulkAction = async (action) => {
         );
       }
 
-      // case "actions":
-      //   return (
-      //     <button onClick={() => setRowActionOpen(rowActionOpen === index ? null : index)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100">
-      //       <MoreVertical size={16} />
-      //     </button>
-      //   );
-
       case "actions":
         return (
-          <button
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const spaceBelow = window.innerHeight - rect.bottom;
-              const dropdownEstimatedHeight = 220; // action items ki approx height
-              setActionDropdownUp(spaceBelow < dropdownEstimatedHeight);
-              setRowActionOpen(rowActionOpen === index ? null : index);
-            }}
-            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100"
-          >
+          <button onClick={() => setRowActionOpen(rowActionOpen === index ? null : index)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100">
             <MoreVertical size={16} />
           </button>
         );
@@ -399,9 +409,10 @@ const handleBulkAction = async (action) => {
           {showExport && (
             <button
               onClick={exportEndpoint ? handleExportServer : handleExportCSV}
-              className="px-4 py-2 border rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
+              disabled={exporting}
+              className={`px-4 py-2 border rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50 ${exporting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <Upload size={16} /> Export CSV
+              <Upload size={16} /> {exporting ? "Exporting..." : "Export CSV"}
             </button>
           )}
         </div>
@@ -528,10 +539,8 @@ const handleBulkAction = async (action) => {
                         <div className={`flex items-center ${col.type === "hotel" || col.type === "hotelCell" ? "justify-start" : "justify-center"}`}>
                           {renderCell(enrichedRow, col, index)}
                         </div>
-                        {/* {col.type === "actions" && rowActionOpen === index && (
-                          <div className="absolute right-2 top-12 w-44 bg-white border rounded-lg shadow-lg z-50 text-left"> */}
                         {col.type === "actions" && rowActionOpen === index && (
-                          <div className={`absolute right-2 ${actionDropdownUp ? "bottom-12" : "top-12"} w-44 bg-white border rounded-lg shadow-lg z-50 text-left flex flex-col`}>
+                          <div className="absolute right-2 top-12 w-44 bg-white border rounded-lg shadow-lg z-50 text-left">
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}
@@ -632,7 +641,7 @@ const handleBulkAction = async (action) => {
                       <div key={col.key} className="relative" onClick={e => e.stopPropagation()}>
                         {renderCell(enrichedRow, col, index)}
                         {rowActionOpen === index && (
-                          <div className={`absolute right-0 w-36 bg-white border rounded-lg shadow-lg flex flex-col z-50 ${actionDropdownUp ? "bottom-full mb-2" : "mt-2"}`}>
+                          <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
                             {extraActions.map((action) => (
                               <button key={action.label} onClick={() => { setRowActionOpen(null); action.onClick(row); }} className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue font-medium">{action.label}</button>
                             ))}

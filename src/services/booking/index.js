@@ -24,3 +24,7 @@ export const getRecentBooking = async (data) => {
 export const deleteBooking = async (id) => {
     return Api.delete(`bookings/${id}`);
 };
+
+export const getBookedDates = async (params) => {
+    return Api.get("bookings/booked-dates", { params });
+};

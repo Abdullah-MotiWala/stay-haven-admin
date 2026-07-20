@@ -4,10 +4,11 @@ import selection from "../../assets/icons/selection.png";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import tablecalender from "../../assets/icons/calendarIcon.png";
-import { createBooking, getById, updateBooking } from "../../services/booking";
+import { createBooking, getById, updateBooking, getBookedDates } from "../../services/booking";
 import { getAllRooms } from "../../services/rooms";
 import { openNotification } from "../../network/notification";
-import { Select } from "antd";
+import { Select, DatePicker } from "antd";
+import dayjs from "dayjs";
 import SuccessModal from "../../components/shared/successModal";
 import { getAllApartment } from "../../services/apartment";
 import phone from "../../assets/icons/phone.png";
@@ -68,11 +69,13 @@ const BookingAddComp = () => {
     apartmentName: "", apartmentNumber: "",
     numGuests: "01 Adult",
     checkIn: "", checkOut: "", duration: 0,
-    pricePerNight: 0, taxes: 10, discount: 0,
+    pricePerNight: 0, taxes: 0, discount: 0, paidAmount: 0,
     pricePerNightFormatted: "",
     paymentMethod: "Cash", status: "Booked",
     isApartment: false, infants: 0,
   });
+
+  const [bookedRanges, setBookedRanges] = useState([]);
 
   const [hostData, setHostData] = useState({
     name: "Ali Raza Hussain", role: "Superhost",
@@ -111,6 +114,7 @@ const BookingAddComp = () => {
         const pricePerNightFormatted = booking.paymentSummary?.pricePerNightFormatted || booking.pricePerNightFormatted || "";
         const taxes = Number(booking.paymentSummary?.taxes || booking.taxes || 0);
         const discount = Number(booking.paymentSummary?.discount || booking.discount || 0);
+        const paidAmount = Number(booking.paymentSummary?.paidAmount ?? booking.paidAmount ?? 0);
 
         const adults = booking.stayDetails?.adults || booking.adults || 1;
         const numGuests = `${String(adults).padStart(2, "0")} Adult${adults > 1 ? "s" : ""}`;
@@ -154,6 +158,7 @@ const BookingAddComp = () => {
           pricePerNightFormatted,
           taxes,
           discount,
+          paidAmount,
           paymentMethod: booking.paymentMethod || "Cash",
           status: booking.status || "Booked",
         }));
@@ -255,14 +260,72 @@ const BookingAddComp = () => {
     return rooms.filter((r) => !formData.roomType || r.roomType?.title === formData.roomType).map((r) => r.roomNumber);
   };
 
+  const disabledDate = (current) => {
+    if (!current) return false;
+    if (current < dayjs().startOf("day")) return true;
+    return bookedRanges.some(({ start, end }) =>
+      current.isSame(start, "day") || (current.isAfter(start, "day") && current.isBefore(end, "day"))
+    );
+  };
+
+  const rangeHasConflict = (start, end) => {
+    if (!start || !end) return false;
+    return bookedRanges.some(({ start: bStart, end: bEnd }) =>
+      start.isBefore(bEnd, "day") && end.isAfter(bStart, "day")
+    );
+  };
+
+  useEffect(() => {
+    const targetId = formData.bookingType === "Apartment" ? formData.apartmentId : formData.roomId;
+    if (!targetId) { setBookedRanges([]); return; }
+
+    const loadBookedDates = async () => {
+      try {
+        const params = formData.bookingType === "Apartment"
+          ? { apartmentId: targetId }
+          : { roomId: targetId };
+        if (isEditMode && id) params.excludeBookingId = id;
+
+        const res = await getBookedDates(params);
+        const rows = res?.data?.data || res?.data || [];
+        setBookedRanges(
+          rows
+            .filter((r) => r.checkIn && r.checkOut)
+            .map((r) => ({ start: dayjs(r.checkIn), end: dayjs(r.checkOut) }))
+        );
+      } catch {
+        setBookedRanges([]);
+      }
+    };
+    loadBookedDates();
+  }, [formData.roomId, formData.apartmentId, formData.bookingType, isEditMode, id]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const start = formData.checkIn ? dayjs(formData.checkIn) : null;
+    const end = formData.checkOut ? dayjs(formData.checkOut) : null;
+    if (!start || !end || !end.isAfter(start, "day")) {
+      openNotification("error", "Check-out date must be after check-in date");
+      return;
+    }
+    if (rangeHasConflict(start, end)) {
+      openNotification("error", "These dates are already booked. Please select different dates.");
+      return;
+    }
+
     setLoading(true);
     try {
       const finalPayload = {
-        ...formData, isApartment: formData.bookingType === "Apartment", guestEmail: formData.email,      // ✅ backend entity field name se match
+        ...formData,
+        isApartment: formData.bookingType === "Apartment",
+        guestEmail: formData.email,
         guestPhone: formData.phone,
         guestIdCard: formData.cnic,
+        taxes,
+        discount,
+        paidAmount,
+        duration: Number(formData.duration) || 0,
       };
       const res = isEditMode ? await updateBooking(id, finalPayload) : await createBooking(finalPayload);
       if (res.status === 200 || res.status === 201) {
@@ -270,8 +333,7 @@ const BookingAddComp = () => {
         setIsModalOpen(true);
       }
     } catch (err) {
-      console.log("Catch triggered:", err.data.message); // ye add karo
-      openNotification("error", err?.data?.message ||err?.response?.data?.error || err?.message || "Failed to save booking");
+      openNotification("error", err?.response?.data?.message || err?.response?.data?.error || err?.message || "Failed to save booking");
     }
     finally { setLoading(false); }
   };
@@ -281,12 +343,14 @@ const BookingAddComp = () => {
   const taxes = Number(formData.taxes) || 0;
   const discount = Number(formData.discount) || 0;
   const totalPayable = basePriceTotal + taxes - discount;
+  const paidAmount = totalPayable;
+  const remainingBalance = 0;
   const summaryName = isApt ? (formData.apartmentName || formData.hotelName || "Not Selected") : (formData.hotelName || "Not Selected");
   const summaryNumber = isApt ? formData.apartmentNumber : formData.roomNumber;
 
   const currencySign = formData.pricePerNightFormatted
-    ? formData.pricePerNightFormatted.replace(/[0-9.,\s]/g, "") || "$"
-    : "$";
+    ? formData.pricePerNightFormatted.replace(/[0-9.,\s]/g, "") || "Rs"
+    : "Rs";
 
   return (
     <>

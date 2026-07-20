@@ -4,7 +4,7 @@ import checkList from "../../assets/icons/checkList.svg";
 import location from "../../assets/icons/location.svg";
 import { DEFAULT_IMAGE } from "../../shared/constant";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "antd";
+import { Modal, Image } from "antd";
 import { deleteRoom } from "../../services/rooms";
 import { openNotification } from "../../network/notification";
 
@@ -12,6 +12,18 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const STATUS_OPTIONS = ["available", "active", "occupied", "maintenance", "inactive"];
+  const STATUS_STYLE = {
+    available: "bg-lightGreenOne text-darkGreen",
+    active: "bg-lightGreenOne text-darkGreen",
+    occupied: "bg-lightYellow text-black",
+    booked: "bg-lightYellow text-black",
+    maintenance: "bg-orange-100 text-orange-600",
+    inactive: "bg-lightRed text-red",
+    draft: "bg-gray-100 text-gray-600",
+    pending_approval: "bg-orange-100 text-orange-600",
+  };
+  const formatStatus = (value) =>
+    value ? value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "N/A";
   let id = room?.id;
   const handleEditClick = () => { navigate(editPath ? `${editPath}/${id}` : `/admin/rooms/edit/${id}`); };
 
@@ -115,11 +127,15 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
         ${active ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-100 hover:border-gray-200"}
       `}
     >
-      <div className="w-full md:w-60 shrink-0">
-        <img
-          src={room.mainImage ?? DEFAULT_IMAGE}
-          alt={room.title}
-          className="object-cover rounded-lg h-44 w-full md:w-60 max-w-full"
+      <div className="w-full md:w-60 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <Image
+          src={room.mainImage || DEFAULT_IMAGE}
+          fallback={DEFAULT_IMAGE}
+          alt={room?.roomName || room?.roomType?.title || "Room"}
+          width="100%"
+          height={176}
+          style={{ width: "100%", height: 176, objectFit: "cover", borderRadius: 8 }}
+          preview={{ mask: <span className="text-xs font-medium">View</span> }}
         />
       </div>
 
@@ -139,8 +155,8 @@ function RoomCard({ room, active, onClick, onStatusChange, editPath, onDelete })
 
             {/* Right Side: Status & Menu (shrink-0 zaroori hai taake ye title ko push na kare) */}
             <div className="flex items-center gap-2 shrink-0">
-              <span className={`text-sm ${room.status === "available" ? "bg-lightGreenOne text-darkGreen" : "bg-lightYellow text-black"} px-2 py-1 rounded-lg font-medium`}>
-                {room.status ? room.status.charAt(0).toUpperCase() + room.status.slice(1) : "N/A"}
+              <span className={`text-sm ${STATUS_STYLE[room.status] || "bg-gray-100 text-gray-600"} px-2 py-1 rounded-lg font-medium whitespace-nowrap`}>
+                {formatStatus(room.status)}
               </span>
 
               {/* Three Dots Menu */}

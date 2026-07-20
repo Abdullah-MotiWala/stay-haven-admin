@@ -16,6 +16,7 @@ import hotel1 from "../../../assets/icons/IconHotel1.png";
 import hotel2 from "../../../assets//icons/IconHotel1.png";
 import hotel3 from "../../../assets/icons/IconHotel2.png";
 import hotel4 from "../../../assets/icons/IconHotel3.png";
+import { Image } from "antd";
 import HotelDirectory from "../../../components/Table";
 import RevenueSnapshot from "../../../components/hotels/charts";
 import { getAllFeature } from "../../../services/features";
@@ -255,10 +256,26 @@ const HotelProfile = () => {
   const options = [
     { label: "Active", value: "active" },
     { label: "Inactive", value: "inactive" },
+    { label: "Maintenance", value: "maintenance" },
+    { label: "Draft", value: "draft" },
   ];
 
+  const STATUS_STYLE = {
+    active: "bg-lightGreenOne text-darkGreen",
+    available: "bg-lightGreenOne text-darkGreen",
+    inactive: "bg-lightRed text-red",
+    draft: "bg-gray-100 text-gray-600",
+    maintenance: "bg-lightYellow text-black",
+    pending_approval: "bg-orange-100 text-orange-600",
+  };
+
+  const formatStatus = (value) =>
+    (value || "")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
   const handleStatusSelect = async (newStatus) => {
-    if (newStatus === hotel.isActive) return;
+    if (newStatus === hotel.status) { setOpen(false); return; }
 
     try {
       await hotelStatusUpdate(id, {
@@ -267,7 +284,8 @@ const HotelProfile = () => {
 
       setHotel((prev) => ({
         ...prev,
-        isActive: newStatus,
+        status: newStatus,
+        isAdminApproved: true,
       }));
       setRefresh(true);
 
@@ -279,8 +297,8 @@ const HotelProfile = () => {
     }
   };
 
-  const currentStatus =
-    options.find((o) => o.value === hotel.status) || options[0];
+  const currentStatusLabel =
+    options.find((o) => o.value === hotel.status)?.label || formatStatus(hotel.status) || "—";
 
 
 
@@ -307,10 +325,14 @@ const HotelProfile = () => {
 
         <div className="flex flex-col lg:flex-row gap-8 items-start mb-10">
           <div className="w-full lg:w-[217px] h-[152px] shrink-0">
-            <img
-              src={hotel.imageUrl ?? DEFAULT_IMAGE}
-              className="w-full h-full rounded-[16px] object-cover border border-gray-100"
+            <Image
+              src={hotel.imageUrl || DEFAULT_IMAGE}
+              fallback={DEFAULT_IMAGE}
               alt={hotel.name}
+              width="100%"
+              height={152}
+              style={{ width: "100%", height: 152, objectFit: "cover", borderRadius: 16, border: "1px solid #f3f4f6" }}
+              preview={{ mask: <span className="text-xs font-medium">View</span> }}
             />
           </div>
 
@@ -351,14 +373,9 @@ const HotelProfile = () => {
                 <div className="relative inline-block">
                   <div
                     onClick={() => setOpen((prev) => !prev)}
-                    className={`flex items-center gap-3 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer
-      ${hotel.status === "active"
-                        ? "bg-lightGreenOne text-darkGreen"
-                        : "bg-lightRed text-red"
-                      }
-    `}
+                    className={`flex items-center gap-3 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${STATUS_STYLE[hotel.status] || "bg-gray-100 text-gray-600"}`}
                   >
-                    {currentStatus.label}
+                    {currentStatusLabel}
                     <img
                       src={downArrowIcon}
                       alt="arrow"
@@ -367,12 +384,17 @@ const HotelProfile = () => {
                   </div>
 
                   {open && (
-                    <div className="absolute top-full left-0 mt-1 w-28 bg-white border rounded-lg shadow-md z-50">
+                    <div className="absolute top-full left-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-50 overflow-hidden">
+                      {hotel.status === "pending_approval" && (
+                        <p className="px-3 py-2 text-[10px] text-gray-400 border-b">
+                          Select status
+                        </p>
+                      )}
                       {options.map((opt) => (
                         <button
                           key={opt.label}
                           onClick={() => handleStatusSelect(opt.value)}
-                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-100"
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-100 ${hotel.status === opt.value ? "font-bold text-blue" : ""}`}
                         >
                           {opt.label}
                         </button>
